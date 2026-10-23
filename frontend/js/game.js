@@ -1,7 +1,7 @@
 import {
   STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, ZHIHAO_INNER, HELP_LINES,
-} from './story.js';
-import { W, H, SCENES, FOREGROUNDS, drawChar, drawPortrait, sceneLabels } from './sprites.js';
+} from './story.js?v=dev';
+import { W, H, SCENES, FOREGROUNDS, drawChar, drawPortrait, sceneLabels } from './sprites.js?v=dev';
 
 const $ = (id) => document.getElementById(id);
 const screen = $('screen');

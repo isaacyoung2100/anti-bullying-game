@@ -34,6 +34,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      # 每次部署換一個版本號，手機才會載入新檔案，不會一直用快取裡的舊版
+      - name: Stamp asset version
+        run: |
+          v="${GITHUB_SHA::7}"
+          sed -i "s/?v=dev/?v=$v/g" frontend/index.html frontend/js/*.js
+          grep -c "?v=$v" frontend/index.html frontend/js/game.js frontend/js/story.js
       - uses: actions/upload-pages-artifact@v3
         with:
           path: frontend

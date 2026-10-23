@@ -13,9 +13,9 @@
 // { k: 'if', flag, then: [步驟...] }                       有某個旗標才會發生
 // effect: { courage, witness, kind }                      勇氣變化、旁觀沉默的人數、善意的次數
 
-import azhe from './stories/azhe.js';
-import xiaoyu from './stories/xiaoyu.js';
-import aming from './stories/aming.js';
+import azhe from './stories/azhe.js?v=dev';
+import xiaoyu from './stories/xiaoyu.js?v=dev';
+import aming from './stories/aming.js?v=dev';
 
 export const STORIES = [azhe, xiaoyu, aming];
 
