@@ -1,6 +1,6 @@
 # 五年三班大隊接力
 
-反霸凌體驗遊戲（國小高年級）。玩家以第一人稱扮演被同學欺負的阿哲，度過運動會前的一個禮拜，親身體會被欺負的人的感受。
+反霸凌體驗遊戲（國小高年級）。開場選一個角色（阿哲、小雨、阿明），以第一人稱扮演被同學欺負的孩子，度過運動會前的一個禮拜，親身體會被欺負的人的感受。直向版面，手機直拿最好玩。
 
 ## 玩法與設計
 
@@ -9,7 +9,7 @@
 - **心裡想的**：對話會同時顯示說出口的話和心裡真正的想法。
 - **旁觀者是固定劇情**：欺負你的人和旁觀者怎麼做，玩家控制不了；玩家的選擇只改變自己的感受和找誰說，不決定該不該被欺負。
 - **一週回顧**：結尾顯示每天的勇氣變化，以及「有人看到了卻沒說話」和「有人伸出手」的次數。
-- **安全設計**：開場提醒、隨時可以暫停或結束、結尾一定有「這不是你的錯」和求助資源。
+- **安全設計**：開場提醒、右上角隨時可以暫停（繼續、重新開始、回主畫面、離開遊戲），結尾一定有「這不是你的錯」和求助資源。
 
 ## 執行
 
@@ -27,6 +27,7 @@ python -m http.server 8000 --directory frontend
 
 - **Render**：新增 Static Site，Publish directory 填 `frontend`，Build command 留空。
 - **GitHub Pages**：把 `frontend` 的內容放到 Pages 指定的資料夾。
+- **單一檔案（Claude Artifacts 等）**：執行 `python tools/build_artifact.py`，會把整個遊戲打包成 `dist/artifact.html`。
 
 ## 研究資料
 
@@ -37,7 +38,9 @@ python -m http.server 8000 --directory frontend
 ```
 frontend/index.html      遊戲頁面
 frontend/css/style.css   樣式
-frontend/js/story.js     劇本（五天的情境、選項、勇氣值、結局）
+frontend/js/story.js     共用設定（角色名字、勇氣值、志豪的內心話）
+frontend/js/stories/     三個角色的劇本（五天的情境、選項、結局）
 frontend/js/sprites.js   像素美術（全部用程式繪製）
 frontend/js/game.js      遊戲流程
+tools/build_artifact.py  打包成單一 HTML 檔
 ```

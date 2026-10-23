@@ -126,6 +126,8 @@ const PALETTES = {
   jiajia:  { hair: 'bob',      H: '#2a2230', h: '#4a3e55', S: SKIN_LIGHT, C: '#9b7be0', D: '#7a5cc0', P: '#2f3e6e', A: '#ff7aa8' },
   teacher: { hair: 'bun',      H: '#3b2b25', h: '#5c4338', S: SKIN_LIGHT, C: '#e8d9b5', D: '#c7b48c', P: '#5a4a3a', glasses: true },
   mom:     { hair: 'long',     H: '#4a3326', h: '#6e4c37', S: SKIN_LIGHT, C: '#d9776b', D: '#b55a50', P: '#5a4a3a' },
+  momX:    { hair: 'ponytail', H: '#2a2230', h: '#4a3e55', S: SKIN_LIGHT, C: '#6f8fa8', D: '#56738a', P: '#3e3a4a' },
+  momM:    { hair: 'long',     H: '#1f1a24', h: '#3d3548', S: '#d9a273', C: '#e8b84a', D: '#c4962e', P: '#5a4a3a' },
 };
 
 const FIXED = { O: OUTLINE, W: '#ffffff', K: '#f2f2f2' };
@@ -417,17 +419,17 @@ function home(g, t) {
 
 // 前景：畫在角色前面的東西（餐桌讓角色看起來坐著）
 function homeFront(g) {
-  rect(g, 30, 62, 132, 4, '#c98f5a');
-  rect(g, 30, 66, 132, 12, '#a8744a');
-  rect(g, 36, 78, 4, 30, '#7a5230');
-  rect(g, 152, 78, 4, 30, '#7a5230');
+  rect(g, 30, 82, 132, 4, '#c98f5a');
+  rect(g, 30, 86, 132, 12, '#a8744a');
+  rect(g, 36, 98, 4, 10, '#7a5230');
+  rect(g, 152, 98, 4, 10, '#7a5230');
   // 碗和盤子
   for (const bx of [58, 122]) {
-    rect(g, bx, 57, 12, 5, '#ffffff');
-    rect(g, bx + 1, 56, 10, 1, '#f7efe6');
+    rect(g, bx, 77, 12, 5, '#ffffff');
+    rect(g, bx + 1, 76, 10, 1, '#f7efe6');
   }
-  rect(g, 86, 58, 20, 4, '#f2f2f2');
-  rect(g, 89, 56, 14, 2, '#7cb342');
+  rect(g, 86, 78, 20, 4, '#f2f2f2');
+  rect(g, 89, 76, 14, 2, '#7cb342');
 }
 
 function title(g, t) {

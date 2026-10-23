@@ -1,5 +1,5 @@
 import {
-  PLAYER, CHARACTERS, START_COURAGE, OVERNIGHT, STORY, ENDINGS, ZHIHAO_INNER, BRAVE_THRESHOLD,
+  STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, ZHIHAO_INNER, BRAVE_THRESHOLD,
 } from './story.js';
 import { W, H, SCENES, FOREGROUNDS, drawChar, drawPortrait, sceneLabels } from './sprites.js';
 
@@ -10,10 +10,11 @@ const low = document.createElement('canvas');
 low.width = W; low.height = H;
 const lg = low.getContext('2d');
 
-// 角色腳底的高度：要高於對話框，角色才不會被擋住
-const FLOOR_Y = 77;
+// 角色腳底的高度
+const FLOOR_Y = 100;
 
 const state = {
+  story: null,        // 目前玩的角色故事
   steps: [],
   i: 0,
   courage: START_COURAGE,
@@ -22,6 +23,7 @@ const state = {
   flags: {},
   days: [],           // 每天結束時的勇氣 [{ day, courage }]
   day: null,
+  ending: null,
   view: { bg: 'title', chars: [], speaker: null },
   typing: null,
   paused: false,
@@ -62,8 +64,12 @@ function loop(t) {
 
 function clamp(n) { return Math.max(0, Math.min(100, n)); }
 
+function setHudVisible(on) {
+  $('hud').classList.toggle('off', !on);
+}
+
 function updateHud(delta) {
-  $('hud').hidden = false;
+  setHudVisible(true);
   const fill = $('courageFill');
   fill.style.width = `${state.courage}%`;
   fill.style.background = state.courage >= 60 ? 'var(--good)' : state.courage >= 35 ? 'var(--gold)' : 'var(--bad)';
@@ -89,11 +95,16 @@ function applyEffect(effect) {
 
 // ---------- 對話 ----------
 
+// 玩家扮演的角色顯示為「你」
+function nameOf(id) {
+  if (id === state.story?.id) return '你';
+  return (CHARACTERS[id] || CHARACTERS.narrator).name;
+}
+
 function showLine({ speaker, text, inner }) {
   hidePanel();
-  $('dialog').hidden = false;
-  const who = CHARACTERS[speaker] || CHARACTERS.narrator;
-  $('speaker').textContent = who.name;
+  $('dialog').classList.remove('idle');
+  $('speaker').textContent = nameOf(speaker);
   state.view.speaker = speaker;
   const portrait = $('portrait');
   const emo = state.view.chars.find((c) => c.id === speaker)?.emo || 'neutral';
@@ -128,13 +139,24 @@ function finishTyping() {
   return true;
 }
 
+function clearDialog() {
+  clearInterval(state.typing?.timer);
+  state.typing = null;
+  $('dialog').classList.add('idle');
+  $('speaker').textContent = '';
+  $('line').textContent = '';
+  $('inner').hidden = true;
+  $('portrait').classList.add('empty');
+}
+
 // ---------- 面板 ----------
 
 function showPanel(html, cls = '') {
-  $('dialog').hidden = true;
+  clearDialog();
   const panel = $('panel');
   panel.innerHTML = `<div class="card pixel-box ${cls}">${html}</div>`;
   panel.hidden = false;
+  panel.scrollTop = 0;
   const card = panel.firstElementChild;
   card.addEventListener('click', (e) => e.stopPropagation());
   return card;
@@ -167,6 +189,7 @@ function run() {
   if (!step) return;
   const handler = {
     title: stepTitle,
+    select: stepSelect,
     day: stepDay,
     choice: stepChoice,
     if: stepIf,
@@ -185,7 +208,7 @@ function stepLine(step) {
   }
   if (step.emo) {
     // 旁白或全班說話時，表情套用在「你」身上
-    const target = state.view.chars.some((c) => c.id === step.speaker) ? step.speaker : PLAYER;
+    const target = state.view.chars.some((c) => c.id === step.speaker) ? step.speaker : state.story.id;
     const c = state.view.chars.find((x) => x.id === target);
     if (c) c.emo = step.emo;
   }
@@ -206,17 +229,39 @@ function stepTitle() {
     { id: 'zhihao', x: 152, emo: 'happy' },
   ];
   state.view.speaker = null;
-  $('hud').hidden = true;
+  setHudVisible(false);
   showPanel(`
     <div class="kicker">反霸凌體驗遊戲</div>
-    <h1>五年三班大隊接力</h1>
-    <p class="sub">運動會前的一個禮拜。這一次，你是阿哲。</p>
+    <h1>五年三班<br>大隊接力</h1>
+    <p class="sub">運動會前的一個禮拜。<br>這一次，你是被欺負的那個人。</p>
     <div class="notice">
-      在這個遊戲裡，你會成為一個被同學欺負的孩子。<br>
-      如果玩的時候覺得難受，可以隨時按畫面下方的「暫停」。
+      在這個遊戲裡，你會成為一個被同學欺負的孩子。如果玩的時候覺得難受，可以隨時按右上角的「暫停」。
     </div>
     <div class="btn-row"><button class="btn" type="button" id="go">開始 ▶</button></div>
   `, 'title-card').querySelector('#go').onclick = next;
+}
+
+function stepSelect() {
+  state.view.speaker = null;
+  setHudVisible(false);
+  const card = showPanel(`
+    <div class="kicker">選擇角色</div>
+    <h2>你想成為誰？</h2>
+    <div class="roles">
+      ${STORIES.map((st) => `
+        <button class="role" type="button" data-id="${st.id}">
+          <canvas width="64" height="64" data-p="${st.id}"></canvas>
+          <span class="role-text">
+            <span class="role-name">${esc(st.name)}</span>
+            <span class="role-blurb">${esc(st.blurb)}</span>
+          </span>
+        </button>`).join('')}
+    </div>
+  `, 'select-card');
+  STORIES.forEach((st) => drawPortrait(card.querySelector(`[data-p="${st.id}"]`), st.id, 'neutral'));
+  card.querySelectorAll('.role').forEach((btn) => {
+    btn.onclick = () => startStory(btn.dataset.id);
+  });
 }
 
 function stepDay(step) {
@@ -271,7 +316,7 @@ function stepChoice(step) {
 function stepEnding() {
   const key = state.courage >= BRAVE_THRESHOLD ? 'brave' : 'heavy';
   state.ending = key;
-  insertAfterCurrent([...ENDINGS[key], { k: 'zhihao' }, { k: 'reflect' }, { k: 'closing' }]);
+  insertAfterCurrent([...state.story.endings[key], { k: 'zhihao' }, { k: 'reflect' }, { k: 'closing' }]);
   next();
 }
 
@@ -295,7 +340,7 @@ function stepZhihao() {
 
 function stepReflect() {
   state.view.bg = 'track';
-  state.view.chars = [{ id: 'azhe', x: 96, emo: state.ending === 'brave' ? 'happy' : 'neutral' }];
+  state.view.chars = [{ id: state.story.id, x: 96, emo: state.ending === 'brave' ? 'happy' : 'neutral' }];
   const bars = state.days.map((d) => `
     <div class="day-bar">
       <span class="bar-wrap"><span class="bar-fill" style="height:${d.courage}%"></span></span>
@@ -304,20 +349,18 @@ function stepReflect() {
   showPanel(`
     <div class="kicker">這一個禮拜</div>
     <h2>你的勇氣，每天都不一樣</h2>
-    <div class="reflect-grid">
-      <div class="day-bars" role="img" aria-label="每天的勇氣值">${bars}</div>
-      <div class="facts">
-        <p><b class="num">${state.witness}</b> 次，有人看到了，卻沒有說話。</p>
-        <p><b class="num">${state.kind}</b> 次，有人對你伸出手。</p>
-        <p class="quiet">對被欺負的人來說，一句「你還好嗎？」可能就改變了一整天。</p>
-      </div>
+    <div class="day-bars" role="img" aria-label="每天的勇氣值">${bars}</div>
+    <div class="facts">
+      <p><b class="num">${state.witness}</b> 次，有人看到了，卻沒有說話。</p>
+      <p><b class="num">${state.kind}</b> 次，有人對你伸出手。</p>
+      <p class="quiet">對被欺負的人來說，一句「你還好嗎？」可能就改變了一整天。</p>
     </div>
     <div class="btn-row"><button class="btn" type="button" id="go">繼續 ▶</button></div>
   `, 'reflect-card').querySelector('#go').onclick = next;
 }
 
 function stepClosing() {
-  $('hud').hidden = true;
+  setHudVisible(false);
   const card = showPanel(`
     <div class="kicker">最後</div>
     <h2>如果你在現實生活中，也遇到類似的事</h2>
@@ -328,29 +371,46 @@ function stepClosing() {
       <li>安心專線 <b>1925</b>（24 小時）、保護專線 <b>113</b>。</li>
     </ul>
     <p>如果你看到別人被這樣對待：你不用很勇敢。走過去問一句「你還好嗎？」，就很有用。</p>
-    <div class="btn-row"><button class="btn" type="button" id="again">再玩一次</button></div>
+    <div class="btn-row">
+      ${state.story ? '<button class="btn" type="button" id="again">再玩一次</button>' : ''}
+      <button class="btn secondary" type="button" id="home">回主畫面</button>
+    </div>
   `, 'closing-card');
-  card.querySelector('#again').onclick = restart;
+  card.querySelector('#again')?.addEventListener('click', () => startStory(state.story.id));
+  card.querySelector('#home').onclick = goHome;
 }
 
-// ---------- 暫停 ----------
+// ---------- 暫停選單 ----------
 
 function pause() {
-  if (state.paused) return;
+  if (state.paused || !state.story) return;
   state.paused = true;
+  const canFullscreen = document.fullscreenEnabled;
   const overlay = $('pause');
   overlay.hidden = false;
   overlay.innerHTML = `
-    <div class="card pixel-box pause-card">
-      <div class="kicker">休息一下</div>
-      <h2>沒關係，可以先停下來</h2>
-      <p>如果玩的時候想起不舒服的事，可以找身邊信任的大人聊一聊。</p>
-      <div class="btn-row">
+    <div class="card pixel-box pause-card" role="dialog" aria-label="暫停選單">
+      <div class="kicker">暫停</div>
+      <h2>休息一下</h2>
+      <p>如果玩的時候想起不舒服的事，可以先停下來，找身邊信任的大人聊一聊。</p>
+      <div class="menu">
         <button class="btn" type="button" id="resume">繼續玩</button>
-        <button class="btn secondary" type="button" id="quit">結束遊戲</button>
+        <button class="btn secondary" type="button" id="restartStory">重新開始這個故事</button>
+        <button class="btn secondary" type="button" id="toHome">回主畫面</button>
+        ${canFullscreen ? `<button class="btn secondary" type="button" id="fullscreen">${document.fullscreenElement ? '離開全螢幕' : '全螢幕'}</button>` : ''}
+        <button class="btn secondary" type="button" id="quit">離開遊戲</button>
       </div>
     </div>`;
+  overlay.addEventListener('click', (e) => e.stopPropagation(), { once: true });
   overlay.querySelector('#resume').onclick = resume;
+  overlay.querySelector('#restartStory').onclick = () => startStory(state.story.id);
+  overlay.querySelector('#toHome').onclick = goHome;
+  overlay.querySelector('#fullscreen')?.addEventListener('click', () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen?.();
+    resume();
+  });
+  // 離開遊戲：直接到最後一頁（這不是你的錯、求助方式）
   overlay.querySelector('#quit').onclick = () => {
     resume();
     state.steps = [...state.steps.slice(0, state.i + 1), { k: 'closing' }];
@@ -380,33 +440,26 @@ function advance() {
 }
 
 $('stage').addEventListener('click', (e) => {
-  if (e.target.closest('#panel, #pause')) return;
+  if (e.target.closest('#panel, #pause, #hud')) return;
   advance();
 });
 
 document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (state.paused) resume();
+    else pause();
+    return;
+  }
   if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') {
     if (e.target.closest?.('input, textarea, button, a')) return;
     e.preventDefault();
     advance();
   }
-  if (e.key === 'Escape') pause();
 });
-
-$('btnFullscreen').onclick = () => {
-  if (document.fullscreenElement) document.exitFullscreen();
-  else document.documentElement.requestFullscreen?.();
-};
 
 $('btnPause').onclick = pause;
 
-$('btnRestart').onclick = () => {
-  if (confirm('要重新開始嗎？')) restart();
-};
-
-function restart() {
-  resume();
-  state.steps = [{ k: 'title' }, ...STORY, { k: 'ending' }].map((s) => ({ ...s }));
+function resetProgress() {
   state.i = 0;
   state.courage = START_COURAGE;
   state.witness = 0;
@@ -415,8 +468,24 @@ function restart() {
   state.days = [];
   state.day = null;
   state.ending = null;
+}
+
+// 回主畫面：標題 → 選角色
+function goHome() {
+  resume();
+  state.story = null;
+  resetProgress();
+  state.steps = [{ k: 'title' }, { k: 'select' }];
   run();
 }
 
-restart();
+function startStory(id) {
+  resume();
+  state.story = STORIES.find((st) => st.id === id);
+  resetProgress();
+  state.steps = [...state.story.story, { k: 'ending' }].map((s) => ({ ...s }));
+  run();
+}
+
+goHome();
 requestAnimationFrame(loop);

@@ -2,48 +2,43 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1c1620">
   <title>五年三班大隊接力</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="projector">
+<body>
   <main class="stage" id="stage">
-    <canvas id="screen" width="960" height="540" aria-label="遊戲畫面"></canvas>
-
-    <div class="hud" id="hud" hidden>
-      <div class="mood">
-        <span class="mood-label">勇氣</span>
-        <span class="mood-bar"><span class="mood-fill" id="courageFill"></span></span>
+    <header class="hud off" id="hud">
+      <div class="courage">
+        <span class="courage-label">勇氣</span>
+        <span class="courage-bar"><span class="courage-fill" id="courageFill"></span></span>
         <span class="mood-delta" id="courageDelta"></span>
       </div>
-      <div class="hud-right">
-        <span class="chip" id="dayChip"></span>
-      </div>
+      <span class="chip" id="dayChip"></span>
+      <button class="pause-btn" type="button" id="btnPause" aria-label="暫停">❚❚ 暫停</button>
+    </header>
+
+    <div class="scene">
+      <canvas id="screen" width="960" height="540" aria-label="遊戲畫面"></canvas>
     </div>
 
-    <div class="dialog pixel-box" id="dialog" hidden>
-      <canvas class="portrait" id="portrait" width="96" height="96"></canvas>
-      <div class="dialog-body">
+    <section class="dialog pixel-box idle" id="dialog" aria-live="polite">
+      <div class="dialog-head">
+        <canvas class="portrait" id="portrait" width="96" height="96"></canvas>
         <div class="speaker" id="speaker"></div>
-        <div class="line" id="line"></div>
-        <div class="inner" id="inner" hidden></div>
       </div>
-      <div class="next-hint" id="nextHint">▼</div>
-    </div>
+      <div class="line" id="line"></div>
+      <div class="inner" id="inner" hidden></div>
+      <div class="next-hint" id="nextHint">點一下繼續 ▼</div>
+    </section>
 
     <div class="panel" id="panel" hidden></div>
-    <div class="panel" id="pause" hidden></div>
+    <div class="panel pause-layer" id="pause" hidden></div>
   </main>
-
-  <nav class="teacher-bar" aria-label="遊戲控制">
-    <button type="button" id="btnPause">暫停</button>
-    <button type="button" id="btnFullscreen">全螢幕</button>
-    <button type="button" id="btnRestart">重新開始</button>
-    <span class="hint">點畫面或按空白鍵繼續</span>
-  </nav>
 
   <script type="module" src="js/game.js"></script>
 </body>
