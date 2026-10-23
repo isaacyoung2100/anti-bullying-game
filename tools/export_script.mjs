@@ -41,6 +41,11 @@ function steps(list, player, depth = 0) {
     if (step.k === 'day') {
       rows.push('', `### ${step.day}｜${step.title}`, '');
       if (step.recap) rows.push(`> 摘要（「換你想一想」選這天時顯示）：${step.recap}`, '');
+      if (step.help) {
+        rows.push('> 「換你想一想」這天可以做的小行動 → 結果：');
+        for (const h of step.help) rows.push(`> - ${h.text} → ${h.result}`);
+        rows.push('');
+      }
     } else if (step.k === 'choice') {
       rows.push(`${indent}- 🔸 **你的選擇：${step.prompt}**`);
       step.options.forEach((o, n) => {

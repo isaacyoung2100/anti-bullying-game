@@ -402,7 +402,14 @@ function stepThink() {
   const st = state.story;
   const ta = st.pronoun || '他';
   const days = st.story.filter((s) => s.k === 'day');
-  const actions = ['問一句：「你還好嗎？」', '不跟著笑', `陪${ta}一起走一段路`, '下課去告訴老師'];
+  // 每天有自己的小行動（劇本裡的 help）；沒有寫的話用通用的四個
+  const fallback = [
+    { text: '問一句：「你還好嗎？」', result: '' },
+    { text: '不跟著笑', result: '' },
+    { text: `陪${ta}一起走一段路`, result: '' },
+    { text: '下課去告訴老師', result: '' },
+  ];
+  const actionsFor = (day) => day.help || fallback;
   const weatherFor = (day) => {
     const mood = state.days.find((d) => d.day === day.day);
     return mood ? weatherOf(mood.courage).word : '';
@@ -436,12 +443,12 @@ function stepThink() {
       </div>
       <h2 class="think-q">那天，你可以做什麼？</h2>
       <div class="pick-col">
-        ${actions.map((a, n) => `<button class="pick" type="button" data-n="${n}">${esc(a)}</button>`).join('')}
+        ${actionsFor(day).map((a, n) => `<button class="pick" type="button" data-n="${n}">${esc(a.text)}</button>`).join('')}
       </div>
       <button class="text-btn" type="button" id="back">← 換一天</button>
     `, 'think-card');
     card.querySelectorAll('.pick').forEach((btn) => {
-      btn.onclick = () => showResult(day, actions[Number(btn.dataset.n)]);
+      btn.onclick = () => showResult(day, actionsFor(day)[Number(btn.dataset.n)]);
     });
     card.querySelector('#back').onclick = pickDay;
   };
@@ -449,7 +456,9 @@ function stepThink() {
   const showResult = (day, action) => {
     showPanel(`
       <div class="kicker">換你想一想・3 / 3</div>
-      <p class="think-result">${esc(day.day)}，「${esc(day.title)}」那天，你${esc(action.replace('：', ''))}。</p>
+      <div class="round-label">${esc(day.day)}・${esc(day.title)}</div>
+      <p class="think-choice">你選擇：${esc(action.text)}</p>
+      ${action.result ? `<p class="think-result">${esc(action.result)}</p>` : ''}
       <p>對${esc(st.name)}來說，這可能就是那個禮拜裡，最不一樣的一刻。</p>
       <p><b>現實中的你，也可以這樣做。</b></p>
       <div class="btn-row"><button class="btn" type="button" id="go">繼續 ▶</button></div>

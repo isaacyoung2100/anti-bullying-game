@@ -51,6 +51,8 @@ test('「換你想一想」可以選的每一天，都有那天發生了什麼�
   for (const { st } of ALL) {
     for (const d of st.story.filter((s) => s.k === 'day')) {
       assert.ok(d.recap && d.recap.trim(), `${st.id} ${d.day} 缺少 recap（玩家回想那天時需要）`);
+      assert.ok(Array.isArray(d.help) && d.help.length >= 3, `${st.id} ${d.day} 至少要有三個那天專屬的小行動（help）`);
+      for (const h of d.help) assert.ok(h.text && h.result, `${st.id} ${d.day} 的小行動缺 text 或 result`);
     }
   }
 });

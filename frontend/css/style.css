@@ -584,6 +584,7 @@ button {
 .pick:active { transform: translateY(0.5cqw); box-shadow: 0 0.3cqw 0 var(--ink); }
 
 .think-q { margin-top: 5cqw; }
+.think-choice { font-size: 4.6cqw; font-weight: 900; }
 
 .text-btn {
   margin-top: 4cqw;
