@@ -1,5 +1,5 @@
 import {
-  STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, ZHIHAO_INNER, BRAVE_THRESHOLD,
+  STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, ZHIHAO_INNER, BRAVE_THRESHOLD, HELP_LINES,
 } from './story.js';
 import { W, H, SCENES, FOREGROUNDS, drawChar, drawPortrait, sceneLabels } from './sprites.js';
 
@@ -294,8 +294,9 @@ function stepChoice(step) {
     <div class="choices">
       ${step.options.map((o, n) => {
         const locked = (o.need || 0) > state.courage;
+        // 說不出口時，顯示心裡具體在怕什麼：說不出口是因為處境太難，不是因為不夠勇敢
         return locked
-          ? `<button class="choice locked" type="button" disabled><s>${esc(o.text)}</s><span class="why">（你現在說不出口）</span></button>`
+          ? `<button class="choice locked" type="button" disabled><s>${esc(o.text)}</s><span class="why">（你現在說不出口）</span>${o.fear ? `<span class="fear">心裡想：${esc(o.fear)}</span>` : ''}</button>`
           : `<button class="choice" type="button" data-n="${n}">${esc(o.text)}</button>`;
       }).join('')}
     </div>
@@ -348,8 +349,8 @@ function stepReflect() {
     </div>`).join('');
   showPanel(`
     <div class="kicker">這一個禮拜</div>
-    <h2>你的勇氣，每天都不一樣</h2>
-    <div class="day-bars" role="img" aria-label="每天的勇氣值">${bars}</div>
+    <h2>你的心靈能量，每天都不一樣</h2>
+    <div class="day-bars" role="img" aria-label="每天的心靈能量">${bars}</div>
     <div class="facts">
       <p><b class="num">${state.witness}</b> 次，有人看到了，卻沒有說話。</p>
       <p><b class="num">${state.kind}</b> 次，有人對你伸出手。</p>
@@ -366,10 +367,13 @@ function stepClosing() {
     <h2>如果你在現實生活中，也遇到類似的事</h2>
     <p class="big">這不是你的錯。</p>
     <ul>
-      <li>告訴一個你信任的大人：爸爸媽媽、老師、輔導老師都可以。</li>
+      <li>告訴一個你信任的大人：爸爸媽媽、導師、輔導室或學務處的老師都可以。</li>
       <li>如果很難說出口，可以先寫下來，交給他們看。</li>
-      <li>安心專線 <b>1925</b>（24 小時）、保護專線 <b>113</b>。</li>
+      <li>說出來之後，大人需要一點時間了解和處理。如果事情沒有馬上變好，那不是你的錯，可以再說一次，或找另一個大人。</li>
     </ul>
+    <div class="help-lines">
+      ${HELP_LINES.map((h) => `<p><b>${esc(h.name)}　${esc(h.number)}</b><br><span>${esc(h.note)}</span></p>`).join('')}
+    </div>
     <p>如果你看到別人被這樣對待：你不用很勇敢。走過去問一句「你還好嗎？」，就很有用。</p>
     <div class="btn-row">
       ${state.story ? '<button class="btn" type="button" id="again">再玩一次</button>' : ''}
@@ -393,6 +397,7 @@ function pause() {
       <div class="kicker">暫停</div>
       <h2>休息一下</h2>
       <p>如果玩的時候想起不舒服的事，可以先停下來，找身邊信任的大人聊一聊。</p>
+      <p class="help-inline">需要幫忙：${esc(HELP_LINES[0].name)} <b>${esc(HELP_LINES[0].number)}</b>（24 小時）</p>
       <div class="menu">
         <button class="btn" type="button" id="resume">繼續玩</button>
         <button class="btn secondary" type="button" id="restartStory">重新開始這個故事</button>

@@ -6,7 +6,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, BRAVE_THRESHOLD, ZHIHAO_INNER,
+  STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, BRAVE_THRESHOLD, ZHIHAO_INNER, HELP_LINES,
 } from '../frontend/js/story.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -17,7 +17,7 @@ const FLAG_LABEL = { toldMom: '有把事情告訴媽媽', toldTeacher: '有把�
 function effectNote(effect) {
   if (!effect) return '';
   const parts = [];
-  if (effect.courage) parts.push(`勇氣 ${effect.courage > 0 ? '+' : ''}${effect.courage}`);
+  if (effect.courage) parts.push(`心靈能量 ${effect.courage > 0 ? '+' : ''}${effect.courage}`);
   if (effect.witness) parts.push(`看到卻沒說話 +${effect.witness}`);
   if (effect.kind) parts.push(`有人伸出手 +${effect.kind}`);
   return parts.length ? ` 〔${parts.join('｜')}〕` : '';
@@ -41,7 +41,7 @@ function steps(list, player, depth = 0) {
       rows.push(`${indent}- 🔸 **你的選擇：${step.prompt}**`);
       step.options.forEach((o, n) => {
         const letter = 'ABC'[n];
-        const need = o.need ? `（勇氣至少 ${o.need} 才能選，不夠時會被劃掉：你現在說不出口）` : '';
+        const need = o.need ? `（心靈能量至少 ${o.need} 才能選，不夠時會被劃掉：你現在說不出口${o.fear ? `；心裡想：${o.fear}` : ''}）` : '';
         rows.push(`${indent}  - **${letter}. ${o.text}**${need}${effectNote(o.effect)}`);
         rows.push(...steps(o.then, player, depth + 2));
       });
@@ -72,11 +72,12 @@ const doc = [
   '## 遊戲規則',
   '',
   `- 玩家選一個角色，以第一人稱「你」度過運動會前的一個禮拜（週一到週五，週六是運動會）。`,
-  `- **勇氣值**從 ${START_COURAGE} 開始（最高 100）。每天早上睡一覺 +${OVERNIGHT}。`,
-  '- 有些選項需要足夠的勇氣，不夠時會被劃掉，旁邊寫「（你現在說不出口）」。',
+  `- **心靈能量**（原名「勇氣值」）從 ${START_COURAGE} 開始（最高 100）。每天早上睡一覺 +${OVERNIGHT}。`,
+  '- 有些選項需要足夠的心靈能量，不夠時會被劃掉，旁邊寫「（你現在說不出口）」，並顯示你心裡具體在怕什麼。',
   '- 欺負你的人和旁觀者怎麼做是固定的；你的選擇只改變你的感受和你找誰說。',
-  `- **結局**：運動會前勇氣 ≥ ${BRAVE_THRESHOLD} 走「勇敢」結局，否則走「沉重」結局。兩種都不是懲罰。`,
-  '- 結局之後：志豪的內心話 → 一週回顧（每天的勇氣、有人看到卻沒說話的次數、有人伸出手的次數）→ 最後一頁。',
+  '- 週五早上，老師一定會發現並私下找你談，不取決於你有沒有說出來；如果你有告訴媽媽，會多一份家人的支持。',
+  `- **結局**：運動會前心靈能量 ≥ ${BRAVE_THRESHOLD} 走結局 A「抬起頭」，否則走結局 B「慢慢來」。兩種都不是懲罰，結局 B 一定有大人和朋友陪著，並約好下禮拜再聊。`,
+  '- 結局之後：志豪的內心話 → 一週回顧（每天的心靈能量、有人看到卻沒說話的次數、有人伸出手的次數）→ 最後一頁。',
   '- 標記說明：**粗體**是說話的人；*斜體*是旁白；💭 是你心裡真正的想法；〔 〕是這句話對數值的影響。',
   '',
 ];
@@ -84,9 +85,9 @@ const doc = [
 for (const st of STORIES) {
   doc.push('---', '', `## ${st.name}的故事`, '', `> ${st.blurb}`);
   doc.push(...steps(st.story, st.id));
-  doc.push('', '### 週六｜運動會（勇敢結局）', '');
+  doc.push('', '### 週六｜運動會（結局 A：抬起頭）', '');
   doc.push(...steps(st.endings.brave.filter((s) => s.k !== 'day'), st.id));
-  doc.push('', '### 週六｜運動會（沉重結局）', '');
+  doc.push('', '### 週六｜運動會（結局 B：慢慢來）', '');
   doc.push(...steps(st.endings.heavy.filter((s) => s.k !== 'day'), st.id));
   doc.push('');
 }
@@ -97,22 +98,23 @@ doc.push(
   '### 志豪的內心話', '',
   ...ZHIHAO_INNER.split('\n').map((t) => `> ${t}`), '',
   '### 一週回顧', '',
-  '- 長條圖：每天結束時的勇氣。',
+  '- 長條圖：每天結束時的心靈能量。',
   '- 「＿次，有人看到了，卻沒有說話。」',
   '- 「＿次，有人對你伸出手。」',
   '- 「對被欺負的人來說，一句「你還好嗎？」可能就改變了一整天。」', '',
   '### 最後一頁', '',
   '**如果你在現實生活中，也遇到類似的事**', '',
   '這不是你的錯。', '',
-  '- 告訴一個你信任的大人：爸爸媽媽、老師、輔導老師都可以。',
+  '- 告訴一個你信任的大人：爸爸媽媽、導師、輔導室或學務處的老師都可以。',
   '- 如果很難說出口，可以先寫下來，交給他們看。',
-  '- 安心專線 1925（24 小時）、保護專線 113。', '',
+  '- 說出來之後，大人需要一點時間了解和處理。如果事情沒有馬上變好，那不是你的錯，可以再說一次，或找另一個大人。', '',
+  ...HELP_LINES.map((h) => `- **${h.name} ${h.number}**：${h.note}`), '',
   '如果你看到別人被這樣對待：你不用很勇敢。走過去問一句「你還好嗎？」，就很有用。', '',
   '---', '',
   '## 開場與暫停', '',
   '**開場副標**：運動會前的一個禮拜。選一個同學，過他的一週。', '',
   '**開場提醒**：這個故事裡會有同學之間不愉快的事，例如嘲笑和排擠。如果玩的時候覺得不舒服，可以隨時按右上角的「暫停」。', '',
-  '**暫停選單**：休息一下。如果玩的時候想起不舒服的事，可以先停下來，找身邊信任的大人聊一聊。（繼續玩／重新開始這個故事／回主畫面／全螢幕／離開遊戲）', '',
+  '**暫停選單**：休息一下。如果玩的時候想起不舒服的事，可以先停下來，找身邊信任的大人聊一聊。需要幫忙：教育部防制校園霸凌專線 1953（24 小時）。（繼續玩／重新開始這個故事／回主畫面／全螢幕／離開遊戲）', '',
 );
 
 mkdirSync(dirname(out), { recursive: true });

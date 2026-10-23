@@ -401,6 +401,32 @@ button {
   color: var(--bad);
 }
 
+.choice .fear {
+  display: block;
+  margin-top: 0.6cqw;
+  font-size: 3.6cqw;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--inner);
+}
+
+/* 求助專線 */
+.help-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 2cqw;
+  margin: 1cqw 0 3cqw;
+  padding: 3cqw 4cqw;
+  background: var(--paper-2);
+  border-radius: 1.4cqw;
+}
+
+.help-lines p { margin: 0; }
+.help-lines b { font-size: 4.6cqw; }
+.help-lines span { font-size: 3.6cqw; font-weight: 500; color: var(--muted); }
+
+.help-inline { font-size: 3.8cqw; color: var(--muted); }
+
 /* 內心話 */
 .inner-card .portrait-lg {
   display: block;

@@ -34,10 +34,17 @@ export const CHARACTERS = {
   narrator:{ name: '' },
 };
 
-export const START_COURAGE = 70;
+export const START_COURAGE = 60;
 // 每天早上睡了一覺，勇氣會回來一點點
 export const OVERNIGHT = 5;
 export const BRAVE_THRESHOLD = 70;
 
-// 結局後揭露：帶頭的人也可能在害怕
-export const ZHIHAO_INNER = '其實……四年級的時候，被大家笑的人是我。\n我發現只要大家在笑別人，就不會有人笑我了。';
+// 結局後揭露：帶頭的人也可能在害怕；但理解原因不等於可以原諒傷害，他要為自己的行為負責
+export const ZHIHAO_INNER = '其實……四年級的時候，被大家笑的人是我。\n我發現只要大家在笑別人，就不會有人笑我了。\n可是這個禮拜，我變成了以前我最討厭的那種人。\n這不是藉口。欺負別人，是我做錯了。下禮拜，我想跟他說對不起。';
+
+// 求助資源（已查證：教育部防制校園霸凌專線自 111 年 8 月 30 日起改為 1953，24 小時）
+export const HELP_LINES = [
+  { name: '教育部防制校園霸凌專線', number: '1953', note: '24 小時，被欺負或看到別人被欺負都可以打' },
+  { name: '安心專線', number: '1925', note: '24 小時，心情很不好、想傷害自己的時候' },
+  { name: '保護專線', number: '113', note: '在家裡或其他地方被大人傷害的時候' },
+];
