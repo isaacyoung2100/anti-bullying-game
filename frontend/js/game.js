@@ -170,9 +170,12 @@ function clearDialog() {
 
 // ---------- 面板 ----------
 
-function showPanel(html, cls = '') {
+// 短的內容（每天的標題、選擇、內心話）用浮在場景上的卡片；
+// 長的內容（一週回顧、最後一頁）用 page: true 佔滿整個畫面，像一般網頁一樣往下滑
+function showPanel(html, cls = '', { page = false } = {}) {
   clearDialog();
   const panel = $('panel');
+  panel.classList.toggle('page', page);
   panel.innerHTML = `<div class="card pixel-box ${cls}">${html}</div>`;
   panel.hidden = false;
   panel.scrollTop = 0;
@@ -390,7 +393,7 @@ function stepReflect() {
       <p class="quiet">對被欺負的人來說，一句「你還好嗎？」可能就改變了一整天。</p>
     </div>
     <div class="btn-row"><button class="btn" type="button" id="go">繼續 ▶</button></div>
-  `, 'reflect-card').querySelector('#go').onclick = next;
+  `, 'reflect-card', { page: true }).querySelector('#go').onclick = next;
 }
 
 // 換位思考：從被欺負的人回到旁觀者，想一件自己可以做的小事（不記錄、不評分）
@@ -400,52 +403,60 @@ function stepThink() {
   const ta = st.pronoun || '他';
   const days = st.story.filter((s) => s.k === 'day');
   const actions = ['問一句：「你還好嗎？」', '不跟著笑', `陪${ta}一起走一段路`, '下課去告訴老師'];
-  const card = showPanel(`
-    <div class="kicker">換你想一想</div>
-    <h2>如果你是五年三班的同學，你會在哪一天，走過去找${esc(st.name)}？</h2>
-    <div class="pick-row" id="dayPick">
-      ${days.map((d, n) => `<button class="pick" type="button" data-n="${n}">${esc(d.day)}<small>${esc(d.title)}</small></button>`).join('')}
-    </div>
-    <div id="actionPart" hidden>
-      <div class="think-recap">
-        <div class="round-label" id="recapHead"></div>
-        <p id="recapText"></p>
+  const weatherFor = (day) => {
+    const mood = state.days.find((d) => d.day === day.day);
+    return mood ? weatherOf(mood.courage).word : '';
+  };
+
+  // 一次只問一件事：先選哪一天，再看那天發生什麼、選一件小事，最後看結果
+  const pickDay = () => {
+    const card = showPanel(`
+      <div class="kicker">換你想一想・1 / 3</div>
+      <h2>如果你是五年三班的同學，你會在哪一天，走過去找${esc(st.name)}？</h2>
+      <div class="pick-col">
+        ${days.map((d, n) => `
+          <button class="pick day-pick" type="button" data-n="${n}">
+            <span class="pick-main">${esc(d.day)}　${esc(d.title)}</span>
+            <small>${esc(st.name)}心裡的天氣：${weatherFor(d)}</small>
+          </button>`).join('')}
       </div>
-      <p class="think-q">那天，你可以做什麼？</p>
-      <div class="pick-col" id="actionPick">
+    `, 'think-card');
+    card.querySelectorAll('.pick').forEach((btn) => {
+      btn.onclick = () => pickAction(days[Number(btn.dataset.n)]);
+    });
+  };
+
+  // 玩完一整週，很難記得每天發生什麼：先提醒那天的事
+  const pickAction = (day) => {
+    const card = showPanel(`
+      <div class="kicker">換你想一想・2 / 3</div>
+      <div class="think-recap">
+        <div class="round-label">${esc(day.day)}・${esc(day.title)}</div>
+        <p>${esc(day.recap || '')}</p>
+      </div>
+      <h2 class="think-q">那天，你可以做什麼？</h2>
+      <div class="pick-col">
         ${actions.map((a, n) => `<button class="pick" type="button" data-n="${n}">${esc(a)}</button>`).join('')}
       </div>
-    </div>
-    <div id="thinkResult" hidden>
-      <p class="think-result" id="thinkText"></p>
+      <button class="text-btn" type="button" id="back">← 換一天</button>
+    `, 'think-card');
+    card.querySelectorAll('.pick').forEach((btn) => {
+      btn.onclick = () => showResult(day, actions[Number(btn.dataset.n)]);
+    });
+    card.querySelector('#back').onclick = pickDay;
+  };
+
+  const showResult = (day, action) => {
+    showPanel(`
+      <div class="kicker">換你想一想・3 / 3</div>
+      <p class="think-result">${esc(day.day)}，「${esc(day.title)}」那天，你${esc(action.replace('：', ''))}。</p>
+      <p>對${esc(st.name)}來說，這可能就是那個禮拜裡，最不一樣的一刻。</p>
+      <p><b>現實中的你，也可以這樣做。</b></p>
       <div class="btn-row"><button class="btn" type="button" id="go">繼續 ▶</button></div>
-    </div>
-  `, 'think-card');
-  let dayN = null;
-  const mark = (row, btn) => row.querySelectorAll('.pick').forEach((b) => b.classList.toggle('picked', b === btn));
-  card.querySelectorAll('#dayPick .pick').forEach((btn) => {
-    btn.onclick = () => {
-      dayN = Number(btn.dataset.n);
-      mark(card.querySelector('#dayPick'), btn);
-      // 玩完一整週，很難記得每天發生什麼：先提醒那天的事和那天心裡的天氣
-      const day = days[dayN];
-      const mood = state.days.find((d) => d.day === day.day);
-      card.querySelector('#recapHead').textContent =
-        `${day.day}・${day.title}${mood ? `・${st.name}心裡的天氣：${weatherOf(mood.courage).word}` : ''}`;
-      card.querySelector('#recapText').textContent = day.recap || '';
-      card.querySelector('#actionPart').hidden = false;
-    };
-  });
-  card.querySelectorAll('#actionPick .pick').forEach((btn) => {
-    btn.onclick = () => {
-      mark(card.querySelector('#actionPick'), btn);
-      const day = days[dayN];
-      card.querySelector('#thinkText').textContent =
-        `${day.day}，「${day.title}」那天，你${actions[Number(btn.dataset.n)].replace('：', '')}。\n對${st.name}來說，這可能就是那個禮拜裡，最不一樣的一刻。\n現實中的你，也可以這樣做。`;
-      card.querySelector('#thinkResult').hidden = false;
-      card.querySelector('#go').onclick = next;
-    };
-  });
+    `, 'think-card').querySelector('#go').onclick = next;
+  };
+
+  pickDay();
 }
 
 function stepClosing() {
@@ -467,7 +478,7 @@ function stepClosing() {
       ${state.story ? '<button class="btn" type="button" id="again">再玩一次</button>' : ''}
       <button class="btn secondary" type="button" id="home">回主畫面</button>
     </div>
-  `, 'closing-card');
+  `, 'closing-card', { page: true });
   card.querySelector('#again')?.addEventListener('click', () => startStory(state.story.id));
   card.querySelector('#home').onclick = goHome;
 }
