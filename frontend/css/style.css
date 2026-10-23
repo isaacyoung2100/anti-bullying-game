@@ -86,11 +86,12 @@ button { cursor: pointer; }
   user-select: none;
   cursor: pointer;
   padding-bottom: env(safe-area-inset-bottom);
+  /* 只有紅色邊線；橫線只畫在下面寫字的地方（.dialog），整本才是同一張紙
+     這裡用 %：.stage 自己的屬性裡，cqw 量的是視窗而不是這本日記，位置會和裡面的紅線對不齊 */
   background:
-    linear-gradient(90deg, transparent 7cqw, var(--margin) 7cqw, var(--margin) 7.3cqw, transparent 7.3cqw),
-    repeating-linear-gradient(to bottom, transparent 0 calc(var(--lh) - 1px), var(--rule) calc(var(--lh) - 1px) var(--lh)),
+    linear-gradient(90deg, transparent 7%, var(--margin) 7%, var(--margin) 7.3%, transparent 7.3%),
     var(--paper);
-  box-shadow: 0 0 6cqw rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 6vmin rgba(0, 0, 0, 0.5);
 }
 
 /* 左邊的裝訂孔 */
@@ -228,7 +229,7 @@ button { cursor: pointer; }
 
 /* ---------- 對話：直接寫在本子的橫線上 ---------- */
 
-/* 對話區有自己的橫線（跟著文字捲動），文字才會剛好寫在線上 */
+/* 對話區只畫橫線、底色透明：紅色邊線和裝訂孔來自同一張紙；橫線跟著文字捲動，文字才會剛好寫在線上 */
 .dialog {
   position: relative;
   flex: 1;
@@ -236,10 +237,7 @@ button { cursor: pointer; }
   margin-top: 2cqw;
   padding: 0 4cqw 9cqw 10cqw;
   overflow-y: auto;
-  background:
-    linear-gradient(90deg, transparent 7cqw, var(--margin) 7cqw, var(--margin) 7.3cqw, transparent 7.3cqw),
-    repeating-linear-gradient(to bottom, transparent 0 calc(var(--lh) - 1px), var(--rule) calc(var(--lh) - 1px) var(--lh)),
-    var(--paper);
+  background: repeating-linear-gradient(to bottom, transparent 0 calc(var(--lh) - 1px), var(--rule) calc(var(--lh) - 1px) var(--lh));
   background-attachment: local;
 }
 
