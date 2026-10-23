@@ -233,9 +233,9 @@ function stepTitle() {
   showPanel(`
     <div class="kicker">反霸凌體驗遊戲</div>
     <h1>五年三班<br>大隊接力</h1>
-    <p class="sub">運動會前的一個禮拜。<br>這一次，你是被欺負的那個人。</p>
+    <p class="sub">運動會前的一個禮拜。<br>選一個同學，過他的一週。</p>
     <div class="notice">
-      在這個遊戲裡，你會成為一個被同學欺負的孩子。如果玩的時候覺得難受，可以隨時按右上角的「暫停」。
+      這個故事裡會有同學之間不愉快的事，例如嘲笑和排擠。如果玩的時候覺得不舒服，可以隨時按右上角的「暫停」。
     </div>
     <div class="btn-row"><button class="btn" type="button" id="go">開始 ▶</button></div>
   `, 'title-card').querySelector('#go').onclick = next;
