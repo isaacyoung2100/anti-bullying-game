@@ -19,7 +19,7 @@ STORY_IDS = ["azhe", "xiaoyu", "aming"]
 # Artifacts 會自動加上 <html>/<head>，並在上下保留手機安全區域；
 # 這裡補上左右留白，並讓畫面高度跟著可用空間走
 ARTIFACT_CSS = """
-:root { color-scheme: dark; }
+:root { color-scheme: light; }
 html, body { height: 100%; }
 body {
   padding-left: max(16px, env(safe-area-inset-left, 0px));
@@ -60,7 +60,7 @@ def main():
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
 <style>
 {css}
 {ARTIFACT_CSS}

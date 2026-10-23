@@ -1,18 +1,29 @@
-/* 直向版面：手機直拿最好玩；電腦上會置中成一個直向的畫面
-   字級用 cqw（畫面寬度的百分比），不同大小的螢幕比例都一樣 */
+/* 日記本風格：整個畫面是一本五年三班的日記本
+   - 橫線紙、左邊紅色邊線、手寫字型
+   - 場景像用紙膠帶貼在本子上的一張圖；卡片像夾在本子裡的索引卡
+   - 直向版面；字級用 cqw（畫面寬度的百分比），不同大小的螢幕比例都一樣 */
 
 :root {
-  --ink: #2b2030;
-  --paper: #fffaf0;
-  --paper-2: #f6ecd6;
-  --accent: #e8584a;
-  --gold: #ffd166;
-  --muted: #7a6a72;
-  --good: #3f9a4a;
-  --bad: #c0392b;
-  --inner: #6b5d8a;
-  --page: #1c1620;
-  --stage: #2e2434;
+  --ink: #3a3140;
+  --ink-soft: #6f6578;
+  --pencil: #7b7090;
+  --paper: #fbf7ee;
+  --paper-2: #f3ead6;
+  --card: #fffdf7;
+  --rule: #d3e0ec;
+  --margin: #eba3a3;
+  --red-pen: #d0463c;
+  --blue-pen: #3b6fb6;
+  --hl: #ffe27a;
+  --good: #5aa84f;
+  --mid: #e8b23c;
+  --bad: #d0463c;
+  --tape: rgba(244, 205, 120, 0.72);
+  --tape-2: rgba(150, 200, 230, 0.7);
+  --desk: #2b2420;
+  --lh: 8.6cqw;               /* 橫線的間距，對話文字的行高也用這個 */
+  --hand: 'LXGW WenKai TC', 'Kaiti TC', 'BiauKai', 'DFKai-SB', serif;
+  --hand-border: 1.6cqw 0.6cqw 1.8cqw 0.5cqw / 0.5cqw 1.8cqw 0.6cqw 1.6cqw;
 }
 
 * { box-sizing: border-box; }
@@ -31,11 +42,14 @@
 html, body {
   margin: 0;
   height: 100%;
-  background: var(--page);
+  background: var(--desk);
   color: var(--ink);
-  font-family: 'Noto Sans TC', system-ui, sans-serif;
+  font-family: var(--hand);
   -webkit-tap-highlight-color: transparent;
 }
+
+/* 英文版：中文手寫字型的引號是全形，英文先用西文手寫字型 */
+html:lang(en) { --hand: 'Patrick Hand', 'LXGW WenKai TC', 'Segoe Print', cursive; }
 
 body {
   display: flex;
@@ -43,12 +57,22 @@ body {
   overflow: hidden;
 }
 
-button {
+button, input, textarea {
   font: inherit;
-  cursor: pointer;
+  color: inherit;
 }
 
-/* ---------- 舞台 ---------- */
+button { cursor: pointer; }
+
+/* 橫線紙：本子的內頁、整頁模式、索引卡都用 */
+.ruled {
+  background:
+    linear-gradient(90deg, transparent 7cqw, var(--margin) 7cqw, var(--margin) 7.3cqw, transparent 7.3cqw),
+    repeating-linear-gradient(to bottom, transparent 0 calc(var(--lh) - 1px), var(--rule) calc(var(--lh) - 1px) var(--lh)),
+    var(--paper);
+}
+
+/* ---------- 舞台：一本日記本 ---------- */
 
 .stage {
   position: relative;
@@ -58,32 +82,41 @@ button {
   max-width: calc(100dvh * 9 / 16);
   height: 100dvh;
   container-type: inline-size;
-  background: var(--stage);
   overflow: hidden;
   user-select: none;
   cursor: pointer;
   padding-bottom: env(safe-area-inset-bottom);
+  background:
+    linear-gradient(90deg, transparent 7cqw, var(--margin) 7cqw, var(--margin) 7.3cqw, transparent 7.3cqw),
+    repeating-linear-gradient(to bottom, transparent 0 calc(var(--lh) - 1px), var(--rule) calc(var(--lh) - 1px) var(--lh)),
+    var(--paper);
+  box-shadow: 0 0 6cqw rgba(0, 0, 0, 0.5);
 }
 
-/* 像素風邊框 */
-.pixel-box {
-  background: var(--paper);
-  border: 0.8cqw solid var(--ink);
-  border-radius: 1.6cqw;
-  box-shadow: inset -0.8cqw -0.8cqw 0 var(--paper-2), 0 1.2cqw 0 rgba(0, 0, 0, 0.35);
+/* 左邊的裝訂孔 */
+.stage::before {
+  content: "";
+  position: absolute;
+  left: 1.6cqw;
+  top: 0;
+  bottom: 0;
+  width: 3cqw;
+  background: radial-gradient(circle at 50% 50%, var(--desk) 0 1.1cqw, transparent 1.2cqw) 0 4cqw / 3cqw 12cqw repeat-y;
+  opacity: 0.85;
+  pointer-events: none;
 }
 
-/* ---------- 上方：勇氣、日期、暫停 ---------- */
+/* ---------- 上方：心靈能量、日期、暫停 ---------- */
 
 .hud {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 2cqw;
-  padding: calc(2.4cqw + env(safe-area-inset-top)) 3cqw 2.4cqw;
-  font-size: 3.6cqw;
-  font-weight: 900;
-  color: var(--paper);
+  gap: 2.4cqw;
+  padding: calc(2.6cqw + env(safe-area-inset-top)) 3.4cqw 2cqw 9cqw;
+  font-size: 3.8cqw;
+  font-weight: 700;
+  color: var(--ink);
   cursor: default;
   /* 卡片顯示時，暫停按鈕仍然按得到 */
   position: relative;
@@ -98,16 +131,19 @@ button {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 2cqw;
+  gap: 1.8cqw;
   min-width: 0;
 }
 
+.courage-label { white-space: nowrap; }
+
+/* 用鉛筆畫的溫度計 */
 .courage-bar {
   flex: 1;
-  height: 3.4cqw;
-  background: #4a3d52;
-  border: 0.6cqw solid var(--paper);
-  border-radius: 1cqw;
+  height: 3.6cqw;
+  background: #ffffff;
+  border: 0.5cqw solid var(--ink);
+  border-radius: 2cqw 0.8cqw 2cqw 0.8cqw / 0.8cqw 2cqw 0.8cqw 2cqw;
   overflow: hidden;
 }
 
@@ -115,70 +151,96 @@ button {
   display: block;
   height: 100%;
   width: 70%;
-  background: var(--good);
-  transition: width 0.8s steps(8), background 0.3s;
+  background-color: var(--good);
+  background-image: repeating-linear-gradient(-55deg, rgba(255, 255, 255, 0.35) 0 0.6cqw, transparent 0.6cqw 1.4cqw);
+  transition: width 0.8s ease, background-color 0.3s;
 }
 
 .mood-delta {
-  min-width: 7cqw;
-  font-weight: 900;
+  min-width: 6cqw;
+  font-weight: 700;
 }
 
-.mood-delta.up { color: #7fd38a; }
-.mood-delta.down { color: #ff8a7a; }
+.mood-delta.up { color: var(--good); }
+.mood-delta.down { color: var(--red-pen); }
 
+/* 日期：紅色印章 */
 .chip {
-  background: var(--paper);
-  color: var(--ink);
-  border-radius: 1.2cqw;
-  padding: 0.6cqw 2cqw;
+  color: var(--red-pen);
+  border: 0.5cqw solid var(--red-pen);
+  border-radius: 1cqw;
+  padding: 0.2cqw 1.6cqw;
+  transform: rotate(-5deg);
+  white-space: nowrap;
 }
 
 .chip:empty { display: none; }
 
+/* 暫停：像一張便利貼 */
 .pause-btn {
   flex: none;
   min-height: 44px;
-  font-size: 3.4cqw;
-  font-weight: 900;
+  font-size: 3.6cqw;
+  font-weight: 700;
   color: var(--ink);
-  background: var(--gold);
-  border: 0.6cqw solid var(--ink);
-  border-radius: 1.2cqw;
-  padding: 1cqw 2.4cqw;
-  box-shadow: 0 0.8cqw 0 var(--ink);
+  background: var(--hl);
+  border: 0;
+  padding: 1cqw 2.6cqw;
+  box-shadow: 0.4cqw 0.8cqw 1.2cqw rgba(58, 49, 64, 0.25);
+  transform: rotate(2deg);
 }
 
-.pause-btn:active { transform: translateY(0.5cqw); box-shadow: 0 0.3cqw 0 var(--ink); }
+.pause-btn:active { transform: rotate(2deg) translateY(0.4cqw); }
 
-/* ---------- 場景 ---------- */
+/* ---------- 場景：貼在本子上的一張圖 ---------- */
 
 /* 場景畫布是 16:9，直向時裁掉左右兩側，讓角色大一點 */
 .scene {
+  position: relative;
   flex: none;
   aspect-ratio: 4 / 3;
-  overflow: hidden;
-  border-top: 0.8cqw solid var(--ink);
-  border-bottom: 0.8cqw solid var(--ink);
+  margin: 1cqw 4cqw 0 10cqw;
+  padding: 1.6cqw;
+  background: #ffffff;
+  box-shadow: 0.6cqw 1.2cqw 2.4cqw rgba(58, 49, 64, 0.22);
+  transform: rotate(-0.8deg);
 }
+
+.scene::before, .scene::after {
+  content: "";
+  position: absolute;
+  top: -1.8cqw;
+  width: 16cqw;
+  height: 4.6cqw;
+  background: var(--tape);
+  pointer-events: none;
+}
+
+.scene::before { left: -3cqw; transform: rotate(-24deg); }
+.scene::after { right: -3cqw; transform: rotate(20deg); background: var(--tape-2); }
 
 .scene canvas {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  image-rendering: pixelated;
 }
 
-/* ---------- 對話 ---------- */
+/* ---------- 對話：直接寫在本子的橫線上 ---------- */
 
+/* 對話區有自己的橫線（跟著文字捲動），文字才會剛好寫在線上 */
 .dialog {
   position: relative;
   flex: 1;
   min-height: 0;
-  margin: 3cqw;
-  padding: 3cqw 4cqw 9cqw;
+  margin-top: 2cqw;
+  padding: 0 4cqw 9cqw 10cqw;
   overflow-y: auto;
+  background:
+    linear-gradient(90deg, transparent 7cqw, var(--margin) 7cqw, var(--margin) 7.3cqw, transparent 7.3cqw),
+    repeating-linear-gradient(to bottom, transparent 0 calc(var(--lh) - 1px), var(--rule) calc(var(--lh) - 1px) var(--lh)),
+    var(--paper);
+  background-attachment: local;
 }
 
 .dialog.idle > * { visibility: hidden; }
@@ -187,67 +249,63 @@ button {
   display: flex;
   align-items: center;
   gap: 2.4cqw;
-  margin-bottom: 2cqw;
+  height: calc(var(--lh) * 2);
 }
 
+/* 頭像像一張圓形貼紙 */
 .portrait {
-  width: 13cqw;
-  height: 13cqw;
+  width: 12cqw;
+  height: 12cqw;
   flex: none;
-  image-rendering: pixelated;
-  background: var(--paper-2);
-  border: 0.6cqw solid var(--ink);
-  border-radius: 1cqw;
+  background: #fff3d6;
+  border: 0.8cqw solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0.3cqw 0.6cqw 1.2cqw rgba(58, 49, 64, 0.25);
+  transform: rotate(-4deg);
 }
 
 .portrait.empty { display: none; }
 
+/* 名字用螢光筆畫過 */
 .speaker {
   display: inline-block;
-  font-size: 4cqw;
-  font-weight: 900;
-  color: #ffffff;
-  background: var(--accent);
-  border: 0.6cqw solid var(--ink);
-  border-radius: 1cqw;
-  padding: 0.2cqw 2.4cqw;
+  font-size: 5cqw;
+  font-weight: 700;
+  padding: 0 1.4cqw;
+  background: linear-gradient(transparent 50%, var(--hl) 50%, var(--hl) 92%, transparent 92%);
 }
 
 .speaker:empty { display: none; }
 
 .line {
-  font-size: 5cqw;
-  line-height: 1.65;
+  font-size: 5.3cqw;
+  line-height: var(--lh);
   font-weight: 700;
   white-space: pre-line;
 }
 
+/* 心裡想的：鉛筆寫的小字 */
 .inner {
-  margin-top: 2cqw;
-  padding-left: 2.4cqw;
-  border-left: 0.8cqw solid #c9bfdc;
-  font-size: 4.4cqw;
-  line-height: 1.6;
-  font-weight: 500;
-  font-style: italic;
-  color: var(--inner);
+  font-size: 4.6cqw;
+  line-height: var(--lh);
+  font-weight: 400;
+  color: var(--pencil);
 }
 
 .next-hint {
   position: absolute;
-  right: 3.6cqw;
-  bottom: 2.4cqw;
-  font-size: 3.4cqw;
-  font-weight: 700;
-  color: var(--muted);
-  animation: blink 1s steps(2) infinite;
+  right: 0;
+  bottom: 2cqw;
+  font-size: 3.6cqw;
+  color: var(--ink-soft);
+  animation: blink 1.2s ease-in-out infinite;
 }
 
 .next-hint.hide { visibility: hidden; }
 
-@keyframes blink { 50% { opacity: 0.2; } }
+@keyframes blink { 50% { opacity: 0.25; } }
 
-/* ---------- 面板（標題、選角色、每天的標題卡、選擇、內心話、回顧） ---------- */
+/* ---------- 面板（標題、選角色、每天的標題卡、選擇、內心話、日記、回顧） ---------- */
 
 .panel {
   position: absolute;
@@ -255,20 +313,57 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: calc(15cqw + env(safe-area-inset-top)) 4cqw 4cqw;
-  background: rgba(28, 22, 32, 0.55);
+  padding: calc(15cqw + env(safe-area-inset-top)) 5cqw 5cqw;
+  background: rgba(251, 247, 238, 0.5);
+  backdrop-filter: blur(1.5px);
   overflow-y: auto;
   cursor: default;
 }
 
-.pause-layer { z-index: 7; padding-top: 4cqw; background: rgba(28, 22, 32, 0.75); }
+.pause-layer { z-index: 7; padding-top: 6cqw; background: rgba(43, 36, 32, 0.55); }
 
-/* 整頁模式：長內容佔滿畫面，蓋住場景和上方的能量條，像一般網頁一樣往下滑 */
+/* 索引卡：淡淡的橫線、頂端一段紙膠帶 */
+.paper-card {
+  position: relative;
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 calc(var(--lh) - 1px), #e6eef5 calc(var(--lh) - 1px) var(--lh)),
+    var(--card);
+  border-radius: 0.6cqw;
+  box-shadow: 0.6cqw 1.4cqw 3cqw rgba(58, 49, 64, 0.28);
+}
+
+.card {
+  width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 5cqw 6cqw 7cqw;
+  font-size: 4.5cqw;
+  font-weight: 400;
+  line-height: 1.7;
+}
+
+/* 卡片頂端的紙膠帶（卡片內容會捲動，所以畫在卡片裡面的最上方） */
+.panel:not(.page) > .card::before {
+  content: "";
+  display: block;
+  width: 20cqw;
+  height: 4.4cqw;
+  margin: -3.4cqw auto 1.6cqw;
+  background: var(--tape);
+  transform: rotate(-3deg);
+}
+
+/* 整頁模式：長內容佔滿畫面，像翻到日記本的新一頁，往下滑 */
 .panel.page {
   z-index: 5;
   align-items: flex-start;
-  padding: calc(8cqw + env(safe-area-inset-top)) 6cqw 0;
-  background: var(--paper);
+  padding: calc(8cqw + env(safe-area-inset-top)) 6cqw 0 11cqw;
+  /* 整頁的內容高度不一，橫線對不齊文字會很亂，所以只留左邊的紅線 */
+  background:
+    linear-gradient(90deg, transparent 7cqw, var(--margin) 7cqw, var(--margin) 7.3cqw, transparent 7.3cqw),
+    var(--paper);
+  background-attachment: local;
+  backdrop-filter: none;
 }
 
 .panel.page .card {
@@ -276,7 +371,6 @@ button {
   overflow: visible;
   padding: 0;
   background: none;
-  border: 0;
   border-radius: 0;
   box-shadow: none;
 }
@@ -287,56 +381,51 @@ button {
   bottom: 0;
   margin-top: 4cqw;
   padding: 3cqw 0 6cqw;
-  background: var(--paper);
-  box-shadow: 0 -3cqw 3cqw -2cqw var(--paper);
+  background: linear-gradient(transparent, var(--card) 35%);
+}
+
+.panel.page .card > .btn-row:last-child {
+  padding-bottom: calc(6cqw + env(safe-area-inset-bottom));
+  background: linear-gradient(transparent, var(--paper) 35%);
 }
 
 .card:has(> .btn-row:last-child) { padding-bottom: 0; }
-.panel.page .card > .btn-row:last-child { padding-bottom: calc(6cqw + env(safe-area-inset-bottom)); }
 
-.card {
-  width: 100%;
-  max-height: 100%;
-  overflow-y: auto;
-  padding: 6cqw 6cqw 7cqw;
-  font-size: 4.3cqw;
-  font-weight: 700;
-  line-height: 1.65;
-}
-
-.card h1, .card h2, .card h3 { margin: 0 0 3cqw; line-height: 1.3; }
-.card h1 { font-size: 8.5cqw; font-weight: 900; }
-.card h2 { font-size: 5.4cqw; font-weight: 900; text-wrap: balance; }
+.card h1, .card h2, .card h3 { margin: 0 0 3cqw; line-height: 1.35; font-weight: 700; }
+.card h1 { font-size: 9cqw; }
+.card h2 { font-size: 5.8cqw; text-wrap: balance; }
 .card p { margin: 0 0 3cqw; }
 .card ul { margin: 0 0 3cqw; padding-left: 6cqw; }
 .card li { margin-bottom: 1.4cqw; }
 
 .kicker {
-  font-size: 3.4cqw;
-  font-weight: 900;
-  color: var(--accent);
-  letter-spacing: 0.1em;
-  margin-bottom: 1cqw;
+  display: inline-block;
+  font-size: 3.8cqw;
+  font-weight: 700;
+  color: var(--red-pen);
+  margin-bottom: 1.4cqw;
 }
 
-.sub { color: var(--muted); }
+.sub { color: var(--ink-soft); }
 
+/* 按鈕：手畫的框，主要按鈕塗上螢光筆 */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 1.4cqw;
-  font-size: 4.4cqw;
-  font-weight: 900;
-  padding: 2cqw 5cqw;
-  background: var(--gold);
+  min-height: 44px;
+  font-size: 4.8cqw;
+  font-weight: 700;
+  padding: 1.6cqw 6cqw;
+  background: var(--hl);
   color: var(--ink);
-  border: 0.7cqw solid var(--ink);
-  border-radius: 1.6cqw;
-  box-shadow: 0 1cqw 0 var(--ink);
+  border: 0.55cqw solid var(--ink);
+  border-radius: var(--hand-border);
+  box-shadow: 0.6cqw 0.9cqw 0 var(--ink);
 }
 
-.btn:active { transform: translateY(0.6cqw); box-shadow: 0 0.4cqw 0 var(--ink); }
+.btn:active { transform: translate(0.4cqw, 0.6cqw); box-shadow: 0.2cqw 0.3cqw 0 var(--ink); }
 .btn.secondary { background: #ffffff; }
 
 .btn-row {
@@ -346,27 +435,49 @@ button {
   margin-top: 4cqw;
 }
 
+.text-btn {
+  margin-top: 3cqw;
+  padding: 1.6cqw 0;
+  min-height: 44px;
+  font-size: 4.2cqw;
+  color: var(--blue-pen);
+  background: none;
+  border: 0;
+  text-decoration: underline wavy rgba(59, 111, 182, 0.4);
+  text-underline-offset: 1cqw;
+}
+
 /* 標題 */
 .title-card { text-align: center; }
-.title-card h1 { margin-top: 1cqw; }
+.title-card h1 { margin: 1cqw 0 2cqw; font-size: 11cqw; line-height: 1.2; }
+.title-card h1 span { background: linear-gradient(transparent 55%, var(--hl) 55%, var(--hl) 90%, transparent 90%); }
 .title-card .btn-row { justify-content: center; }
 
 .notice {
   margin-top: 3cqw;
-  padding: 3cqw 4cqw;
-  font-size: 3.8cqw;
-  line-height: 1.6;
+  padding: 2.4cqw 3.6cqw;
+  font-size: 3.9cqw;
+  line-height: 1.65;
   text-align: left;
-  background: #fff1ec;
-  border: 0.6cqw solid var(--accent);
-  border-radius: 1.4cqw;
+  background: #fff0ea;
+  border: 0.45cqw dashed var(--red-pen);
+  border-radius: var(--hand-border);
 }
 
-/* 選角色 */
+/* 標題畫面右上角的語言切換 */
+.lang-btn {
+  display: block;
+  margin: -3cqw -2cqw 0 auto;
+  padding: 1cqw 2cqw;
+  font-size: 3.8cqw;
+  text-decoration: none;
+}
+
+/* 選角色：像貼在本子上的照片 */
 .roles {
   display: flex;
   flex-direction: column;
-  gap: 3cqw;
+  gap: 3.4cqw;
 }
 
 .role {
@@ -374,36 +485,45 @@ button {
   align-items: center;
   gap: 4cqw;
   text-align: left;
-  padding: 3cqw;
+  padding: 2.6cqw 3cqw;
   background: #ffffff;
   color: var(--ink);
-  border: 0.7cqw solid var(--ink);
-  border-radius: 1.6cqw;
-  box-shadow: 0 1cqw 0 var(--ink);
+  border: 0.5cqw solid var(--ink);
+  border-radius: var(--hand-border);
+  box-shadow: 0.6cqw 0.9cqw 0 var(--ink);
 }
 
-.role:active { transform: translateY(0.6cqw); box-shadow: 0 0.4cqw 0 var(--ink); }
+.role:nth-child(2) { transform: rotate(0.6deg); }
+.role:nth-child(3) { transform: rotate(-0.5deg); }
+.role:active { transform: translate(0.4cqw, 0.6cqw); box-shadow: 0.2cqw 0.3cqw 0 var(--ink); }
 
 .role canvas {
-  width: 16cqw;
-  height: 16cqw;
+  width: 17cqw;
+  height: 17cqw;
   flex: none;
-  image-rendering: pixelated;
-  background: var(--paper-2);
-  border: 0.6cqw solid var(--ink);
-  border-radius: 1cqw;
+  background: #fff3d6;
+  border: 0.8cqw solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0.3cqw 0.6cqw 1.2cqw rgba(58, 49, 64, 0.25);
 }
 
-.role-text { display: flex; flex-direction: column; gap: 0.6cqw; }
-.role-name { font-size: 5.4cqw; font-weight: 900; }
-.role-blurb { font-size: 3.8cqw; font-weight: 500; color: var(--muted); line-height: 1.5; }
+.role-text { display: flex; flex-direction: column; gap: 0.4cqw; }
+.role-name { font-size: 5.8cqw; font-weight: 700; }
+.role-blurb { font-size: 3.9cqw; color: var(--ink-soft); line-height: 1.5; }
 
 /* 每天的標題卡 */
 .chapter-card { text-align: center; }
-.chapter-card .kicker { font-size: 5cqw; }
+.chapter-card .kicker {
+  font-size: 5cqw;
+  padding: 0.4cqw 2.4cqw;
+  border: 0.5cqw solid var(--red-pen);
+  border-radius: 1cqw;
+  transform: rotate(-4deg);
+}
+.chapter-card h1 { font-size: 10cqw; }
 .chapter-card .btn-row { justify-content: center; }
 
-/* 選擇 */
+/* 選擇：像日記裡的勾選清單 */
 .choices {
   display: flex;
   flex-direction: column;
@@ -411,44 +531,58 @@ button {
 }
 
 .choice {
+  position: relative;
   text-align: left;
-  font-size: 4.4cqw;
+  font-size: 4.6cqw;
   font-weight: 700;
   line-height: 1.5;
-  padding: 3cqw 4cqw;
+  padding: 2.6cqw 3.6cqw 2.6cqw 10cqw;
   background: #ffffff;
   color: var(--ink);
-  border: 0.7cqw solid var(--ink);
-  border-radius: 1.6cqw;
-  box-shadow: 0 1cqw 0 var(--ink);
+  border: 0.5cqw solid var(--ink);
+  border-radius: var(--hand-border);
+  box-shadow: 0.6cqw 0.9cqw 0 var(--ink);
 }
 
-.choice:active { transform: translateY(0.6cqw); box-shadow: 0 0.4cqw 0 var(--ink); }
+.choice::before {
+  content: "";
+  position: absolute;
+  left: 3.4cqw;
+  top: 3.6cqw;
+  width: 3.6cqw;
+  height: 3.6cqw;
+  border: 0.45cqw solid var(--ink);
+  border-radius: 0.4cqw 0.9cqw 0.5cqw 0.8cqw;
+}
 
+.choice:active { transform: translate(0.4cqw, 0.6cqw); box-shadow: 0.2cqw 0.3cqw 0 var(--ink); }
+
+/* 說不出口的選項：被紅筆劃掉 */
 .choice.locked {
   cursor: not-allowed;
-  background: var(--paper-2);
-  color: #6b6070;
+  background: transparent;
+  color: var(--ink-soft);
+  border-style: dashed;
   border-color: #b9aeb5;
   box-shadow: none;
 }
 
-.choice.locked s { text-decoration-thickness: 0.4cqw; }
+.choice.locked::before { border-color: #b9aeb5; }
+.choice.locked s { text-decoration-color: var(--red-pen); text-decoration-thickness: 0.5cqw; }
 
 .choice .why {
   display: block;
   margin-top: 0.6cqw;
-  font-size: 3.6cqw;
-  color: var(--bad);
+  font-size: 3.9cqw;
+  color: var(--red-pen);
 }
 
 .choice .fear {
   display: block;
-  margin-top: 0.6cqw;
-  font-size: 3.6cqw;
-  font-weight: 500;
-  font-style: italic;
-  color: var(--inner);
+  margin-top: 0.4cqw;
+  font-size: 3.9cqw;
+  font-weight: 400;
+  color: var(--pencil);
 }
 
 /* 求助專線 */
@@ -458,35 +592,36 @@ button {
   gap: 2cqw;
   margin: 1cqw 0 3cqw;
   padding: 3cqw 4cqw;
-  background: var(--paper-2);
-  border-radius: 1.4cqw;
+  background: #ffffff;
+  border: 0.45cqw solid var(--ink);
+  border-radius: var(--hand-border);
 }
 
 .help-lines p { margin: 0; }
-.help-lines b { font-size: 4.6cqw; }
-.help-lines span { font-size: 3.6cqw; font-weight: 500; color: var(--muted); }
+.help-lines b { font-size: 4.8cqw; }
+.help-lines span { font-size: 3.9cqw; color: var(--ink-soft); }
 
-.help-inline { font-size: 3.8cqw; color: var(--muted); }
+.help-inline { font-size: 4cqw; color: var(--ink-soft); }
 
 /* 內心話 */
 .inner-card .portrait-lg {
   display: block;
   width: 24cqw;
   height: 24cqw;
-  margin-bottom: 3cqw;
-  image-rendering: pixelated;
-  background: var(--paper-2);
-  border: 0.7cqw solid var(--ink);
-  border-radius: 1.4cqw;
+  margin: 0 auto 3cqw;
+  background: #fff3d6;
+  border: 1cqw solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0.4cqw 0.8cqw 1.4cqw rgba(58, 49, 64, 0.25);
 }
 
-.inner-card p { font-size: 4.5cqw; line-height: 1.7; }
+.inner-card p { font-size: 4.7cqw; line-height: 1.75; }
 
-/* 一週回顧：心裡的天氣 */
+/* 一週回顧：心裡的天氣（天氣貼紙） */
 .wx-row {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 1.6cqw;
+  gap: 1.4cqw;
   margin-bottom: 4cqw;
 }
 
@@ -494,132 +629,97 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1cqw;
-  padding: 2cqw 0 1.6cqw;
-  background: var(--paper-2);
-  border-radius: 1.2cqw;
+  gap: 0.6cqw;
+  padding: 1.6cqw 0 1.2cqw;
+  background: #ffffff;
+  border: 0.4cqw solid var(--ink);
+  border-radius: var(--hand-border);
 }
 
-.wx-word { font-size: 3.2cqw; font-weight: 900; }
-.wx-label { font-size: 3cqw; color: var(--muted); }
+.wx { font-size: 7cqw; line-height: 1; }
+.wx-word { font-size: 3.4cqw; font-weight: 700; }
+.wx-label { font-size: 3.1cqw; color: var(--ink-soft); }
 
-/* 天氣圖示：用色塊拼成的小像素圖 */
-.wx {
-  position: relative;
-  width: 9cqw;
-  height: 7cqw;
-}
-
-.wx.sun::before {
-  content: "";
-  position: absolute;
-  left: 1.5cqw; top: 0.5cqw;
-  width: 6cqw; height: 6cqw;
-  background: var(--gold);
-  border: 0.5cqw solid #c9962e;
-  border-radius: 50%;
-}
-
-.wx.cloud::before, .wx.overcast::before, .wx.rain::before {
-  content: "";
-  position: absolute;
-  left: 0.5cqw; top: 1.5cqw;
-  width: 8cqw; height: 3.6cqw;
-  border-radius: 2cqw;
-}
-
-.wx.cloud::after {
-  content: "";
-  position: absolute;
-  right: 0; top: 0;
-  width: 4cqw; height: 4cqw;
-  background: var(--gold);
-  border-radius: 50%;
-  z-index: -0;
-}
-
-.wx.cloud::before { background: #ffffff; border: 0.5cqw solid #b9c3cf; z-index: 1; }
-.wx.overcast::before { background: #b5b0bd; border: 0.5cqw solid #8a8296; }
-.wx.rain::before { background: #8a8296; border: 0.5cqw solid #6b6378; }
-
-.wx.rain i, .wx.rain i::before, .wx.rain i::after {
-  position: absolute;
-  top: 5.6cqw;
-  width: 0.8cqw; height: 1.4cqw;
-  background: #5b8fd6;
-}
-
-.wx.rain i { left: 2.2cqw; display: block; }
-.wx.rain i::before, .wx.rain i::after { content: ""; top: 0; }
-.wx.rain i::before { left: 2cqw; }
-.wx.rain i::after { left: 4cqw; }
+.facts .num { font-size: 8.6cqw; color: var(--red-pen); margin-right: 1cqw; }
+.facts .quiet { color: var(--ink-soft); font-size: 4.2cqw; }
 
 /* 換你想一想 */
 .pick-col {
   display: flex;
   flex-direction: column;
-  gap: 2cqw;
+  gap: 2.4cqw;
 }
 
 .pick {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.4cqw;
   min-width: 0;
-  font-size: 4cqw;
-  font-weight: 900;
-  padding: 2cqw 0.6cqw;
+  font-size: 4.5cqw;
+  font-weight: 700;
+  text-align: left;
+  padding: 2.4cqw 4cqw;
   background: #ffffff;
   color: var(--ink);
-  border: 0.6cqw solid var(--ink);
-  border-radius: 1.4cqw;
-  box-shadow: 0 0.8cqw 0 var(--ink);
+  border: 0.5cqw solid var(--ink);
+  border-radius: var(--hand-border);
+  box-shadow: 0.6cqw 0.9cqw 0 var(--ink);
 }
 
-.pick small { font-size: 3.4cqw; font-weight: 500; color: var(--muted); line-height: 1.4; }
-.pick-col .pick { align-items: flex-start; padding: 2.6cqw 4cqw; font-size: 4.3cqw; text-align: left; }
-.pick-main { font-weight: 900; }
-.pick.picked { background: #fff3c4; outline: 0.8cqw solid var(--gold); }
-.pick:active { transform: translateY(0.5cqw); box-shadow: 0 0.3cqw 0 var(--ink); }
+.pick small { font-size: 3.7cqw; font-weight: 400; color: var(--ink-soft); line-height: 1.4; }
+.pick-main { font-weight: 700; }
+.pick:active { transform: translate(0.4cqw, 0.6cqw); box-shadow: 0.2cqw 0.3cqw 0 var(--ink); }
 
+.round-label { font-weight: 700; color: var(--red-pen); }
 .think-q { margin-top: 5cqw; }
-.think-choice { font-size: 4.6cqw; font-weight: 900; }
-
-.text-btn {
-  margin-top: 4cqw;
-  padding: 2cqw 0;
-  min-height: 44px;
-  font-size: 4cqw;
-  font-weight: 700;
-  color: var(--muted);
-  background: none;
-  border: 0;
-}
+.think-choice { font-size: 4.8cqw; font-weight: 700; }
 
 .think-recap {
   margin-top: 2cqw;
-  padding: 3cqw 4cqw;
-  background: #eef3fb;
+  padding: 2.6cqw 4cqw;
+  background: #eef4fb;
   border-left: 1cqw solid #8aa6d6;
 }
 
 .think-recap .round-label { margin: 0 0 1cqw; }
-.think-recap p { margin: 0; font-weight: 500; line-height: 1.7; }
+.think-recap p { margin: 0; line-height: 1.7; }
 
 .think-result {
   margin-top: 4cqw;
-  padding: 3cqw 4cqw;
-  background: var(--paper-2);
-  border-radius: 1.4cqw;
+  padding: 2.6cqw 4cqw;
+  background: #fff8dc;
+  border: 0.45cqw dashed var(--mid);
+  border-radius: var(--hand-border);
   white-space: pre-line;
 }
 
-.facts .num { font-size: 8cqw; color: var(--accent); margin-right: 1cqw; }
-.facts .quiet { color: var(--muted); font-size: 4cqw; }
+/* 聽完分享，再想一次：兩次的選擇並排 */
+.compare {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4cqw;
+  margin: 2cqw 0 4cqw;
+}
+
+.compare > div {
+  padding: 2.4cqw 4cqw;
+  background: #ffffff;
+  border: 0.45cqw solid var(--ink);
+  border-radius: var(--hand-border);
+}
+
+.compare .label { display: block; font-size: 3.8cqw; color: var(--red-pen); font-weight: 700; }
+.first-note { font-size: 4cqw; color: var(--ink-soft); }
 
 /* 最後 */
-.closing-card .big { font-size: 7.4cqw; font-weight: 900; color: var(--accent); }
+.closing-card .big {
+  display: inline-block;
+  font-size: 8cqw;
+  font-weight: 700;
+  color: var(--red-pen);
+  background: linear-gradient(transparent 60%, rgba(255, 226, 122, 0.8) 60%, rgba(255, 226, 122, 0.8) 92%, transparent 92%);
+}
 
 /* 暫停選單 */
 .pause-card { text-align: center; }
@@ -633,26 +733,182 @@ button {
 
 .menu .btn { width: 100%; }
 
+/* ---------- 日記 ---------- */
+
+.diary-card .diary-date {
+  display: inline-block;
+  padding: 0.2cqw 2cqw;
+  font-size: 4.2cqw;
+  font-weight: 700;
+  color: var(--red-pen);
+  border: 0.5cqw solid var(--red-pen);
+  border-radius: 1cqw;
+  transform: rotate(-4deg);
+  margin-bottom: 2cqw;
+}
+
+.diary-q { font-size: 5.4cqw; }
+
+/* 情緒象限：上下是能量高低，左右是舒不舒服 */
+.quad-wrap {
+  display: grid;
+  grid-template-columns: 5cqw 1fr;
+  grid-template-rows: 1fr auto;
+  gap: 1.2cqw;
+  margin: 1cqw 0 3cqw;
+}
+
+.quad-y {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 3.3cqw;
+  color: var(--ink-soft);
+}
+
+.quad-y span { writing-mode: vertical-rl; }
+
+.quad-x {
+  grid-column: 2;
+  display: flex;
+  justify-content: space-between;
+  font-size: 3.3cqw;
+  color: var(--ink-soft);
+}
+
+.quad-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2cqw;
+}
+
+.quad {
+  min-height: 21cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6cqw;
+  padding: 2cqw 1.6cqw;
+  font-size: 4.2cqw;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ink);
+  border: 0.5cqw solid var(--ink);
+  border-radius: var(--hand-border);
+  box-shadow: 0.5cqw 0.8cqw 0 var(--ink);
+}
+
+.quad small { font-size: 3.3cqw; font-weight: 400; color: var(--ink-soft); }
+.quad .face { font-size: 7cqw; line-height: 1; }
+.quad.red { background: #ffd9d2; }
+.quad.yellow { background: #fff1b3; }
+.quad.blue { background: #d7e5f6; }
+.quad.green { background: #d9efcf; }
+.quad[aria-pressed="true"] { outline: 1cqw solid var(--ink); outline-offset: 0.6cqw; }
+.quad:active { transform: translate(0.3cqw, 0.5cqw); box-shadow: 0.2cqw 0.3cqw 0 var(--ink); }
+
+.words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2cqw;
+  margin: 1cqw 0 3cqw;
+}
+
+.word {
+  min-height: 44px;
+  padding: 1cqw 3.4cqw;
+  font-size: 4.3cqw;
+  font-weight: 700;
+  background: #ffffff;
+  border: 0.45cqw solid var(--ink);
+  border-radius: 6cqw 5cqw 6.5cqw 5cqw / 5cqw 6.5cqw 5cqw 6cqw;
+}
+
+.word[aria-pressed="true"] { background: var(--hl); }
+
+.own-word {
+  display: flex;
+  align-items: center;
+  gap: 2cqw;
+  font-size: 4.2cqw;
+}
+
+.own-word input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  font-size: 4.8cqw;
+  font-weight: 700;
+  padding: 0 1cqw;
+  background: transparent;
+  border: 0;
+  border-bottom: 0.5cqw solid var(--ink);
+  border-radius: 0;
+}
+
+.diary-text {
+  display: block;
+  width: 100%;
+  min-height: calc(var(--lh) * 4);
+  padding: 0 1cqw;
+  font-size: 4.8cqw;
+  line-height: var(--lh);
+  background: repeating-linear-gradient(to bottom, transparent 0 calc(var(--lh) - 1px), var(--rule) calc(var(--lh) - 1px) var(--lh));
+  background-attachment: local;
+  border: 0;
+  border-left: 0.4cqw solid var(--margin);
+  resize: vertical;
+}
+
+.picked-feel {
+  display: inline-block;
+  margin-bottom: 2cqw;
+  padding: 0.6cqw 3cqw;
+  font-weight: 700;
+  border: 0.45cqw solid var(--ink);
+  border-radius: 6cqw 5cqw 6.5cqw 5cqw / 5cqw 6.5cqw 5cqw 6cqw;
+}
+
+.picked-feel.red { background: #ffd9d2; }
+.picked-feel.yellow { background: #fff1b3; }
+.picked-feel.blue { background: #d7e5f6; }
+.picked-feel.green { background: #d9efcf; }
+
+.diary-hint { font-size: 3.9cqw; color: var(--ink-soft); }
+
+/* 一週回顧裡的日記 */
+.diary-week {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4cqw;
+  margin: 2cqw 0 4cqw;
+}
+
+.diary-entry {
+  padding: 2.4cqw 3.6cqw;
+  background: #ffffff;
+  border: 0.45cqw solid var(--ink);
+  border-radius: var(--hand-border);
+}
+
+.diary-entry .head { display: flex; align-items: center; gap: 2cqw; flex-wrap: wrap; }
+.diary-entry .day { font-weight: 700; color: var(--red-pen); }
+.diary-entry p { margin: 1cqw 0 0; white-space: pre-line; }
+.diary-entry .q { font-size: 3.8cqw; color: var(--ink-soft); }
+
+input:focus-visible, textarea:focus-visible { outline: 0.6cqw solid var(--blue-pen); outline-offset: 0.4cqw; }
+
 /* 系統設定「減少動態效果」時，關掉閃爍與轉場 */
 @media (prefers-reduced-motion: reduce) {
   .next-hint { animation: none; }
   .courage-fill { transition: none; }
-  .btn:active, .choice:active, .role:active, .pick:active, .pause-btn:active { transform: none; }
+  .btn:active, .choice:active, .role:active, .pick:active, .quad:active, .pause-btn:active { transform: none; }
 }
 
 /* 鍵盤操作時看得到焦點 */
 button:focus-visible {
-  outline: 0.8cqw solid #3b82c4;
-  outline-offset: 0.4cqw;
+  outline: 0.8cqw solid var(--blue-pen);
+  outline-offset: 0.6cqw;
 }
-
-/* 標題畫面右上角的語言切換 */
-.lang-btn {
-  display: block;
-  margin: -2cqw -1cqw 0 auto;
-  padding: 1cqw 2cqw;
-  font-size: 3.6cqw;
-}
-
-/* 英文版：中文字型裡的引號和撇號是全形，英文先用系統的西文字型 */
-html:lang(en) body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif; }
