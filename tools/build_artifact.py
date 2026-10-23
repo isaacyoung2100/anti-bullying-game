@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "frontend"
 OUT = ROOT / "dist" / "artifact.html"
 
-STORY_IDS = ["azhe", "xiaoyu", "aming"]
+STORY_IDS = ["azhe", "xiaoyu", "aming", "kai", "qing", "pinyu"]
 
 # Artifacts 會自動加上 <html>/<head>，並在上下保留手機安全區域；
 # 這裡補上左右留白，並讓畫面高度跟著可用空間走

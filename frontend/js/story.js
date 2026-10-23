@@ -16,8 +16,11 @@
 import azhe from './stories/azhe.js?v=dev';
 import xiaoyu from './stories/xiaoyu.js?v=dev';
 import aming from './stories/aming.js?v=dev';
+import kai from './stories/kai.js?v=dev';
+import qing from './stories/qing.js?v=dev';
+import pinyu from './stories/pinyu.js?v=dev';
 
-export const STORIES = [azhe, xiaoyu, aming];
+export const STORIES = [azhe, xiaoyu, aming, kai, qing, pinyu];
 
 // 玩家扮演的角色在對話中顯示為「你」
 export const CHARACTERS = {
@@ -30,6 +33,14 @@ export const CHARACTERS = {
   mom:     { name: '媽媽' },
   momX:    { name: '媽媽' },
   momM:    { name: '媽媽' },
+  kai:     { name: '阿凱' },
+  qing:    { name: '小晴' },
+  pinyu:   { name: '品妤' },
+  guanyu:  { name: '冠宇' },
+  xinyi:   { name: '欣儀' },
+  grandma: { name: '阿嬤' },
+  dadQ:    { name: '爸爸' },
+  sister:  { name: '姊姊' },
   class:   { name: '同學們' },
   narrator:{ name: '' },
 };

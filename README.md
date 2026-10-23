@@ -35,7 +35,7 @@ python -m http.server 8000 --directory frontend
 npm test
 ```
 
-窮舉三個角色所有的選擇路徑，檢查不會卡關、結局固定內容在每條路徑都相同、週五老師一定介入、劇情前後一致等規則；英文版也會檢查劇本每一句都有翻譯。GitHub Actions 會在每次推送時自動執行。改了數值後，路徑統計快照會失敗；確認是刻意的，再用 `UPDATE_SNAPSHOT=1 npm test` 更新。
+窮舉六個角色所有的選擇路徑，檢查不會卡關、結局固定內容在每條路徑都相同、週五老師一定介入、劇情前後一致等規則；英文版也會檢查劇本每一句都有翻譯。GitHub Actions 會在每次推送時自動執行。改了數值後，路徑統計快照會失敗；確認是刻意的，再用 `UPDATE_SNAPSHOT=1 npm test` 更新。
 
 ## 部署
 
@@ -55,7 +55,7 @@ npm test
 frontend/index.html      遊戲頁面
 frontend/css/style.css   樣式
 frontend/js/story.js     共用設定（角色名字、心靈能量、求助專線、志豪的內心話）
-frontend/js/stories/     三個角色的劇本（五天的情境、選項、結局）
+frontend/js/stories/     六個角色的劇本（五天的情境、選項、日記問題、結局）
 frontend/js/sprites.js   日記本塗鴉風的場景與角色（全部用程式繪製）
 frontend/js/game.js      遊戲流程
 frontend/js/i18n.js      中英文切換與介面文字

@@ -125,6 +125,14 @@ const PALETTES = {
   mom:     { hair: 'long',     H: '#5a3a28', S: SKIN,     C: '#e08478', D: '#bb5d52', P: '#6a5a48', adult: true },
   momX:    { hair: 'bun',      H: '#35293c', S: SKIN,     C: '#5f8a8b', D: '#3f6667', P: '#4e4a5a', adult: true },
   momM:    { hair: 'long',     H: '#2a2430', S: SKIN_TAN, C: '#efc35a', D: '#c99a30', P: '#6a5a48', adult: true },
+  kai:     { hair: 'neat',     H: '#6b4a34', S: SKIN,     C: '#4fb3b0', D: '#2f8a87', P: '#4a5a8a' },
+  qing:    { hair: 'bangs',    H: '#2a2430', S: SKIN,     C: '#f2a7b8', D: '#d47b92', P: '#4a5a8a' },
+  pinyu:   { hair: 'twin',     H: '#4a3329', S: SKIN,     C: '#f6d36b', D: '#d9ad3a', P: '#4a5a8a', ties: '#e86060' },
+  guanyu:  { hair: 'neat',     H: '#2a2430', S: SKIN,     C: '#b5b9c4', D: '#8a8fa0', P: '#4a5a8a', glasses: true },
+  xinyi:   { hair: 'ponytail', H: '#5a3a28', S: SKIN,     C: '#ff9fc8', D: '#e070a0', P: '#4a5a8a' },
+  grandma: { hair: 'bun',      H: '#c9c3cc', S: SKIN,     C: '#c98bd0', D: '#a061aa', P: '#5a4a5a', adult: true },
+  dadQ:    { hair: 'neat',     H: '#2a2430', S: SKIN,     C: '#f2e6a8', D: '#cdbd6a', P: '#3e4a5a', adult: true },
+  sister:  { hair: 'long',     H: '#35293c', S: SKIN,     C: '#7d8fd8', D: '#5a6ab8', P: '#3e3a4a', adult: true },
 };
 
 // 頭髮：後面的頭髮先畫（在臉後面），瀏海後畫（蓋在額頭上）
@@ -134,6 +142,10 @@ function hairBack(g, pal, hx, hy) {
   if (pal.hair === 'long') shape(g, [...ellipsePts(hx, hy - 1, 10.5, 10, 14, Math.PI, Math.PI * 2), [hx + 10.5, hy + 11], [hx - 10.5, hy + 11]], o);
   if (pal.hair === 'ponytail') shape(g, ellipsePts(hx + 9.5, hy + 2, 3.2, 6.5), o);
   if (pal.hair === 'bun') oval(g, hx, hy - 10.5, 4.2, 3.6, o);
+  // 齊瀏海短髮：兩側直直垂到下巴
+  if (pal.hair === 'bangs') shape(g, [...ellipsePts(hx, hy - 1, 10.4, 10, 14, Math.PI, Math.PI * 2), [hx + 10.4, hy + 8.5], [hx - 10.4, hy + 8.5]], o);
+  // 雙馬尾
+  if (pal.hair === 'twin') for (const s of [-1, 1]) shape(g, ellipsePts(hx + s * 10.5, hy + 3.5, 2.8, 5.5), o);
 }
 
 function fringe(g, pal, hx, hy) {
@@ -147,9 +159,15 @@ function fringe(g, pal, hx, hy) {
     shape(g, [...tips, [hx + 9, hy - 2], [hx + 4, hy - 4.5], [hx + 1, hy - 2.5], [hx - 3, hy - 4.5], [hx - 9, hy - 2]], o);
     return;
   }
-  // 整齊的瀏海：一側分線
-  shape(g, [...top, [hx + 9.4, hy - 1], [hx + 3, hy - 4.6], [hx - 2, hy - 3.6], [hx - 9.4, hy - 1.5]], o);
+  if (pal.hair === 'bangs') {
+    // 齊瀏海：剪得平平的
+    shape(g, [...top, [hx + 9.4, hy - 2.6], [hx - 9.4, hy - 2.6]], o);
+  } else {
+    // 整齊的瀏海：一側分線
+    shape(g, [...top, [hx + 9.4, hy - 1], [hx + 3, hy - 4.6], [hx - 2, hy - 3.6], [hx - 9.4, hy - 1.5]], o);
+  }
   if (pal.clip) box(g, hx + 4, hy - 6.5, 3.2, 1.6, { fill: pal.clip, width: 0.4 });
+  if (pal.ties) for (const s of [-1, 1]) oval(g, hx + s * 10.2, hy - 1.2, 1.4, 1.2, { fill: pal.ties, width: 0.35 });
 }
 
 function face(g, emo, hx, hy, glasses) {
@@ -198,13 +216,43 @@ function face(g, emo, hx, hy, glasses) {
   }
 }
 
+let dimCanvas = null;
+function dimLayer(target) {
+  if (!dimCanvas) dimCanvas = document.createElement('canvas');
+  if (dimCanvas.width !== target.width || dimCanvas.height !== target.height) {
+    dimCanvas.width = target.width;
+    dimCanvas.height = target.height;
+  }
+  return dimCanvas;
+}
+
 // 畫角色：x 為中心，y 為腳底（約 48 單位高）
 export function drawChar(g, id, x, y, emo = 'neutral', { bob = 0, dim = false, boil = 0, shadow = true } = {}) {
   const pal = PALETTES[id];
   if (!pal) return;
+  // 沒在說話的人畫淡一點：先畫在另一層再整層變淡，
+  // 不然各部位各自半透明，後面的頭髮會透過臉看得到
+  if (dim) {
+    const layer = dimLayer(g.canvas);
+    const lg = layer.getContext('2d');
+    lg.setTransform(1, 0, 0, 1, 0, 0);
+    lg.clearRect(0, 0, layer.width, layer.height);
+    lg.setTransform(g.getTransform());
+    drawChar(lg, id, x, y, emo, { bob, boil, shadow });
+    // 蓋一層紙的顏色：看起來褪色，但不會透出後面的桌子
+    lg.setTransform(1, 0, 0, 1, 0, 0);
+    lg.globalCompositeOperation = 'source-atop';
+    lg.fillStyle = 'rgba(251, 247, 238, 0.5)';
+    lg.fillRect(0, 0, layer.width, layer.height);
+    lg.globalCompositeOperation = 'source-over';
+    g.save();
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.drawImage(layer, 0, 0);
+    g.restore();
+    return;
+  }
   seed(hash(id) + boil * 7919);
   g.save();
-  if (dim) g.globalAlpha = 0.55;
   // 大人畫得高一點
   if (pal.adult) { g.translate(x, y); g.scale(1.12, 1.12); g.translate(-x, -y); }
   y += bob;

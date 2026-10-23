@@ -15,6 +15,7 @@ const ALL = STORIES.map((st) => ({ st, paths: enumeratePaths(st, { start: START_
 const ALWAYS_LOCKED_OK = new Set([
   'azhe|週一|2',  // 第一天就讓玩家遇到「說不出口」
   'aming|週一|2',
+  'kai|週一|2',
 ]);
 
 const FORBIDDEN = ['外籍新娘'];
