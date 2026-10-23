@@ -2,6 +2,8 @@
 
 反霸凌體驗遊戲（國小高年級）。開場選一個角色（阿哲、小雨、阿明），以第一人稱扮演被同學欺負的孩子，度過運動會前的一個禮拜，親身體會被欺負的人的感受。直向版面，手機直拿最好玩。
 
+**線上遊玩：https://isaacyoung2100.github.io/anti-bullying-game/**（推送到 main 後，測試通過才會自動部署）
+
 ## 玩法與設計
 
 - **心靈能量**：每次被嘲笑、被排擠就會下降；每天早上睡一覺、被善待時會回來一點。
@@ -35,7 +37,7 @@ npm test
 整個 `frontend` 資料夾就是網站，可以部署到任何靜態網站服務，免費而且不會休眠：
 
 - **Render**：新增 Static Site，Publish directory 填 `frontend`，Build command 留空。
-- **GitHub Pages**：把 `frontend` 的內容放到 Pages 指定的資料夾。
+- **GitHub Pages**（目前使用）：`.github/workflows/pages.yml` 會在推送到 main 時先跑 `npm test`，通過後把 `frontend` 資料夾部署上去。
 - **單一檔案（Claude Artifacts 等）**：執行 `python tools/build_artifact.py`，會把整個遊戲打包成 `dist/artifact.html`。
 
 ## 研究資料
