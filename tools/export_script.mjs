@@ -130,3 +130,9 @@ doc.push(
 mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, doc.join('\n'), 'utf8');
 console.log(`wrote docs/劇本.md (${doc.length} lines)`);
+
+// 給協作 AI 的單一檔案：角色擴充簡報（手寫）＋ 由來與完整劇本（自動產生）
+const brief = readFileSync(join(root, 'docs', '角色擴充簡報.md'), 'utf8').trim();
+const combined = `${brief}\n\n---\n\n${doc.join('\n')}`;
+writeFileSync(join(root, 'docs', '給協作AI_角色擴充與完整劇本.md'), combined, 'utf8');
+console.log('wrote docs/給協作AI_角色擴充與完整劇本.md');
