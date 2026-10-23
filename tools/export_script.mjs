@@ -2,7 +2,7 @@
 // 用法：node tools/export_script.mjs
 // 文件直接從 frontend/js/stories/ 產生，改完劇本重新執行即可保持一致
 
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -55,10 +55,19 @@ function steps(list, player, depth = 0) {
   return rows;
 }
 
+// 遊戲由來是手寫的，放在 docs/由來.md；劇本部分自動產生
+const origin = readFileSync(join(root, 'docs', '由來.md'), 'utf8').trim();
+
 const doc = [
-  '# 五年三班大隊接力｜完整劇本',
+  '# 五年三班大隊接力｜遊戲由來與完整劇本',
   '',
-  '> 這份文件由遊戲的劇本檔（`frontend/js/stories/`）自動產生。改劇本後執行 `node tools/export_script.mjs` 重新產生。',
+  '> 「由來」一節由 `docs/由來.md` 手寫維護；劇本部分由遊戲的劇本檔（`frontend/js/stories/`）自動產生。改完後執行 `node tools/export_script.mjs` 重新產生。',
+  '',
+  origin,
+  '',
+  '---',
+  '',
+  '# 完整劇本',
   '',
   '## 遊戲規則',
   '',
