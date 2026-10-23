@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>教師手冊｜五年三班大隊接力</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #2b2030;
+      --muted: #6b5d66;
+      --paper: #fffaf0;
+      --line: #e6d9c2;
+      --accent: #e8584a;
+      --warn-bg: #fff1ec;
+      --tip-bg: #eef7ff;
+      --tip-ink: #2d6aa3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #f3e6c8;
+      color: var(--ink);
+      font-family: 'Noto Sans TC', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.75;
+    }
+    main {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 32px 16px 64px;
+    }
+    .sheet {
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 12px;
+      padding: 32px clamp(16px, 5vw, 48px);
+    }
+    .kicker { color: var(--accent); font-weight: 900; letter-spacing: 0.08em; font-size: 14px; }
+    h1 { font-size: 30px; font-weight: 900; margin: 4px 0 8px; line-height: 1.3; }
+    h2 {
+      font-size: 21px;
+      font-weight: 900;
+      margin: 40px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 3px solid var(--ink);
+    }
+    h3 { font-size: 17px; font-weight: 900; margin: 24px 0 6px; }
+    p { margin: 0 0 12px; }
+    ul, ol { margin: 0 0 12px; padding-left: 24px; }
+    li { margin-bottom: 4px; }
+    .lead { color: var(--muted); }
+    table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; font-size: 15px; }
+    th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+    th { font-weight: 900; background: #f6ecd6; }
+    td:first-child { white-space: nowrap; font-weight: 700; }
+    .box { border-radius: 8px; padding: 14px 18px; margin: 12px 0 16px; }
+    .box.warn { background: var(--warn-bg); border: 2px solid var(--accent); }
+    .box.tip { background: var(--tip-bg); border: 2px solid var(--tip-ink); }
+    .box h3 { margin-top: 0; }
+    .chapter { border: 2px solid var(--line); border-radius: 8px; padding: 4px 18px 8px; margin: 12px 0; }
+    .label { font-weight: 900; }
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+    .actions a, .actions button {
+      font: inherit;
+      font-weight: 900;
+      color: var(--ink);
+      text-decoration: none;
+      background: #ffd166;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      padding: 6px 16px;
+      cursor: pointer;
+    }
+    .actions button { background: #ffffff; }
+    @media print {
+      body { background: #ffffff; font-size: 12pt; }
+      main { padding: 0; }
+      .sheet { border: none; padding: 0; }
+      .actions { display: none; }
+      h2 { break-after: avoid; }
+      .chapter, .box { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+<main>
+<article class="sheet">
+  <div class="kicker">教師手冊</div>
+  <h1>五年三班大隊接力</h1>
+  <p class="lead">國小五、六年級反霸凌課堂遊戲。一節課（約 40 分鐘），由老師帶領全班一起玩。</p>
+  <div class="actions">
+    <a href="/">開始遊戲</a>
+    <button type="button" onclick="window.print()">列印手冊</button>
+  </div>
+
+  <h2>這個遊戲想做什麼</h2>
+  <p>霸凌通常不只發生在兩個人之間。旁邊的人是跟著笑、沉默，還是站出來，往往決定了事情會變好還是變糟。這個遊戲讓全班扮演「旁觀者」，在三個情境裡一起決定要怎麼做，並看見每個選擇的後果。</p>
+  <ul>
+    <li>學生不需要扮演霸凌者，也不需要扮演被霸凌的人。</li>
+    <li>劇情全部固定，老師可以先玩一次，確認所有內容。</li>
+    <li>投票是匿名的，畫面上只會出現全班的統計，不會顯示誰投了什麼。</li>
+    <li>遊戲最重要的部分不是螢幕，而是每次投票後的<strong>老師時間</strong>：由您帶全班討論。</li>
+  </ul>
+
+  <h2>上課前的準備</h2>
+  <ol>
+    <li><span class="label">自己先玩一次。</span>完整玩一次大約 15 分鐘，熟悉流程和每章的內容。</li>
+    <li><span class="label">想想班上的狀況。</span>三個故事分別和注意力不足過動特質、單親與經濟弱勢、新住民家庭有關。如果班上有學生的處境很接近，而且正在被同學取笑，建議先和輔導老師討論，或先私下和那位學生聊過，再決定要不要使用、用哪幾章。</li>
+    <li><span class="label">確認設備。</span>需要一台電腦和投影機。學生用平板投票時，平板要能連上網路；沒有平板的話，可以選「舉手計票」，由老師輸入人數。</li>
+    <li><span class="label">先跟輔導室打聲招呼。</span>玩這類遊戲時，有學生可能會說出自己的經驗。事先知道可以轉介給誰，會比較安心。</li>
+  </ol>
+
+  <h2>40 分鐘教案</h2>
+  <table>
+    <thead><tr><th>時間</th><th>內容</th><th>老師可以做的事</th></tr></thead>
+    <tbody>
+      <tr><td>0–3 分</td><td>開場</td><td>說明規則：大家一起投票決定故事怎麼走。沒有標準答案，選你「真的會做」的，不是「應該做」的。討論時不提班上真實的人。</td></tr>
+      <tr><td>3–12 分</td><td>第一章　阿哲</td><td>投票、老師時間（約 3–4 分鐘），視情況再投一次。</td></tr>
+      <tr><td>12–21 分</td><td>第二章　小雨</td><td>同上。</td></tr>
+      <tr><td>21–30 分</td><td>第三章　阿明</td><td>同上。</td></tr>
+      <tr><td>30–33 分</td><td>志豪的內心話、結局</td><td>讓學生看完結局，先不急著評論。</td></tr>
+      <tr><td>33–40 分</td><td>課後討論</td><td>用畫面上的三個問題帶討論，最後請每個人想一件明天可以做的「小事」。</td></tr>
+    </tbody>
+  </table>
+  <div class="box tip">
+    <h3>時間不夠的時候</h3>
+    <p>「再投一次」可以只在一章使用，建議選全班沉默或附和比例最高的那一章。也可以把三章分成兩節課進行。</p>
+  </div>
+
+  <h2>每一章的引導重點</h2>
+  <p>每次投票公布後，畫面會停在「老師時間」，顯示全班的選擇和兩個建議提問。討論夠了，再按「看看會發生什麼」。</p>
+
+  <div class="chapter">
+    <h3>第一章　起跑線（阿哲）</h3>
+    <p><span class="label">想讓學生理解：</span>有些人的衝動、坐不住不是故意的，排除他不是解決問題的方法。</p>
+    <p><span class="label">常聽到的回答：</span>「可是他真的會害我們被取消資格。」</p>
+    <p><span class="label">可以這樣回應：</span>先肯定這個擔心是合理的，再引導到「我們是要解決犯規的問題，還是要把阿哲排除？」兩者的差別。</p>
+  </div>
+
+  <div class="chapter">
+    <h3>第二章　班服（小雨）</h3>
+    <p><span class="label">想讓學生理解：</span>家裡的狀況不是孩子能選擇的，不應該成為被嘲笑的理由。</p>
+    <p><span class="label">常聽到的回答：</span>「志豪只是開玩笑。」</p>
+    <p><span class="label">可以這樣回應：</span>「開玩笑要兩個人都覺得好笑。小雨覺得好笑嗎？」</p>
+    <p><span class="label">特別注意：</span>討論時避免讓班上經濟比較辛苦的學生被注意到，例如不要問「班上誰家也……」。</p>
+  </div>
+
+  <div class="chapter">
+    <h3>第三章　加油口號（阿明）</h3>
+    <p><span class="label">想讓學生理解：</span>會說兩種語言是一種能力。取綽號、學口音，對被取笑的人來說一點都不好笑。</p>
+    <p><span class="label">常聽到的回答：</span>「大家都在喊，我一個人說不要很奇怪。」</p>
+    <p><span class="label">可以這樣回應：</span>承認這種壓力真的存在，再討論不用當眾對抗也能做的小事：下課私下關心阿明、自己不跟著喊、告訴老師。</p>
+  </div>
+
+  <div class="chapter">
+    <h3>最後　志豪的內心話</h3>
+    <p>志豪說他四年級時也被大家笑過。這不是要替他找藉口，而是讓學生看見：帶頭的人也可能在害怕。可以問：「如果當年有人站在志豪那邊，現在會不一樣嗎？」</p>
+  </div>
+
+  <h2>「再投一次」怎麼用</h2>
+  <ul>
+    <li>討論完再投一次，畫面會顯示討論前後的變化，例如「沉默或附和：40% → 15%」。</li>
+    <li>目的不是要學生改成「正確答案」。如果討論後選擇沒有改變，也是很好的討論材料：「為什麼還是很難站出來？」</li>
+    <li>故事會依照最後一次投票的結果繼續。</li>
+  </ul>
+
+  <h2>當學生說出自己正在被欺負</h2>
+  <div class="box warn">
+    <h3>這可能真的會發生。請照下面的順序處理：</h3>
+    <ol>
+      <li><span class="label">當下：</span>謝謝他願意說出來，告訴他老師會幫忙。不要在全班面前追問細節，也不要請他當場說出是誰。</li>
+      <li><span class="label">讓課程繼續：</span>把話題自然帶回故事，例如「謝謝你，我們下課再聊」。</li>
+      <li><span class="label">下課後：</span>私下找他談，了解發生了什麼事。</li>
+      <li><span class="label">通報與轉介：</span>依《校園霸凌防制準則》和學校的流程，通報學務處，並轉介輔導室。</li>
+      <li><span class="label">也注意被提到的學生：</span>如果有學生被點名是欺負別人的人，同樣私下了解，不要當眾指責。</li>
+    </ol>
+    <p>如果學生提到想傷害自己，請立即轉介輔導室並通知家長。也可以提供 24 小時的安心專線 <strong>1925</strong>；兒少遭受傷害可撥 <strong>113</strong> 保護專線。</p>
+  </div>
+
+  <h2>操作方式</h2>
+  <table>
+    <tbody>
+      <tr><td>推進劇情</td><td>點畫面、按空白鍵或簡報筆。卡片上的「繼續」也可以用空白鍵按。</td></tr>
+      <tr><td>平板投票</td><td>開始時選「建立投票房間」，投票畫面會顯示 QR code 和房間碼。按「開放平板投票」後學生才能投，按「公布結果」結束投票。</td></tr>
+      <tr><td>舉手計票</td><td>開始時選「不用平板，舉手計票」，用每個選項旁的 + / − 輸入舉手人數。</td></tr>
+      <tr><td>全螢幕</td><td>畫面下方的「全螢幕」按鈕，或按 F11。</td></tr>
+      <tr><td>重新開始</td><td>畫面下方的「重新開始」，或在最後的討論畫面按「再玩一次」。</td></tr>
+    </tbody>
+  </table>
+
+  <h2>研究紀錄</h2>
+  <p>遊戲會記錄每一章的投票人數、討論前後的變化和結局，<strong>不記錄任何學生的姓名或個人資料</strong>。最後的討論畫面可以匯出研究紀錄（CSV），需要管理密碼。</p>
+</article>
+</main>
+</body>
+</html>

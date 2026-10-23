@@ -130,11 +130,6 @@ body.projector {
   padding: 0.4cqw 1cqw;
 }
 
-.ai-chip.offline {
-  background: var(--paper-2);
-  color: var(--muted);
-}
-
 /* 對話框 */
 .dialog {
   position: absolute;
@@ -397,6 +392,50 @@ body.projector {
 .join .url { color: var(--muted); }
 
 .result-line { font-size: 1.9cqw; margin-top: 1cqw; }
+
+/* 老師時間 */
+.teacher-card { width: 84cqw; max-height: none; }
+
+.teacher-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 2.4cqw;
+  align-items: start;
+}
+
+.round-label {
+  font-size: 1.4cqw;
+  font-weight: 900;
+  color: var(--muted);
+  margin: 0.6cqw 0 0.2cqw;
+}
+
+.teacher-card .dist { height: 2.6cqw; margin-bottom: 0.6cqw; }
+.teacher-card .legend { margin-top: 0.6cqw; }
+
+.change {
+  margin-top: 1.2cqw;
+  font-size: 1.9cqw;
+}
+
+.prompts ol {
+  margin: 0;
+  padding-left: 2.4cqw;
+  font-size: 1.9cqw;
+  line-height: 1.5;
+}
+
+.prompts li { margin-bottom: 0.8cqw; }
+
+.prompts .note {
+  font-size: 1.35cqw;
+  color: var(--muted);
+  margin-top: 0.8cqw;
+}
+
+.guide-link a { color: var(--accent); font-weight: 900; }
+
+.shift { font-size: 1.25cqw; color: var(--good); margin-top: 0.2cqw; }
 
 /* 內心話：日記紙 */
 .inner-card {

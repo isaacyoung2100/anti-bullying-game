@@ -1,5 +1,5 @@
 import {
-  CHARACTERS, TYPE_EFFECT, PROLOGUE, CHAPTERS, ZHIHAO_INNER, ENDINGS, FALLBACK_DEBRIEF,
+  CHARACTERS, TYPE_EFFECT, PROLOGUE, CHAPTERS, ZHIHAO_INNER, ENDINGS, DEBRIEF_QUESTIONS,
 } from './story.js';
 import { W, H, SCENES, drawChar, drawPortrait, sceneLabels } from './sprites.js';
 
@@ -22,11 +22,11 @@ const state = {
   mood: 50,
   trust: { azhe: 50, xiaoyu: 50, aming: 50 },
   choices: [],
+  rounds: {},           // 每章的投票結果，[第一輪, 討論後第二輪]
   view: { bg: 'title', chars: [], speaker: null },
   room: null,           // { code, token }
   tablet: false,        // true：學生用平板投票；false：舉手計票
   codeRequired: false,  // 伺服器是否要求老師通行碼
-  ai: 'unknown',        // 'on' | 'off' | 'unknown'
   session: Math.random().toString(36).slice(2, 10),
   typing: null,
   lanBase: null,
@@ -109,10 +109,6 @@ function updateHud(delta) {
   const room = $('roomChip');
   room.hidden = !state.tablet;
   if (state.tablet) room.textContent = `房間 ${state.room.code}`;
-  const ai = $('aiChip');
-  ai.hidden = state.ai === 'unknown';
-  ai.textContent = state.ai === 'on' ? 'AI 角色反應' : '預設劇情';
-  ai.classList.toggle('offline', state.ai !== 'on');
 }
 
 // ---------- 對話 ----------
@@ -182,6 +178,7 @@ function buildSteps() {
     steps.push({ k: 'chapter', ch });
     ch.scenes.forEach((l) => steps.push({ k: 'line', ...l }));
     steps.push({ k: 'vote', ch });
+    steps.push({ k: 'teacher', ch });
     steps.push({ k: 'react', ch });
     steps.push({ k: 'inner', ch, data: ch.inner });
     steps.push({ k: 'info', ch });
@@ -218,6 +215,7 @@ function run() {
     line: stepLine,
     chapter: stepChapter,
     vote: stepVote,
+    teacher: stepTeacher,
     react: stepReact,
     inner: stepInner,
     info: stepInfo,
@@ -254,6 +252,7 @@ function stepTitle() {
     <div class="kicker">反霸凌課堂遊戲・國小高年級</div>
     <h1>五年三班大隊接力</h1>
     <p class="sub">全班一起決定：看到有人被欺負的時候，我們要怎麼做？</p>
+    <p class="sub guide-link">第一次使用？請先看 <a href="/guide" target="_blank" rel="noopener">教師手冊</a></p>
     ${state.codeRequired ? `
       <div class="teacher-code">
         <label for="teacherCode">老師通行碼</label>
@@ -312,9 +311,11 @@ function stepChapter({ ch }) {
 
 // ----- 投票 -----
 
-function stepVote({ ch }) {
+// round 1：第一次投票；round 2：老師帶討論後「再投一次」
+function stepVote({ ch, round = 1 }) {
   state.view.speaker = null;
   const v = ch.vote;
+  const qid = round === 1 ? ch.id : `${ch.id}-r2`;
   const manual = Object.fromEntries(v.options.map((o) => [o.id, 0]));
   let roomCounts = Object.fromEntries(v.options.map((o) => [o.id, 0]));
   let poller = null;
@@ -322,7 +323,7 @@ function stepVote({ ch }) {
 
   const joinUrl = state.tablet ? `${state.lanBase || location.origin}/vote?room=${state.room.code}` : '';
   const card = showPanel(`
-    <div class="kicker">全班投票</div>
+    <div class="kicker">${round === 1 ? '全班投票' : '討論之後，再投一次'}</div>
     <h2>${esc(v.question)}</h2>
     <div class="vote-grid">
       ${v.options.map((o) => `
@@ -383,7 +384,7 @@ function stepVote({ ch }) {
       try {
         await api(`/api/rooms/${state.room.code}/open`, {
           method: 'POST', token: state.room.token,
-          body: { qid: ch.id, question: v.question, options: v.options.map(({ id, text }) => ({ id, text })) },
+          body: { qid, question: v.question, options: v.options.map(({ id, text }) => ({ id, text })) },
         });
         openBtn.textContent = '投票中…';
         openBtn.disabled = true;
@@ -391,7 +392,7 @@ function stepVote({ ch }) {
         poller = setInterval(async () => {
           try {
             const s = await api(`/api/rooms/${state.room.code}`);
-            if (s.qid === ch.id) { roomCounts = s.counts; paint(); }
+            if (s.qid === qid) { roomCounts = s.counts; paint(); }
           } catch { /* 下一輪再試 */ }
         }, 1000);
       } catch {
@@ -406,7 +407,7 @@ function stepVote({ ch }) {
     if (state.tablet && phase === 'open') {
       try {
         const s = await api(`/api/rooms/${state.room.code}/close`, { method: 'POST', token: state.room.token });
-        if (s.qid === ch.id) roomCounts = s.counts;
+        if (s.qid === qid) roomCounts = s.counts;
       } catch { /* 用目前的票數 */ }
     }
     paint();
@@ -417,38 +418,28 @@ function stepVote({ ch }) {
       return;
     }
     phase = 'done';
-    const max = Math.max(...Object.values(t));
-    const tied = v.options.filter((o) => t[o.id] === max);
-    const winner = tied[Math.floor(Math.random() * tied.length)];
-    applyVote(ch, winner, t, sum, card);
+    revealVote(ch, round, t, sum, card);
   };
 
   paint();
 }
 
-function applyVote(ch, winner, counts, sum, card) {
-  const dist = {};
-  let moodDelta = 0;
-  let trustDelta = 0;
-  ch.vote.options.forEach((o) => {
-    const p = counts[o.id] / sum;
-    dist[o.id] = Math.round(p * 100);
-    moodDelta += p * TYPE_EFFECT[o.type].mood;
-    trustDelta += p * TYPE_EFFECT[o.type].trust;
-  });
-  moodDelta = Math.round(moodDelta);
-  trustDelta = Math.round(trustDelta);
-  state.mood = clamp(state.mood + moodDelta);
-  state.trust[ch.target] = clamp(state.trust[ch.target] + trustDelta);
+const pctOf = (ch, dist, types) => ch.vote.options
+  .filter((o) => types.includes(o.type))
+  .reduce((a, o) => a + dist[o.id], 0);
+
+// 公布結果：記下這一輪的票數，先不改變班級氛圍，等老師時間結束才算數
+function revealVote(ch, round, counts, sum, card) {
+  const dist = Object.fromEntries(ch.vote.options.map((o) => [o.id, Math.round((counts[o.id] / sum) * 100)]));
+  const max = Math.max(...Object.values(counts));
+  const tied = ch.vote.options.filter((o) => counts[o.id] === max);
+  const winner = tied[Math.floor(Math.random() * tied.length)];
 
   ch.vote.options.forEach((o) => {
-    const el = card.querySelector(`.opt[data-id="${o.id}"]`);
-    el.classList.add(o.id === winner.id ? 'winner' : 'loser');
+    card.querySelector(`.opt[data-id="${o.id}"]`).classList.add(o.id === winner.id ? 'winner' : 'loser');
   });
-  const pctOf = (types) => ch.vote.options.filter((o) => types.includes(o.type))
-    .reduce((a, o) => a + dist[o.id], 0);
-  const passive = pctOf(['silent', 'side']);
-  const active = pctOf(['defend', 'help']);
+  const passive = pctOf(ch, dist, ['silent', 'side']);
+  const active = pctOf(ch, dist, ['defend', 'help']);
   let note;
   if (winner.type === 'defend' || winner.type === 'help') {
     note = passive ? `也有 ${passive}% 的人選擇了沉默或附和。` : '沒有人選擇沉默或附和。';
@@ -457,63 +448,106 @@ function applyVote(ch, winner, counts, sum, card) {
   }
   card.querySelector('#resultLine').innerHTML =
     `全班選擇 <b>${winner.id.toUpperCase()}</b>（${dist[winner.id]}%）。${note}`;
-  card.querySelector('#btnReveal').textContent = '看看會發生什麼 ▶';
-  const open = card.querySelector('#btnOpen');
-  if (open) open.remove();
+  card.querySelector('#btnReveal').textContent = '老師時間 ▶';
+  card.querySelector('#btnOpen')?.remove();
+
+  const result = { round, counts, total: sum, dist, winner: winner.id, type: winner.type, passive, active };
+  state.rounds[ch.id] = [...(state.rounds[ch.id] || []).filter((r) => r.round !== round), result];
+  log('vote', { chapter: ch.id, ...result });
+}
+
+function distBar(ch, dist) {
+  return `<div class="dist">${ch.vote.options
+    .filter((o) => dist[o.id] > 0)
+    .map((o) => `<span style="width:${dist[o.id]}%;background:${TYPE_COLOR[o.type]}" title="${o.id.toUpperCase()} ${dist[o.id]}%"></span>`)
+    .join('')}</div>`;
+}
+
+function legendHtml() {
+  return Object.entries(TYPE_EFFECT)
+    .map(([k, v]) => `<span><i style="background:${TYPE_COLOR[k]}"></i>${v.label}</span>`).join('');
+}
+
+// ----- 老師時間：投票後停下來討論，可以再投一次 -----
+
+function stepTeacher({ ch }) {
+  state.view.speaker = null;
+  const [r1, r2] = state.rounds[ch.id];
+  let change = '';
+  if (r2) {
+    const diff = r2.passive - r1.passive;
+    change = `<p class="change">沉默或附和：<b>${r1.passive}%</b> → <b>${r2.passive}%</b>`
+      + (diff < 0 ? `（少了 ${-diff}%）` : diff > 0 ? `（多了 ${diff}%）` : '（沒有改變）') + '</p>';
+  }
+  const card = showPanel(`
+    <div class="kicker">老師時間</div>
+    <h2>${r2 ? '討論前後，大家的選擇' : '先停一下，聽聽大家的想法'}</h2>
+    <div class="teacher-grid">
+      <div>
+        <div class="round-label">${r2 ? '討論前' : '全班的選擇'}</div>
+        ${distBar(ch, r1.dist)}
+        ${r2 ? `<div class="round-label">討論後</div>${distBar(ch, r2.dist)}` : ''}
+        <div class="legend">${legendHtml()}</div>
+        ${change}
+      </div>
+      <div class="prompts">
+        <div class="round-label">可以問問看</div>
+        <ol>${ch.teacher.map((q) => `<li>${esc(q)}</li>`).join('')}</ol>
+        <p class="note">請不同選擇的同學說說理由，沒有標準答案。不需要提到班上真實的人或事件。</p>
+      </div>
+    </div>
+    <div class="btn-row">
+      ${r2 ? '' : '<button class="btn secondary" type="button" id="again">討論完，再投一次</button>'}
+      <button class="btn" type="button" id="go">看看會發生什麼 ▶</button>
+    </div>
+  `, 'teacher-card');
+  card.addEventListener('click', (e) => e.stopPropagation());
+  card.querySelector('#again')?.addEventListener('click', () => {
+    insertAfterCurrent([{ k: 'vote', ch, round: 2 }, { k: 'teacher', ch }]);
+    next();
+  });
+  card.querySelector('#go').onclick = () => {
+    commitChoice(ch);
+    next();
+  };
+}
+
+// 以最後一輪投票決定劇情與班級氛圍
+function commitChoice(ch) {
+  const rounds = state.rounds[ch.id];
+  const final = rounds[rounds.length - 1];
+  let moodDelta = 0;
+  let trustDelta = 0;
+  ch.vote.options.forEach((o) => {
+    const p = final.counts[o.id] / final.total;
+    moodDelta += p * TYPE_EFFECT[o.type].mood;
+    trustDelta += p * TYPE_EFFECT[o.type].trust;
+  });
+  moodDelta = Math.round(moodDelta);
+  trustDelta = Math.round(trustDelta);
+  state.mood = clamp(state.mood + moodDelta);
+  state.trust[ch.target] = clamp(state.trust[ch.target] + trustDelta);
   updateHud(moodDelta);
 
+  const option = ch.vote.options.find((o) => o.id === final.winner);
   const choice = {
     chapter: ch.id, title: ch.subtitle, target: ch.target,
-    winner: winner.id, type: winner.type, text: winner.text,
-    counts, dist, moodDelta, mood: state.mood, trust: state.trust[ch.target],
+    winner: option.id, type: option.type, text: option.text,
+    dist: final.dist, rounds, moodDelta, mood: state.mood, trust: state.trust[ch.target],
   };
   state.choices.push(choice);
-  log('vote', choice);
+  log('choice', choice);
 }
 
 function clamp(n) { return Math.max(0, Math.min(100, n)); }
 
-// ----- 角色反應（AI 或預設） -----
+// ----- 角色反應：依全班選出的行動播放固定劇情 -----
 
-async function stepReact({ ch }) {
+function stepReact({ ch }) {
   const choice = state.choices.find((c) => c.chapter === ch.id);
   const last = ch.scenes[ch.scenes.length - 1];
   setView(last.bg, last.chars);
-  state.view.speaker = null;
-  hidePanel();
-  $('dialog').hidden = false;
-  $('speaker').textContent = '';
-  $('portrait').classList.add('empty');
-  typeText('……');
-  state.busy = true;
-
-  const typeLabel = (o) => TYPE_EFFECT[o.type].label;
-  let lines = null;
-  try {
-    const res = await api('/api/react', {
-      method: 'POST',
-      timeout: 30000,
-      body: {
-        chapter: `${ch.title}（${ch.subtitle}）`,
-        target: ch.target,
-        situation: ch.scenes.map((s) => `${CHARACTERS[s.speaker]?.name || '旁白'}：${s.text}`),
-        question: ch.vote.question,
-        chosen: choice.text,
-        chosen_type: choice.type,
-        distribution: Object.fromEntries(ch.vote.options.map((o) => [`${o.id.toUpperCase()} ${typeLabel(o)}`, choice.dist[o.id]])),
-        mood: state.mood,
-      },
-    });
-    lines = res.lines.map((l) => ({ speaker: l.speaker, emo: l.emotion, text: l.text }));
-    state.ai = 'on';
-  } catch {
-    lines = ch.reactions[choice.type];
-    state.ai = 'off';
-  }
-  state.busy = false;
-  updateHud();
-  log('react', { chapter: ch.id, source: state.ai, lines });
-  insertAfterCurrent(lines.map((l) => ({ k: 'line', ...l })));
+  insertAfterCurrent(ch.reactions[choice.type].map((l) => ({ k: 'line', ...l })));
   next();
 }
 
@@ -620,26 +654,22 @@ function stepEndingCard() {
   card.querySelector('#go').onclick = (e) => { e.stopPropagation(); next(); };
 }
 
-async function stepDebrief() {
+function stepDebrief() {
   state.view.speaker = null;
-  const legend = Object.entries(TYPE_EFFECT)
-    .map(([k, v]) => `<span><i style="background:${TYPE_COLOR[k]}"></i>${v.label}</span>`).join('');
   const recap = state.choices.map((c) => {
     const ch = CHAPTERS.find((x) => x.id === c.chapter);
-    const segs = ch.vote.options
-      .filter((o) => c.dist[o.id] > 0)
-      .map((o) => `<span style="width:${c.dist[o.id]}%;background:${TYPE_COLOR[o.type]}"></span>`).join('');
-    return `<div class="recap-item"><span class="t">${esc(c.title)}</span>：全班選 ${c.winner.toUpperCase()}「${esc(c.text)}」<div class="dist">${segs}</div></div>`;
+    const [r1, r2] = c.rounds;
+    const shift = r2 ? `<div class="shift">討論後，沉默或附和 ${r1.passive}% → ${r2.passive}%</div>` : '';
+    return `<div class="recap-item"><span class="t">${esc(c.title)}</span>：全班選 ${c.winner.toUpperCase()}「${esc(c.text)}」${distBar(ch, c.dist)}${shift}</div>`;
   }).join('');
   const card = showPanel(`
     <div class="kicker">課後討論</div>
     <h2>我們這次的選擇</h2>
     <div class="debrief-grid">
-      <div class="recap">${recap}<div class="legend">${legend}</div></div>
+      <div class="recap">${recap}<div class="legend">${legendHtml()}</div></div>
       <div class="questions">
         <h3>想一想、說一說</h3>
-        <p class="loading" id="dbSummary">正在整理討論問題……</p>
-        <ol id="dbQuestions"></ol>
+        <ol>${DEBRIEF_QUESTIONS.map((q) => `<li>${esc(q)}</li>`).join('')}</ol>
       </div>
     </div>
     <div class="btn-row">
@@ -651,25 +681,6 @@ async function stepDebrief() {
   card.querySelector('#again').onclick = (e) => { e.stopPropagation(); restart(); };
   card.querySelector('#export').onclick = () => exportCsv(card.querySelector('#exportError'));
   card.addEventListener('click', (e) => e.stopPropagation());
-
-  let questions = FALLBACK_DEBRIEF;
-  let summary = '';
-  try {
-    const res = await api('/api/debrief', {
-      method: 'POST', timeout: 30000,
-      body: {
-        choices: state.choices.map(({ title, text, type, dist }) => ({ title, chosen: text, type, dist })),
-        mood: state.mood,
-        ending: state.ending.key,
-      },
-    });
-    questions = res.questions;
-    summary = res.summary;
-  } catch { /* 用預設問題 */ }
-  const s = card.querySelector('#dbSummary');
-  s.textContent = summary;
-  s.classList.remove('loading');
-  card.querySelector('#dbQuestions').innerHTML = questions.map((q) => `<li>${esc(q)}</li>`).join('');
 }
 
 // 研究紀錄要管理密碼才能下載（在伺服器那台電腦上開啟則不用）
@@ -699,7 +710,6 @@ async function exportCsv(errEl) {
 // ---------- 操作 ----------
 
 function advance() {
-  if (state.busy) return;
   const step = state.steps[state.i];
   if (!step) return;
   // 卡片上的「繼續」也可以用空白鍵或簡報筆按
@@ -739,6 +749,7 @@ function restart() {
   state.mood = 50;
   state.trust = { azhe: 50, xiaoyu: 50, aming: 50 };
   state.choices = [];
+  state.rounds = {};
   state.session = Math.random().toString(36).slice(2, 10);
   run();
 }

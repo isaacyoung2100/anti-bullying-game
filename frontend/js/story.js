@@ -1,5 +1,6 @@
 // 《五年三班大隊接力》劇本資料
-// 每一章：情境台詞 → 全班投票 → 角色反應（AI 或預設）→ 內心話 → 小知識
+// 每一章：情境台詞 → 全班投票 → 老師時間（討論、可再投一次）→ 角色反應 → 內心話 → 想一想
+// 劇情全部固定，老師可以事先審閱
 // 選項的 type 對應旁觀者角色：side（附和）/ silent（沉默旁觀）/ defend（保護）/ help（找方法、求助）
 
 export const CHARACTERS = {
@@ -35,6 +36,11 @@ export const PROLOGUE = [
 export const CHAPTERS = [
   {
     id: 'ch1',
+    // 老師時間的建議提問
+    teacher: [
+      '請一位選「不說話」的同學說說看：那時候，你在擔心什麼？',
+      '如果你是阿哲，聽到「他根本是來搗亂的」，心裡會有什麼感覺？',
+    ],
     title: '第一章　起跑線',
     subtitle: '阿哲的故事',
     target: 'azhe',
@@ -59,7 +65,7 @@ export const CHAPTERS = [
         { id: 'd', type: 'help',   text: '提議：「我們一起想辦法，例如等『砰』之後再數一下才跑。」' },
       ],
     },
-    // AI 無法使用時的預設反應
+    // 全班選出的行動帶來的後果（依選項類型）
     reactions: {
       side:   [{ speaker: 'azhe', emo: 'sad', text: '……喔。那我不要跑好了。' },
                { speaker: 'zhihao', emo: 'happy', text: '早該這樣了嘛。' }],
@@ -77,6 +83,11 @@ export const CHAPTERS = [
   },
   {
     id: 'ch2',
+    // 老師時間的建議提問
+    teacher: [
+      '大家笑的時候，笑的人是真的覺得好笑嗎？還是有別的原因？',
+      '如果想幫小雨，又不想讓她更尷尬，可以怎麼做？',
+    ],
     title: '第二章　班服',
     subtitle: '小雨的故事',
     target: 'xiaoyu',
@@ -115,6 +126,11 @@ export const CHAPTERS = [
   },
   {
     id: 'ch3',
+    // 老師時間的建議提問
+    teacher: [
+      '大家一起喊綽號的時候，一個人要說「不要這樣」難不難？為什麼？',
+      '有沒有不用跟志豪吵架，也能讓阿明好過一點的方法？',
+    ],
     title: '第三章　加油口號',
     subtitle: '阿明的故事',
     target: 'aming',
@@ -189,7 +205,8 @@ export const ENDINGS = {
   },
 };
 
-export const FALLBACK_DEBRIEF = [
+// 課後討論問題
+export const DEBRIEF_QUESTIONS = [
   '在這三個故事裡，哪一個時刻你最想做點什麼，但是沒有做？為什麼？',
   '志豪為什麼會帶頭笑別人？知道他的內心話之後，你對他的看法有改變嗎？',
   '如果明天在班上看到類似的事，你可以做的一件「小事」是什麼？',
