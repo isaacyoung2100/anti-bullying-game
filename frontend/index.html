@@ -15,13 +15,13 @@
 
     <div class="hud" id="hud" hidden>
       <div class="mood">
-        <span class="mood-label">班級氛圍</span>
-        <span class="mood-bar"><span class="mood-fill" id="moodFill"></span></span>
-        <span class="mood-delta" id="moodDelta"></span>
+        <span class="mood-label">勇氣</span>
+        <span class="mood-bar"><span class="mood-fill" id="courageFill"></span></span>
+        <span class="mood-delta" id="courageDelta"></span>
       </div>
       <div class="hud-right">
-        <span class="chip" id="chapterChip"></span>
-        <span class="chip" id="roomChip" hidden></span>      </div>
+        <span class="chip" id="dayChip"></span>
+      </div>
     </div>
 
     <div class="dialog pixel-box" id="dialog" hidden>
@@ -29,20 +29,22 @@
       <div class="dialog-body">
         <div class="speaker" id="speaker"></div>
         <div class="line" id="line"></div>
+        <div class="inner" id="inner" hidden></div>
       </div>
       <div class="next-hint" id="nextHint">▼</div>
     </div>
 
     <div class="panel" id="panel" hidden></div>
+    <div class="panel" id="pause" hidden></div>
   </main>
 
-  <nav class="teacher-bar" aria-label="老師控制列">
+  <nav class="teacher-bar" aria-label="遊戲控制">
+    <button type="button" id="btnPause">暫停</button>
     <button type="button" id="btnFullscreen">全螢幕</button>
     <button type="button" id="btnRestart">重新開始</button>
     <span class="hint">點畫面或按空白鍵繼續</span>
   </nav>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script type="module" src="js/game.js"></script>
 </body>
 </html>

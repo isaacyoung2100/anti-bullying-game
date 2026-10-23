@@ -1,213 +1,221 @@
-// 《五年三班大隊接力》劇本資料
-// 每一章：情境台詞 → 全班投票 → 老師時間（討論、可再投一次）→ 角色反應 → 內心話 → 想一想
-// 劇情全部固定，老師可以事先審閱
-// 選項的 type 對應旁觀者角色：side（附和）/ silent（沉默旁觀）/ defend（保護）/ help（找方法、求助）
+// 《五年三班大隊接力》劇本：第一人稱，你是阿哲
+//
+// 設計原則
+// - 欺負你的人和旁觀者怎麼做，是固定劇情；你控制不了別人，現實中也是這樣
+// - 你的選擇只改變你的感受、你找誰說，不決定你「該不該」被欺負
+// - 勇氣太低時，有些選項會被劃掉：不是不想說，是說不出口
+//
+// 步驟格式
+// { speaker, text, inner?, emo?, bg?, chars?, effect? }   一句台詞；inner 是你心裡真正的想法
+// { k: 'day', day, title, bg }                            每天開始的標題卡
+// { k: 'choice', prompt, options: [...] }                 你的選擇
+//   option: { text, need?, effect?, flag?, then: [步驟...] }
+// { k: 'if', flag, then: [步驟...] }                       有某個旗標才會發生
+// effect: { courage, witness, kind }                      勇氣變化、旁觀沉默的人數、善意的次數
+
+export const PLAYER = 'azhe';
 
 export const CHARACTERS = {
-  azhe:    { name: '阿哲', role: '愛畫畫、坐不住的男生' },
-  xiaoyu:  { name: '小雨', role: '跑得很快、話不多的女生' },
-  aming:   { name: '阿明', role: '數學很好、媽媽來自越南' },
-  zhihao:  { name: '志豪', role: '班上很會帶氣氛的人' },
-  jiajia:  { name: '佳佳', role: '班長' },
-  teacher: { name: '林老師', role: '導師' },
-  class:   { name: '同學們', role: '' },
-  narrator:{ name: '', role: '' },
+  azhe:    { name: '你' },
+  xiaoyu:  { name: '小雨' },
+  aming:   { name: '阿明' },
+  zhihao:  { name: '志豪' },
+  jiajia:  { name: '佳佳' },
+  teacher: { name: '林老師' },
+  mom:     { name: '媽媽' },
+  class:   { name: '同學們' },
+  narrator:{ name: '' },
 };
 
-// 選項類型對班級氛圍與當事人信任的影響
-export const TYPE_EFFECT = {
-  side:   { mood: -15, trust: -30, label: '跟著起鬨' },
-  silent: { mood: -8,  trust: -15, label: '沉默旁觀' },
-  defend: { mood: +12, trust: +25, label: '挺身而出' },
-  help:   { mood: +10, trust: +20, label: '想辦法、找幫手' },
-};
+export const START_COURAGE = 70;
+// 每天早上睡了一覺，勇氣會回來一點點
+export const OVERNIGHT = 5;
 
-export const PROLOGUE = [
-  { bg: 'classroom', chars: [{ id: 'teacher', x: 96, emo: 'happy' }],
-    speaker: 'teacher', text: '各位，三週後就是運動會了！今年我們五年三班要參加大隊接力。' },
-  { bg: 'classroom', chars: [{ id: 'teacher', x: 96, emo: 'happy' }],
-    speaker: 'teacher', text: '大隊接力的規則是：全班每個人都要跑，一個都不能少。' },
-  { bg: 'classroom', chars: [{ id: 'zhihao', x: 60, emo: 'happy' }, { id: 'jiajia', x: 130, emo: 'happy' }],
-    speaker: 'zhihao', text: '耶！今年我們一定要拿第一！' },
-  { bg: 'classroom', chars: [{ id: 'zhihao', x: 60, emo: 'happy' }, { id: 'jiajia', x: 130, emo: 'neutral' }],
-    speaker: 'narrator', text: '接下來三週，你們——五年三班的每一個人——會一起做很多決定。\n你們的選擇，會決定運動會那天會發生什麼事。' },
+const CLASS_CHARS = (you = 'neutral', zh = 'neutral') => [
+  { id: 'azhe', x: 52, emo: you },
+  { id: 'zhihao', x: 140, emo: zh },
 ];
 
-export const CHAPTERS = [
-  {
-    id: 'ch1',
-    // 老師時間的建議提問
-    teacher: [
-      '請一位選「不說話」的同學說說看：那時候，你在擔心什麼？',
-      '如果你是阿哲，聽到「他根本是來搗亂的」，心裡會有什麼感覺？',
-    ],
-    title: '第一章　起跑線',
-    subtitle: '阿哲的故事',
-    target: 'azhe',
-    scenes: [
-      { bg: 'track', chars: [{ id: 'azhe', x: 70, emo: 'happy' }, { id: 'zhihao', x: 120, emo: 'neutral' }],
-        speaker: 'narrator', text: '放學後，全班在操場練習交棒。' },
-      { bg: 'track', chars: [{ id: 'azhe', x: 70, emo: 'surprised' }, { id: 'zhihao', x: 120, emo: 'neutral' }],
-        speaker: 'narrator', text: '「預備——」\n哨聲還沒響，阿哲就衝出去了。' },
-      { bg: 'track', chars: [{ id: 'azhe', x: 70, emo: 'sad' }, { id: 'zhihao', x: 120, emo: 'angry' }],
-        speaker: 'zhihao', text: '又是阿哲！這已經是第三次了！比賽的時候犯規，我們全班都會被取消資格耶！' },
-      { bg: 'track', chars: [{ id: 'azhe', x: 70, emo: 'sad' }, { id: 'zhihao', x: 120, emo: 'angry' }],
-        speaker: 'zhihao', text: '老師，可以不要讓他跑嗎？他根本是來搗亂的。' },
-      { bg: 'track', chars: [{ id: 'azhe', x: 70, emo: 'sad' }, { id: 'zhihao', x: 120, emo: 'happy' }],
-        speaker: 'class', text: '（有幾個人笑了出來。）' },
-    ],
-    vote: {
-      question: '阿哲低著頭站在旁邊。你們會怎麼做？',
-      options: [
-        { id: 'a', type: 'side',   text: '跟著說：「對啊，換別人跑啦。」' },
-        { id: 'b', type: 'silent', text: '不說話，繼續練自己的。' },
-        { id: 'c', type: 'defend', text: '走過去跟阿哲說：「沒關係，我陪你練起跑。」' },
-        { id: 'd', type: 'help',   text: '提議：「我們一起想辦法，例如等『砰』之後再數一下才跑。」' },
-      ],
-    },
-    // 全班選出的行動帶來的後果（依選項類型）
-    reactions: {
-      side:   [{ speaker: 'azhe', emo: 'sad', text: '……喔。那我不要跑好了。' },
-               { speaker: 'zhihao', emo: 'happy', text: '早該這樣了嘛。' }],
-      silent: [{ speaker: 'azhe', emo: 'sad', text: '（阿哲看了看大家，沒有人看他。他默默走到操場角落坐下。）' }],
-      defend: [{ speaker: 'azhe', emo: 'surprised', text: '真、真的嗎？你不覺得我很煩嗎？' },
-               { speaker: 'azhe', emo: 'happy', text: '那……我們再練一次！' }],
-      help:   [{ speaker: 'jiajia', emo: 'happy', text: '好主意！我們幫阿哲數拍子，大家一起喊「砰、一」再跑！' },
-               { speaker: 'azhe', emo: 'happy', text: '這樣我好像比較不會衝出去了！' }],
-    },
-    inner: {
-      speaker: 'azhe',
-      text: '我真的有聽到「預備」。可是我的腳就是會自己衝出去，好像有一個煞車壞掉了。\n我不是故意的。我其實……很想跟大家一起跑。',
-    },
-    info: '有些人的大腦比較難「踩煞車」，容易衝動、坐不住、忘東忘西，例如有注意力不足過動特質的人。\n他們不是故意的，也不是不努力。給一點提醒和方法，常常就能做得很好。',
-  },
-  {
-    id: 'ch2',
-    // 老師時間的建議提問
-    teacher: [
-      '大家笑的時候，笑的人是真的覺得好笑嗎？還是有別的原因？',
-      '如果想幫小雨，又不想讓她更尷尬，可以怎麼做？',
-    ],
-    title: '第二章　班服',
-    subtitle: '小雨的故事',
-    target: 'xiaoyu',
-    scenes: [
-      { bg: 'classroom', chars: [{ id: 'jiajia', x: 96, emo: 'happy' }],
-        speaker: 'jiajia', text: '大家注意！運動會要穿一樣的班服，一件 350 元，這禮拜五前要交錢喔！' },
-      { bg: 'classroom', chars: [{ id: 'xiaoyu', x: 70, emo: 'sad' }, { id: 'jiajia', x: 120, emo: 'neutral' }],
-        speaker: 'xiaoyu', text: '那個……我可以不要買嗎？' },
-      { bg: 'classroom', chars: [{ id: 'xiaoyu', x: 70, emo: 'sad' }, { id: 'zhihao', x: 120, emo: 'happy' }],
-        speaker: 'zhihao', text: '不買？那你要穿那件洗到變色的外套跑喔？哈哈，好窮酸喔。' },
-      { bg: 'classroom', chars: [{ id: 'xiaoyu', x: 70, emo: 'cry' }, { id: 'zhihao', x: 120, emo: 'happy' }],
-        speaker: 'class', text: '（有人在後面小聲說：「她家好像很窮。」）' },
-    ],
-    vote: {
-      question: '小雨的臉漲紅了。你們會怎麼做？',
-      options: [
-        { id: 'a', type: 'side',   text: '跟著笑：「哈哈，真的有點舊耶。」' },
-        { id: 'b', type: 'silent', text: '假裝沒聽到，低頭寫自己的東西。' },
-        { id: 'c', type: 'defend', text: '跟志豪說：「這樣說很過分，每個人家裡狀況不一樣。」' },
-        { id: 'd', type: 'help',   text: '提議：「不一定要買班服，我們可以一起做一樣的號碼布！」' },
-      ],
-    },
-    reactions: {
-      side:   [{ speaker: 'xiaoyu', emo: 'cry', text: '（小雨把外套拉鍊拉到最上面，整節課都沒有再抬頭。）' }],
-      silent: [{ speaker: 'xiaoyu', emo: 'sad', text: '……算了，當我沒說。' }],
-      defend: [{ speaker: 'zhihao', emo: 'surprised', text: '……我、我只是開玩笑的啦。' },
-               { speaker: 'xiaoyu', emo: 'neutral', text: '（小雨偷偷看了你們一眼，小聲說：「謝謝。」）' }],
-      help:   [{ speaker: 'azhe', emo: 'happy', text: '號碼布我來畫！我可以畫一隻超帥的閃電！' },
-               { speaker: 'xiaoyu', emo: 'happy', text: '那……我可以幫忙剪布。' }],
-    },
-    inner: {
-      speaker: 'xiaoyu',
-      text: '媽媽一個人上班，還要付弟弟的安親班。上次繳畢業旅行的錢，我看到她在廚房算了好久。\n我不想讓她為難。我也不想讓大家知道。',
-    },
-    info: '每個家庭的樣子都不一樣：有單親家庭、隔代教養，也有經濟比較辛苦的家庭。\n家裡的狀況不是孩子能選擇的，更不應該成為被嘲笑的理由。',
-  },
-  {
-    id: 'ch3',
-    // 老師時間的建議提問
-    teacher: [
-      '大家一起喊綽號的時候，一個人要說「不要這樣」難不難？為什麼？',
-      '有沒有不用跟志豪吵架，也能讓阿明好過一點的方法？',
-    ],
-    title: '第三章　加油口號',
-    subtitle: '阿明的故事',
-    target: 'aming',
-    scenes: [
-      { bg: 'classroom', chars: [{ id: 'teacher', x: 96, emo: 'happy' }],
-        speaker: 'teacher', text: '我們來練加油口號！每個人輪流帶喊一句。下一個，阿明！' },
-      { bg: 'classroom', chars: [{ id: 'aming', x: 96, emo: 'neutral' }],
-        speaker: 'aming', text: '五、五年三班——衝衝衝！' },
-      { bg: 'classroom', chars: [{ id: 'aming', x: 70, emo: 'surprised' }, { id: 'zhihao', x: 120, emo: 'happy' }],
-        speaker: 'zhihao', text: '「衝衝衝～」哈哈，你講話怎麼怪腔怪調的？' },
-      { bg: 'classroom', chars: [{ id: 'aming', x: 70, emo: 'sad' }, { id: 'zhihao', x: 120, emo: 'happy' }],
-        speaker: 'zhihao', text: '以後就叫你「怪腔阿明」好了！大家說好不好？' },
-    ],
-    vote: {
-      question: '有人開始跟著喊「怪腔阿明」。你們會怎麼做？',
-      options: [
-        { id: 'a', type: 'side',   text: '跟著喊：「怪腔阿明！怪腔阿明！」' },
-        { id: 'b', type: 'silent', text: '覺得不太好，但不想被說掃興，所以不出聲。' },
-        { id: 'c', type: 'defend', text: '說：「不要這樣叫他，他有自己的名字。」' },
-        { id: 'd', type: 'help',   text: '問阿明：「你會說越南話嗎？可以教我們用越南話喊加油嗎？」' },
-      ],
-    },
-    reactions: {
-      side:   [{ speaker: 'aming', emo: 'cry', text: '（阿明之後再也沒有舉手帶喊過口號。）' }],
-      silent: [{ speaker: 'aming', emo: 'sad', text: '（阿明笑了一下，好像沒事。但他之後講話都變得很小聲。）' }],
-      defend: [{ speaker: 'zhihao', emo: 'neutral', text: '好啦好啦，不叫就不叫。' },
-               { speaker: 'aming', emo: 'happy', text: '（阿明鬆了一口氣。）' }],
-      help:   [{ speaker: 'aming', emo: 'surprised', text: '越南話的加油是「Cố lên」！' },
-               { speaker: 'class', emo: 'happy', text: '「Cố lên！五年三班！」（全班一起喊，大家都笑了。）' }],
-    },
-    inner: {
-      speaker: 'aming',
-      text: '媽媽說越南話的時候，聲音好溫柔。可是在學校，我好怕開口。\n只要我一說話，大家就會想起來：我跟他們不一樣。',
-    },
-    info: '台灣有很多新住民家庭，爸爸或媽媽來自不同的國家。\n會說兩種語言是一種能力，不是奇怪的事。取綽號、學別人的口音，對被取笑的人來說，一點都不好笑。',
-  },
+export const STORY = [
+  // ---------------- 週一 ----------------
+  { k: 'day', day: '週一', title: '忘記帶的作業本', bg: 'classroom' },
+  { bg: 'classroom', chars: [{ id: 'azhe', x: 52, emo: 'happy' }, { id: 'teacher', x: 140, emo: 'neutral' }],
+    speaker: 'narrator', text: '你叫阿哲，五年三班。你最喜歡畫畫，最討厭的是……坐著不動。' },
+  { speaker: 'teacher', text: '請大家把數學作業本拿出來。' },
+  { speaker: 'narrator', emo: 'surprised', text: '你翻遍了書包。\n昨天明明寫完了，放在桌上……然後就忘了放進書包。' },
+  { speaker: 'teacher', emo: 'neutral', text: '阿哲，又忘記了嗎？這個禮拜第二次了喔。' },
+  { bg: 'classroom', chars: CLASS_CHARS('sad', 'happy'),
+    speaker: 'zhihao', text: '（小聲）過動兒又來了。',
+    effect: { courage: -10, witness: 4 } },
+  { speaker: 'class', text: '（後面有幾個人笑了出來。）' },
+  { speaker: 'narrator', text: '你感覺到大家都在看你。' },
+  { k: 'choice', prompt: '你會怎麼做？', options: [
+    { text: '跟著笑：「對啊，我就是很笨。」',
+      effect: { courage: -5 },
+      then: [{ speaker: 'azhe', emo: 'happy', text: '哈哈，對啊，我就是很笨。', inner: '為什麼我要說自己笨？我明明有寫完……' }] },
+    { text: '低下頭，假裝在找東西。',
+      effect: { courage: -5 },
+      then: [{ speaker: 'narrator', emo: 'sad', text: '你一直盯著書包裡面，直到大家不再看你。', inner: '只要不抬頭，就不會看到他們在笑。' }] },
+    { text: '轉頭跟志豪說：「不要這樣叫我。」', need: 55,
+      flag: 'stoodUp',
+      then: [
+        { speaker: 'azhe', emo: 'angry', text: '不要這樣叫我。' },
+        { speaker: 'zhihao', emo: 'happy', text: '開玩笑也不行喔？這麼兇幹嘛。' },
+        { speaker: 'narrator', emo: 'sad', text: '沒有人幫你說話。', inner: '我說出來了……可是好像什麼都沒有改變。' },
+      ] },
+  ] },
+
+  // ---------------- 週二 ----------------
+  { k: 'day', day: '週二', title: '起跑線', bg: 'track' },
+  { bg: 'track', chars: [{ id: 'azhe', x: 52, emo: 'happy' }, { id: 'jiajia', x: 140, emo: 'neutral' }],
+    speaker: 'jiajia', text: '下禮拜六就是運動會了！今天練大隊接力，每個人都要跑喔。' },
+  { speaker: 'azhe', emo: 'happy', text: '（你站上起跑線。你其實很喜歡跑步，跑步的時候不用坐著不動。）' },
+  { speaker: 'narrator', emo: 'surprised', text: '「預備——」\n哨聲還沒響，你的腳就自己衝出去了。' },
+  { bg: 'track', chars: CLASS_CHARS('surprised', 'angry'),
+    speaker: 'zhihao', text: '又是你！比賽的時候犯規，全班都會被取消資格耶！' },
+  { speaker: 'zhihao', text: '老師，可以不要讓他跑嗎？他根本是來搗亂的。',
+    effect: { courage: -15, witness: 7 } },
+  { speaker: 'class', emo: 'happy', text: '（有人笑了。有人說：「對啊，換人啦。」）' },
+  { speaker: 'narrator', emo: 'sad', text: '你看向其他人。\n佳佳低頭看著碼錶，小雨看著地上，阿明假裝在綁鞋帶。',
+    inner: '沒有人看我。' },
+  { k: 'choice', prompt: '你會怎麼做？', options: [
+    { text: '說：「那……我不要跑好了。」',
+      effect: { courage: -10 }, flag: 'gaveUp',
+      then: [{ speaker: 'azhe', emo: 'sad', text: '那……我不要跑好了。', inner: '我其實好想跑。' }] },
+    { text: '走到操場角落坐下。',
+      effect: { courage: -5 },
+      then: [{ speaker: 'narrator', emo: 'sad', text: '你一個人坐在操場角落，看著大家繼續練習。', inner: '如果我不在，大家會比較開心吧。' }] },
+    { text: '跟老師說：「我會再練習，請讓我跑。」', need: 55,
+      effect: { courage: 5 }, flag: 'askedToRun',
+      then: [
+        { speaker: 'azhe', emo: 'neutral', text: '我……我會再練習，請讓我跑。' },
+        { speaker: 'narrator', text: '老師點點頭：「好，我們再試試看。」\n志豪翻了一個白眼。', inner: '心跳得好快。可是我說出來了。' },
+      ] },
+  ] },
+
+  // ---------------- 週三 ----------------
+  { k: 'day', day: '週三', title: '加油海報', bg: 'classroom' },
+  { bg: 'classroom', chars: [{ id: 'teacher', x: 96, emo: 'happy' }],
+    speaker: 'teacher', text: '今天分組做運動會的加油海報！四個人一組，自己找組員。' },
+  { bg: 'classroom', chars: [{ id: 'azhe', x: 52, emo: 'neutral' }],
+    speaker: 'narrator', text: '大家很快就湊成一組一組。你站在原地，不知道要去哪裡。',
+    effect: { courage: -10, witness: 6 } },
+  { speaker: 'narrator', emo: 'sad', text: '最後，老師把你分到志豪那一組。' },
+  { bg: 'classroom', chars: CLASS_CHARS('sad', 'neutral'),
+    speaker: 'zhihao', text: '好啦好啦。你不要亂畫就好，在旁邊遞彩色筆。' },
+  { speaker: 'narrator', text: '你其實是全班最會畫畫的人。你的筆記本裡畫滿了閃電和賽跑的人。',
+    inner: '我可以畫一隻超帥的閃電……' },
+  { k: 'choice', prompt: '你會怎麼做？', options: [
+    { text: '默默把彩色筆遞給他們。',
+      effect: { courage: -5 },
+      then: [{ speaker: 'narrator', emo: 'sad', text: '你遞了一整節課的彩色筆。', inner: '算了，反正他們也不會想用我的畫。' }] },
+    { text: '小聲問：「我可以畫閃電嗎？」', need: 40, effect: { courage: 0 },
+      then: [
+        { speaker: 'azhe', emo: 'neutral', text: '我……我可以畫閃電嗎？' },
+        { speaker: 'zhihao', emo: 'happy', text: '你會畫什麼啦。' },
+        { speaker: 'narrator', text: '佳佳看了你的筆記本一眼，停了一下，但什麼都沒說。', inner: '她明明看到了。' },
+      ] },
+    { text: '下課去找老師，說你被排擠。', need: 70, flag: 'toldTeacher',
+      effect: { courage: 5 },
+      then: [
+        { speaker: 'azhe', emo: 'sad', text: '老師……他們都不讓我畫。' },
+        { speaker: 'teacher', emo: 'neutral', text: '謝謝你告訴我。這件事老師會處理，你先不要擔心。' },
+      ] },
+  ] },
+
+  // ---------------- 週四 ----------------
+  { k: 'day', day: '週四', title: '晚餐', bg: 'home' },
+  { bg: 'home', chars: [{ id: 'azhe', x: 64, emo: 'neutral' }, { id: 'mom', x: 128, emo: 'happy' }],
+    speaker: 'mom', text: '今天在學校怎麼樣？運動會快到了吧？' },
+  { speaker: 'narrator', text: '你看著碗裡的飯。',
+    inner: '星期一、星期二、星期三……' },
+  { k: 'choice', prompt: '你會怎麼回答？', options: [
+    { text: '「還好啊。」',
+      effect: { courage: -5 },
+      then: [
+        { speaker: 'azhe', emo: 'happy', text: '還好啊。', inner: '不想讓媽媽擔心。' },
+        { speaker: 'mom', emo: 'happy', text: '那就好。多吃一點！' },
+      ] },
+    { text: '「……我可以不要去運動會嗎？」', need: 25,
+      then: [
+        { speaker: 'azhe', emo: 'sad', text: '……我可以不要去運動會嗎？' },
+        { speaker: 'mom', emo: 'surprised', text: '怎麼了？發生什麼事了嗎？' },
+        { speaker: 'azhe', emo: 'sad', text: '沒事啦。', inner: '說出來，媽媽會不會覺得是我的問題？' },
+        { speaker: 'mom', emo: 'neutral', text: '如果有什麼事，隨時都可以跟媽媽說，好不好？',
+          effect: { courage: 5, kind: 1 } },
+      ] },
+    { text: '把這幾天發生的事告訴媽媽。', need: 40, flag: 'toldMom',
+      then: [
+        { speaker: 'azhe', emo: 'cry', text: '媽媽……大家都說我是來搗亂的。他們不想讓我跑。' },
+        { speaker: 'mom', emo: 'sad', text: '……謝謝你告訴我。這不是你的錯。' },
+        { speaker: 'mom', emo: 'neutral', text: '明天媽媽會跟老師聯絡。你不用一個人面對。',
+          effect: { courage: 20, kind: 1 } },
+      ] },
+  ] },
+
+  // ---------------- 週五 ----------------
+  { k: 'day', day: '週五', title: '收接力棒', bg: 'track' },
+  { k: 'if', flag: 'toldMom', then: [
+    { bg: 'classroom', chars: [{ id: 'teacher', x: 96, emo: 'neutral' }],
+      speaker: 'teacher', text: '早上，老師在全班面前說：「大隊接力是全班的事，不會有人被換掉。我們一起想辦法。」' },
+    { speaker: 'narrator', text: '下課時，你看到老師把志豪叫到走廊上談話。',
+      effect: { courage: 5, kind: 1 } },
+  ] },
+  { k: 'if', flag: 'toldTeacher', then: [
+    { bg: 'classroom', chars: [{ id: 'teacher', x: 96, emo: 'neutral' }],
+      speaker: 'teacher', text: '早上，老師說：「做海報的時候，每個人都要有工作。阿哲，你負責畫主圖。」',
+      effect: { courage: 5, kind: 1 } },
+  ] },
+  { bg: 'track', chars: [{ id: 'azhe', x: 52, emo: 'sad' }],
+    speaker: 'narrator', text: '放學後，大家都走了。你一個人在操場收接力棒。' },
+  { bg: 'track', chars: [{ id: 'azhe', x: 52, emo: 'surprised' }, { id: 'aming', x: 140, emo: 'neutral' }],
+    speaker: 'aming', text: '……你還好嗎？' },
+  { speaker: 'aming', emo: 'happy', text: '我覺得你起跑真的很快耶。只是太早了一點點。',
+    effect: { courage: 25, kind: 1 } },
+  { speaker: 'narrator', text: '這是這個禮拜，第一次有同學主動跟你說話。' },
+  { k: 'choice', prompt: '你會怎麼回答？', options: [
+    { text: '「……謝謝。」',
+      effect: { courage: 5 },
+      then: [{ speaker: 'azhe', emo: 'happy', text: '……謝謝。', inner: '原來有人看到。' }] },
+    { text: '「你也會被他們笑嗎？」', need: 20, flag: 'friend',
+      effect: { courage: 10 },
+      then: [
+        { speaker: 'azhe', emo: 'neutral', text: '你也會被他們笑嗎？' },
+        { speaker: 'aming', emo: 'sad', text: '會啊。他們學我講話。所以我知道那種感覺。' },
+        { speaker: 'aming', emo: 'happy', text: '明天，我會在終點幫你喊加油。' },
+      ] },
+    { text: '什麼都沒說，點點頭。',
+      then: [{ speaker: 'narrator', emo: 'neutral', text: '阿明也沒再說什麼，陪你把接力棒收完。', inner: '有人陪著，好像沒那麼難過了。' }] },
+  ] },
 ];
 
-// 志豪的內心話：在結局前揭露，說明帶頭的人也有自己的害怕
-export const ZHIHAO_INNER = {
-  speaker: 'zhihao',
-  text: '其實……四年級的時候，被大家笑的人是我。\n我發現只要大家在笑別人，就不會有人笑我了。',
-};
-
-// 結局：依班級氛圍與每個角色的信任值決定
+// 運動會：勇氣足夠時你站上起跑線；不夠時也還是會跑，只是心情不一樣
+// 兩種結局都不是懲罰：被欺負的人怎麼撐過去，都不是他的錯
 export const ENDINGS = {
-  good: {
-    title: '運動會當天',
-    lines: [
-      { bg: 'sportsday', speaker: 'narrator', text: '運動會當天，五年三班全員到齊。' },
-      { bg: 'sportsday', speaker: 'narrator', text: '阿哲在「砰」之後才起跑，小雨一口氣超過了兩個人，阿明帶著全班用越南話喊：「Cố lên！」' },
-      { bg: 'sportsday', speaker: 'teacher', text: '不管名次如何，你們今天沒有丟下任何一個人。這是我看過最棒的一場接力。' },
-    ],
-  },
-  mixed: {
-    title: '運動會當天',
-    lines: [
-      { bg: 'sportsday', speaker: 'narrator', text: '運動會當天，五年三班跑完了大隊接力。' },
-      { bg: 'sportsday', speaker: 'narrator', text: '可是有人一直站在隊伍最後面，一句話都沒說。' },
-      { bg: 'sportsday', speaker: 'teacher', text: '我們跑完了。可是，我們真的是「全班一起」嗎？' },
-    ],
-  },
-  absent: {
-    title: '運動會當天',
-    // {name} 會換成信任值最低的角色
-    lines: [
-      { bg: 'sportsday', speaker: 'narrator', text: '運動會當天，點名的時候——' },
-      { bg: 'sportsday', speaker: 'teacher', text: '{name}？{name}有來嗎？' },
-      { bg: 'sportsday', speaker: 'narrator', text: '{name}沒有來。\n少了一個人，五年三班不能參加大隊接力了。' },
-      { bg: 'sportsday', speaker: 'narrator', text: '如果時間可以倒流，你們會做不一樣的選擇嗎？' },
-    ],
-  },
+  brave: [
+    { k: 'day', day: '週六', title: '運動會', bg: 'sportsday' },
+    { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'neutral' }, { id: 'aming', x: 140, emo: 'happy' }],
+      speaker: 'narrator', text: '你站上起跑線。腿有一點抖。' },
+    { speaker: 'narrator', text: '「預備——」\n你在心裡數：等「砰」，再數一。' },
+    { speaker: 'narrator', emo: 'happy', text: '「砰！」\n你衝了出去。風從耳朵旁邊呼呼吹過。' },
+    { speaker: 'aming', emo: 'happy', text: '阿哲——衝啊！' },
+    { speaker: 'narrator', emo: 'happy', text: '你把接力棒交到下一個人手上。沒有犯規。',
+      inner: '我做到了。' },
+  ],
+  heavy: [
+    { k: 'day', day: '週六', title: '運動會', bg: 'sportsday' },
+    { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'sad' }],
+      speaker: 'narrator', text: '你站在隊伍最後面。你很想回家。' },
+    { speaker: 'narrator', text: '輪到你的時候，你聽到後面有人小聲說：「拜託不要又犯規。」',
+      inner: '不要看我。不要看我。' },
+    { speaker: 'narrator', emo: 'sad', text: '「砰！」\n你跑完了你的那一棒。很快，可是你一點都不開心。' },
+    { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'sad' }, { id: 'aming', x: 140, emo: 'neutral' }],
+      speaker: 'aming', text: '你跑得很好。真的。',
+      inner: '如果這個禮拜，早一點有人這樣跟我說就好了。' },
+  ],
 };
 
-// 課後討論問題
-export const DEBRIEF_QUESTIONS = [
-  '在這三個故事裡，哪一個時刻你最想做點什麼，但是沒有做？為什麼？',
-  '志豪為什麼會帶頭笑別人？知道他的內心話之後，你對他的看法有改變嗎？',
-  '如果明天在班上看到類似的事，你可以做的一件「小事」是什麼？',
-];
+// 結局後揭露：帶頭的人也可能在害怕
+export const ZHIHAO_INNER = '其實……四年級的時候，被大家笑的人是我。\n我發現只要大家在笑別人，就不會有人笑我了。';
+
+export const BRAVE_THRESHOLD = 70;

@@ -90,6 +90,21 @@ const HAIR = {
     '..OHH......HHO..',
     '...OO......OO...',
   ],
+  long: [
+    '....OOOOOOOO....',
+    '...OHHHHHHHHO...',
+    '..OHHHHHHhHHHO..',
+    '..OHHHHHHHHHHO..',
+    '..OHHHSSHHHHHO..',
+    '..OHSSSSSSSSHO..',
+    '..OH........HO..',
+    '..OH........HO..',
+    '..OH........HO..',
+    '..OH........HO..',
+    '..OHH......HHO..',
+    '..OHHO....OHHO..',
+    '...OO......OO...',
+  ],
   bun: [
     '......OOOO......',
     '.....OHHHHO.....',
@@ -110,6 +125,7 @@ const PALETTES = {
   zhihao:  { hair: 'spiky',    H: '#7a4a2a', h: '#a5683f', S: SKIN_LIGHT, C: '#e04b4b', D: '#b23636', P: '#2f3e6e' },
   jiajia:  { hair: 'bob',      H: '#2a2230', h: '#4a3e55', S: SKIN_LIGHT, C: '#9b7be0', D: '#7a5cc0', P: '#2f3e6e', A: '#ff7aa8' },
   teacher: { hair: 'bun',      H: '#3b2b25', h: '#5c4338', S: SKIN_LIGHT, C: '#e8d9b5', D: '#c7b48c', P: '#5a4a3a', glasses: true },
+  mom:     { hair: 'long',     H: '#4a3326', h: '#6e4c37', S: SKIN_LIGHT, C: '#d9776b', D: '#b55a50', P: '#5a4a3a' },
 };
 
 const FIXED = { O: OUTLINE, W: '#ffffff', K: '#f2f2f2' };
@@ -370,11 +386,56 @@ function sportsday(g, t) {
   rect(g, 136, 10, 2, 14, '#7a5230');
 }
 
+function home(g, t) {
+  // 牆壁、地板
+  rect(g, 0, 0, W, 72, '#f0d9c0');
+  rect(g, 0, 64, W, 8, '#e2c6a6');
+  rect(g, 0, 72, W, 36, '#b9895e');
+  for (let x = 0; x < W; x += 16) rect(g, x, 72, 1, 36, '#a37650');
+  // 夜晚的窗戶
+  rect(g, 18, 12, 44, 34, '#f7f1e6');
+  rect(g, 20, 14, 40, 30, '#2c3e66');
+  rect(g, 39, 14, 2, 30, '#f7f1e6');
+  rect(g, 48, 18, 5, 5, '#fff3c4');
+  rect(g, 49, 17, 3, 1, '#fff3c4');
+  for (const [sx, sy] of [[25, 18], [31, 30], [44, 34], [55, 28], [27, 38]]) {
+    if ((Math.floor(t / 600) + sx) % 3) rect(g, sx, sy, 1, 1, '#ffffff');
+  }
+  // 吊燈
+  rect(g, 95, 0, 1, 10, '#6d5a4a');
+  rect(g, 89, 10, 13, 4, '#f7c873');
+  rect(g, 91, 14, 9, 1, '#fff3c4');
+  // 牆上的畫（阿哲畫的閃電）
+  rect(g, 136, 14, 30, 22, '#7a5230');
+  rect(g, 138, 16, 26, 18, '#ffffff');
+  for (const [lx, ly] of [[152, 18], [150, 21], [148, 24], [153, 24], [151, 27], [149, 30]]) rect(g, lx, ly, 3, 3, '#f7c84a');
+  // 冰箱
+  rect(g, 170, 26, 18, 46, '#e8eef2');
+  rect(g, 170, 46, 18, 1, '#b8c4cc');
+  rect(g, 184, 34, 1, 8, '#9aa8b2');
+}
+
+// 前景：畫在角色前面的東西（餐桌讓角色看起來坐著）
+function homeFront(g) {
+  rect(g, 30, 62, 132, 4, '#c98f5a');
+  rect(g, 30, 66, 132, 12, '#a8744a');
+  rect(g, 36, 78, 4, 30, '#7a5230');
+  rect(g, 152, 78, 4, 30, '#7a5230');
+  // 碗和盤子
+  for (const bx of [58, 122]) {
+    rect(g, bx, 57, 12, 5, '#ffffff');
+    rect(g, bx + 1, 56, 10, 1, '#f7efe6');
+  }
+  rect(g, 86, 58, 20, 4, '#f2f2f2');
+  rect(g, 89, 56, 14, 2, '#7cb342');
+}
+
 function title(g, t) {
   track(g, t);
 }
 
-export const SCENES = { classroom, track, sportsday, title };
+export const SCENES = { classroom, track, sportsday, home, title };
+export const FOREGROUNDS = { home: homeFront };
 
 // 布條文字（以高解析度疊在場景上）
 export function sceneLabels(bg) {
