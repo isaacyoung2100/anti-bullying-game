@@ -81,7 +81,7 @@ const doc = [
   '## 遊戲規則',
   '',
   `- 玩家選一個角色，以第一人稱「你」度過運動會前的一個禮拜（週一到週五，週六是運動會）。`,
-  `- **心靈能量**（原名「勇氣值」）從 ${START_COURAGE} 開始（最高 100）。每天早上睡一覺 +${OVERNIGHT}。`,
+  `- **心靈能量**從 ${START_COURAGE} 開始（最高 100）。每天早上睡一覺 +${OVERNIGHT}。`,
   '- 有些選項需要足夠的心靈能量，不夠時會被劃掉，旁邊寫「（你現在說不出口）」，並顯示你心裡具體在怕什麼。',
   '- 欺負你的人和旁觀者怎麼做是固定的；你的選擇只改變你的感受和你找誰說。',
   '- 週五早上，老師一定會發現並私下找你談，不取決於你有沒有說出來；如果你有告訴媽媽，會多一份家人的支持。',
@@ -133,18 +133,26 @@ writeFileSync(out, doc.join('\n'), 'utf8');
 console.log(`wrote docs/劇本.md (${doc.length} lines)`);
 
 // 給協作 AI 的單一檔案：角色擴充簡報（手寫）＋ 由來與完整劇本（自動產生）
-// 由來.md 是寫給評估者的，合併時拿掉「給評估者的說明」和「希望評估者回答的問題」，
-// 只留作背景資料：協作 AI 的任務只有簡報裡寫的那些，不要變成寫審查報告
+// 由來.md 是寫給評估者的，合併時只留「背景」和「目前的設計與數值」：
+// 拿掉給評估者的段落，免得協作 AI 寫成審查報告；
+// 拿掉「設計演變」和「已知限制」，裡面詳細記錄了已經修正的舊問題，AI 容易當成現在的狀態
 const brief = readFileSync(join(root, 'docs', '角色擴充簡報.md'), 'utf8').trim();
-const background = origin
-  .replace(/\r\n/g, '\n')
-  .replace(/^## 給評估者的說明[\s\S]*?\n---\n+/, '')
-  .replace(/\n---\n+## 五、希望評估者回答的問題[\s\S]*$/, '')
-  .trim();
-if (background.includes('評估者')) throw new Error('合併檔裡還有寫給評估者的段落，請檢查 docs/由來.md 的標題是否改過');
+const originLF = origin.replace(/\r\n/g, '\n');
+const section = (title) => {
+  const m = originLF.match(new RegExp(`^## ${title}[^\\n]*\\n[\\s\\S]*?(?=\\n---\\n|(?![\\s\\S]))`, 'm'));
+  if (!m) throw new Error(`docs/由來.md 找不到「${title}」這一節，標題是否改過？`);
+  return m[0].trim();
+};
+const background = [
+  section('一、背景').replace(/^## 一、/, '## 一、'),
+  section('三、目前的設計與數值').replace(/^## 三、/, '## 二、'),
+].join('\n\n---\n\n');
+for (const word of ['評估者', '外籍新娘', '兩種結局']) {
+  if (background.includes(word)) throw new Error(`合併檔的背景資料裡出現「${word}」，請檢查 docs/由來.md`);
+}
 const backgroundDoc = doc.join('\n').replace(origin, background).replace(
   /^# 五年三班大隊接力｜遊戲由來與完整劇本\n\n> .*\n/,
-  '# 背景資料：遊戲由來、設計演變與完整劇本\n\n> 以下只是背景資料，**不需要評估或寫審查報告**，你的任務只有文件最前面「這份文件要請你做什麼」列出的那些。「設計演變」裡提到的問題（例如歧視用詞、有求助老師才介入、兩種結局）都已經修正完畢，請不要再建議。完整劇本是目前的最新版本。\n',
+  '# 背景資料：遊戲背景、目前的設計與完整劇本\n\n> 以下只是背景資料，**不需要評估或寫審查報告**，你的任務只有文件最前面「這份文件要請你做什麼」列出的那些。這裡描述的就是遊戲現在的樣子，完整劇本是目前的最新版本。\n',
 );
 const combined = `${brief}\n\n---\n\n${backgroundDoc}`;
 writeFileSync(join(root, 'docs', '給協作AI_角色擴充與完整劇本.md'), combined, 'utf8');
