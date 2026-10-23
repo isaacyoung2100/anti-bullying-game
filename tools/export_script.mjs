@@ -133,7 +133,19 @@ writeFileSync(out, doc.join('\n'), 'utf8');
 console.log(`wrote docs/劇本.md (${doc.length} lines)`);
 
 // 給協作 AI 的單一檔案：角色擴充簡報（手寫）＋ 由來與完整劇本（自動產生）
+// 由來.md 是寫給評估者的，合併時拿掉「給評估者的說明」和「希望評估者回答的問題」，
+// 只留作背景資料：協作 AI 的任務只有簡報裡寫的那些，不要變成寫審查報告
 const brief = readFileSync(join(root, 'docs', '角色擴充簡報.md'), 'utf8').trim();
-const combined = `${brief}\n\n---\n\n${doc.join('\n')}`;
+const background = origin
+  .replace(/\r\n/g, '\n')
+  .replace(/^## 給評估者的說明[\s\S]*?\n---\n+/, '')
+  .replace(/\n---\n+## 五、希望評估者回答的問題[\s\S]*$/, '')
+  .trim();
+if (background.includes('評估者')) throw new Error('合併檔裡還有寫給評估者的段落，請檢查 docs/由來.md 的標題是否改過');
+const backgroundDoc = doc.join('\n').replace(origin, background).replace(
+  /^# 五年三班大隊接力｜遊戲由來與完整劇本\n\n> .*\n/,
+  '# 背景資料：遊戲由來、設計演變與完整劇本\n\n> 以下只是背景資料，**不需要評估或寫審查報告**，你的任務只有文件最前面「這份文件要請你做什麼」列出的那些。「設計演變」裡提到的問題（例如歧視用詞、有求助老師才介入、兩種結局）都已經修正完畢，請不要再建議。完整劇本是目前的最新版本。\n',
+);
+const combined = `${brief}\n\n---\n\n${backgroundDoc}`;
 writeFileSync(join(root, 'docs', '給協作AI_角色擴充與完整劇本.md'), combined, 'utf8');
 console.log('wrote docs/給協作AI_角色擴充與完整劇本.md');
