@@ -51,6 +51,8 @@ def main():
         strip_module((SRC / "js" / "sprites.js").read_text(encoding="utf-8")),
         *[story_module(sid) for sid in STORY_IDS],
         strip_module((SRC / "js" / "story.js").read_text(encoding="utf-8")),
+        strip_module((SRC / "js" / "lang" / "story_en.js").read_text(encoding="utf-8")),
+        strip_module((SRC / "js" / "i18n.js").read_text(encoding="utf-8")),
         strip_module((SRC / "js" / "game.js").read_text(encoding="utf-8")),
     ])
 

@@ -4,6 +4,8 @@
 
 **線上遊玩：https://isaacyoung2100.github.io/anti-bullying-game/**（推送到 main 後，測試通過才會自動部署）
 
+**英文版**：標題畫面右上角按「🌐 English」，或直接開 https://isaacyoung2100.github.io/anti-bullying-game/?lang=en
+
 ## 玩法與設計
 
 - **心靈能量**：每次被嘲笑、被排擠就會下降；每天早上睡一覺、被善待時會回來一點。
@@ -30,7 +32,7 @@ python -m http.server 8000 --directory frontend
 npm test
 ```
 
-窮舉三個角色所有的選擇路徑，檢查不會卡關、結局固定內容在每條路徑都相同、週五老師一定介入、劇情前後一致等 16 項規則。GitHub Actions 會在每次推送時自動執行。改了數值後，路徑統計快照會失敗；確認是刻意的，再用 `UPDATE_SNAPSHOT=1 npm test` 更新。
+窮舉三個角色所有的選擇路徑，檢查不會卡關、結局固定內容在每條路徑都相同、週五老師一定介入、劇情前後一致等規則；英文版也會檢查劇本每一句都有翻譯。GitHub Actions 會在每次推送時自動執行。改了數值後，路徑統計快照會失敗；確認是刻意的，再用 `UPDATE_SNAPSHOT=1 npm test` 更新。
 
 ## 部署
 
@@ -53,11 +55,15 @@ frontend/js/story.js     共用設定（角色名字、心靈能量、求助專�
 frontend/js/stories/     三個角色的劇本（五天的情境、選項、結局）
 frontend/js/sprites.js   像素美術（全部用程式繪製）
 frontend/js/game.js      遊戲流程
+frontend/js/i18n.js      中英文切換與介面文字
+frontend/js/lang/        劇本的英文翻譯（key 是中文原文，劇本結構兩種語言共用）
 tools/build_artifact.py  打包成單一 HTML 檔
 tools/simulate.mjs       模擬所有選擇路徑，檢查數值平衡
 tools/lib/paths.mjs      窮舉選擇路徑（測試與模擬共用）
 tools/tests/             自動化測試與路徑統計快照
-tools/export_script.mjs  產生 docs/劇本.md
+tools/export_script.mjs  產生 docs/劇本.md 和給協作 AI 的合併文件
+tools/lib/strings.mjs    收集劇本所有會顯示的文字（翻譯檢查用）
+docs/角色擴充簡報.md      給協作 AI：新角色與角色交織的構想（手寫）
 docs/由來.md             遊戲由來與設計演變（手寫）
 docs/研究施測安全流程.md  研究或試玩時必須遵守的安全程序
 ```

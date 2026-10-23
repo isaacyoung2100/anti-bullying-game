@@ -441,6 +441,6 @@ export const FOREGROUNDS = { home: homeFront };
 
 // 布條文字（以高解析度疊在場景上）
 export function sceneLabels(bg) {
-  if (bg === 'sportsday') return [{ text: '第 32 屆 運動會', x: 96, y: 16, size: 7, color: '#fff7e0' }];
+  if (bg === 'sportsday') return [{ key: 'sportsBanner', x: 96, y: 16, size: 7, color: '#fff7e0' }];
   return [];
 }

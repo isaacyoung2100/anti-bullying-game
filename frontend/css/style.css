@@ -645,3 +645,14 @@ button:focus-visible {
   outline: 0.8cqw solid #3b82c4;
   outline-offset: 0.4cqw;
 }
+
+/* 標題畫面右上角的語言切換 */
+.lang-btn {
+  display: block;
+  margin: -2cqw -1cqw 0 auto;
+  padding: 1cqw 2cqw;
+  font-size: 3.6cqw;
+}
+
+/* 英文版：中文字型裡的引號和撇號是全形，英文先用系統的西文字型 */
+html:lang(en) body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif; }
