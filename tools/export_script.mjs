@@ -6,19 +6,22 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, BRAVE_THRESHOLD, ZHIHAO_INNER, HELP_LINES,
+  STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, ZHIHAO_INNER, HELP_LINES,
 } from '../frontend/js/story.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'docs', '劇本.md');
 
-const FLAG_LABEL = { toldMom: '有把事情告訴媽媽', toldTeacher: '有把事情告訴老師' };
+const FLAG_LABEL = {
+  toldMom: '有把事情告訴媽媽', toldTeacher: '有把事情告訴老師', friend: '有問對方「你也會被他們笑嗎？」',
+  askedMomAway: '請媽媽不要來運動會', quietWithMom: '跟媽媽說學校很好',
+};
 
 function effectNote(effect) {
   if (!effect) return '';
   const parts = [];
   if (effect.courage) parts.push(`心靈能量 ${effect.courage > 0 ? '+' : ''}${effect.courage}`);
-  if (effect.witness) parts.push(`看到卻沒說話 +${effect.witness}`);
+  if (effect.witness) parts.push(`看到卻沒說話 +${effect.witness} 人次`);
   if (effect.kind) parts.push(`有人伸出手 +${effect.kind}`);
   return parts.length ? ` 〔${parts.join('｜')}〕` : '';
 }
@@ -76,7 +79,7 @@ const doc = [
   '- 有些選項需要足夠的心靈能量，不夠時會被劃掉，旁邊寫「（你現在說不出口）」，並顯示你心裡具體在怕什麼。',
   '- 欺負你的人和旁觀者怎麼做是固定的；你的選擇只改變你的感受和你找誰說。',
   '- 週五早上，老師一定會發現並私下找你談，不取決於你有沒有說出來；如果你有告訴媽媽，會多一份家人的支持。',
-  `- **結局**：運動會前心靈能量 ≥ ${BRAVE_THRESHOLD} 走結局 A「抬起頭」，否則走結局 B「慢慢來」。兩種都不是懲罰，結局 B 一定有大人和朋友陪著，並約好下禮拜再聊。`,
+  '- **結局**：每個角色只有一個結局。欺負的人和旁觀者在每條路徑都一樣；前面發生的事只用來加入細節（例如有告訴媽媽，媽媽就在觀眾席喊加油）。結局一定有朋友和老師，並約好下禮拜再聊。',
   '- 結局之後：志豪的內心話 → 一週回顧（心裡的天氣、有人看到卻沒說話的次數、有人伸出手的次數）→ 換你想一想（回到旁觀者的角度）→ 最後一頁。',
   '- 標記說明：**粗體**是說話的人；*斜體*是旁白；💭 是你心裡真正的想法；〔 〕是這句話對數值的影響。',
   '',
@@ -85,10 +88,7 @@ const doc = [
 for (const st of STORIES) {
   doc.push('---', '', `## ${st.name}的故事`, '', `> ${st.blurb}`);
   doc.push(...steps(st.story, st.id));
-  doc.push('', '### 週六｜運動會（結局 A：抬起頭）', '');
-  doc.push(...steps(st.endings.brave.filter((s) => s.k !== 'day'), st.id));
-  doc.push('', '### 週六｜運動會（結局 B：慢慢來）', '');
-  doc.push(...steps(st.endings.heavy.filter((s) => s.k !== 'day'), st.id));
+  doc.push(...steps(st.ending, st.id));
   doc.push('');
 }
 
@@ -99,8 +99,8 @@ doc.push(
   ...ZHIHAO_INNER.split('\n').map((t) => `> ${t}`), '',
   '### 一週回顧：你心裡的天氣', '',
   '- 每天顯示一個天氣：晴天（能量 75 以上）、多雲（55–74）、陰天（35–54）、下雨（35 以下）。不顯示數字，避免讓孩子覺得心情低落是「分數比較差」。',
-  '- 「＿次，有人看到了，卻沒有說話。」',
-  '- 「＿次，有人對你伸出手。」',
+  '- 「有＿人次，看到了，卻沒有說話。」（每個事件旁邊有幾個人看到，就算幾人次）',
+  '- 「有＿次，有人對你伸出手。」',
   '- 「對被欺負的人來說，一句「你還好嗎？」可能就改變了一整天。」', '',
   '### 換你想一想', '',
   '- 「如果你是五年三班的同學，你會在哪一天，走過去找（角色名字）？」玩家從週一到週五選一天。',

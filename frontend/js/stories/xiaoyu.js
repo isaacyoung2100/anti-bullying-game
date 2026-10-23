@@ -161,30 +161,27 @@ const STORY = [
   ] },
 ];
 
-const ENDINGS = {
-  brave: [
-    { k: 'day', day: '週六', title: '運動會', bg: 'sportsday' },
-    { bg: 'sportsday', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }, { id: 'momX', x: 140, emo: 'happy' }],
-      speaker: 'narrator', text: '你的班服上，別著一張畫了金色閃電的號碼布。媽媽牽著弟弟，坐在觀眾席最前面。' },
-    { speaker: 'narrator', emo: 'happy', text: '「砰！」\n第三棒。你接過接力棒，一口氣超過了兩個人。' },
-    { speaker: 'momX', emo: 'happy', text: '小雨——加油！' },
-    { speaker: 'narrator', emo: 'happy', text: '你把接力棒交出去的時候，聽到阿哲在旁邊大叫：「閃電女王！」',
-      inner: '這個外號，我喜歡。' },
-  ],
-  heavy: [
-    { k: 'day', day: '週六', title: '運動會', bg: 'sportsday' },
-    { bg: 'sportsday', chars: [{ id: 'xiaoyu', x: 52, emo: 'sad' }],
-      speaker: 'narrator', text: '你穿著和大家一樣的班服，可是還是覺得大家在看你。' },
-    { speaker: 'narrator', text: '你聽到有人在後面小聲說：「復古風女王來了。」',
-      inner: '不要看我。不要看我。' },
-    { speaker: 'narrator', emo: 'neutral', text: '「砰！」\n你超過了兩個人。觀眾席上，媽媽和弟弟在對你揮手。' },
-    { bg: 'sportsday', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }, { id: 'azhe', x: 140, emo: 'happy' }],
-      speaker: 'azhe', text: '你跑得超快的。真的。' },
-    { bg: 'sportsday', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'happy' }],
-      speaker: 'teacher', text: '小雨，下禮拜輔導老師想找你聊聊群組的事。你想說多少都可以，慢慢來。',
-      inner: '心裡還是很重。可是好像……有人站在我這邊了。' },
-  ],
-};
+// 運動會：只有一個結局。欺負的人和旁觀者在每條路徑都一樣
+// 媽媽週四說過會請假來看，所以每條路徑都在；有告訴媽媽，她會大聲喊加油
+const ENDING = [
+  { k: 'day', day: '週六', title: '運動會', bg: 'sportsday' },
+  { bg: 'sportsday', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }],
+    speaker: 'narrator', text: '你穿著和大家一樣的班服，號碼布上有阿哲畫的金色閃電。' },
+  { speaker: 'narrator', text: '有人在後面小聲說：「復古風女王來了。」',
+    inner: '不要理他們。' },
+  { bg: 'sportsday', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }, { id: 'momX', x: 140, emo: 'happy' }],
+    speaker: 'narrator', text: '觀眾席上，媽媽牽著弟弟，對你揮手。' },
+  { k: 'if', flag: 'toldMom', then: [
+    { speaker: 'momX', text: '小雨——媽媽在這裡！加油！' },
+  ] },
+  { speaker: 'narrator', emo: 'happy', text: '「砰！」\n第三棒。你接過接力棒，一口氣超過了兩個人。' },
+  { bg: 'sportsday', chars: [{ id: 'xiaoyu', x: 52, emo: 'happy' }, { id: 'azhe', x: 140, emo: 'happy' }],
+    speaker: 'azhe', text: '閃電女王！',
+    inner: '這個外號，我喜歡。' },
+  { bg: 'sportsday', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'happy' }],
+    speaker: 'teacher', text: '小雨，下禮拜輔導老師想找你聊聊群組的事。你想說多少都可以，慢慢來。',
+    inner: '這個禮拜很難。可是好像……有人站在我這邊了。' },
+];
 
 export default {
   id: 'xiaoyu',
@@ -192,5 +189,5 @@ export default {
   pronoun: '她',
   blurb: '跑步很快，話不多。每天放學去接弟弟。',
   story: STORY,
-  endings: ENDINGS,
+  ending: ENDING,
 };

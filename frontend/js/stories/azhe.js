@@ -171,7 +171,7 @@ const STORY = [
       effect: { courage: 10 },
       then: [
         { speaker: 'azhe', emo: 'neutral', text: '你也會被他們笑嗎？' },
-        { speaker: 'aming', emo: 'sad', text: '會啊。他們學我講話。所以我知道那種感覺。' },
+        { speaker: 'aming', emo: 'sad', text: '會啊。他們叫我外星阿明。所以我知道那種感覺。' },
         { speaker: 'aming', emo: 'happy', text: '明天，我會在終點幫你喊加油。' },
       ] },
     { text: '什麼都沒說，點點頭。',
@@ -179,38 +179,36 @@ const STORY = [
   ] },
 ];
 
-// 運動會的兩種結局都不是懲罰：被欺負的人心裡還很重，從來都不是他的錯
-// 「慢慢來」結局一定要有希望：有大人和朋友在，下禮拜還有人可以聊
-const ENDINGS = {
-  brave: [
-    { k: 'day', day: '週六', title: '運動會', bg: 'sportsday' },
-    { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'neutral' }, { id: 'aming', x: 140, emo: 'happy' }],
-      speaker: 'narrator', text: '你站上起跑線。腿有一點抖。' },
-    { speaker: 'narrator', text: '「預備——」\n你在心裡數：等「砰」，再數一。' },
-    { speaker: 'narrator', emo: 'happy', text: '「砰！」\n你衝了出去。風從耳朵旁邊呼呼吹過。' },
-    { speaker: 'aming', emo: 'happy', text: '阿哲——衝啊！' },
-    { speaker: 'narrator', emo: 'happy', text: '你把接力棒交到下一個人手上。沒有犯規。',
-      inner: '我做到了。' },
-  ],
-  heavy: [
-    { k: 'day', day: '週六', title: '運動會', bg: 'sportsday' },
-    { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'sad' }],
-      speaker: 'narrator', text: '你站在隊伍後面，心跳得很快。' },
-    { speaker: 'narrator', text: '後面有人小聲說：「拜託不要又犯規。」',
-      inner: '不要看我。不要看我。' },
-    { speaker: 'narrator', emo: 'neutral', text: '「砰！」\n你等了一下才出發，把你的那一棒跑完了。' },
-    { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'neutral' }, { id: 'aming', x: 140, emo: 'happy' }],
-      speaker: 'aming', text: '你跑得很好。真的。' },
-    { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'happy' }],
-      speaker: 'teacher', text: '阿哲，下禮拜一午休，要不要來找老師聊聊？可以帶你的畫冊來。',
-      inner: '心裡還是很重。可是好像……沒有那麼孤單了。' },
-  ],
-};
+// 運動會：只有一個結局。欺負的人和旁觀者在每條路徑都一樣（後面一樣有人小聲說話）
+// 依前面發生的事加入細節：有告訴媽媽，媽媽就在觀眾席；和阿明聊過，他會提起約定
+const ENDING = [
+  { k: 'day', day: '週六', title: '運動會', bg: 'sportsday' },
+  { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'neutral' }],
+    speaker: 'narrator', text: '你站上起跑線。腿有一點抖。' },
+  { speaker: 'narrator', text: '後面有人小聲說：「拜託不要又犯規。」',
+    inner: '不要聽。只要聽「砰」就好。' },
+  { k: 'if', flag: 'toldMom', then: [
+    { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'surprised' }, { id: 'mom', x: 140, emo: 'happy' }],
+      speaker: 'narrator', text: '你看到媽媽站在觀眾席最前面，用力對你揮手。' },
+  ] },
+  { speaker: 'narrator', text: '「預備——」\n你在心裡數：等「砰」，再數一。' },
+  { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'happy' }, { id: 'aming', x: 140, emo: 'happy' }],
+    speaker: 'narrator', text: '「砰！」\n你衝了出去。風從耳朵旁邊呼呼吹過。' },
+  { speaker: 'aming', text: '阿哲——衝啊！' },
+  { k: 'if', flag: 'friend', then: [
+    { speaker: 'aming', text: '我說過會在終點幫你喊的！' },
+  ] },
+  { speaker: 'narrator', emo: 'happy', text: '你把接力棒交到下一個人手上。沒有犯規。',
+    inner: '我做到了。' },
+  { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'happy' }],
+    speaker: 'teacher', text: '阿哲，下禮拜一午休，要不要來找老師聊聊？可以帶你的畫冊來。',
+    inner: '這個禮拜很難。可是我不是一個人。' },
+];
 
 export default {
   id: 'azhe',
   name: '阿哲',
   blurb: '愛畫畫，坐不住。常常忘東忘西。',
   story: STORY,
-  endings: ENDINGS,
+  ending: ENDING,
 };

@@ -19,6 +19,15 @@
 
 [hidden] { display: none !important; }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 html, body {
   margin: 0;
   height: 100%;
@@ -129,6 +138,7 @@ button {
 
 .pause-btn {
   flex: none;
+  min-height: 44px;
   font-size: 3.4cqw;
   font-weight: 900;
   color: var(--ink);
@@ -387,7 +397,7 @@ button {
 .choice.locked {
   cursor: not-allowed;
   background: var(--paper-2);
-  color: #a79aa3;
+  color: #6b6070;
   border-color: #b9aeb5;
   box-shadow: none;
 }
@@ -574,3 +584,16 @@ button {
 }
 
 .menu .btn { width: 100%; }
+
+/* 系統設定「減少動態效果」時，關掉閃爍與轉場 */
+@media (prefers-reduced-motion: reduce) {
+  .next-hint { animation: none; }
+  .courage-fill { transition: none; }
+  .btn:active, .choice:active, .role:active, .pick:active, .pause-btn:active { transform: none; }
+}
+
+/* 鍵盤操作時看得到焦點 */
+button:focus-visible {
+  outline: 0.8cqw solid #3b82c4;
+  outline-offset: 0.4cqw;
+}

@@ -35,9 +35,8 @@ export const CHARACTERS = {
 };
 
 export const START_COURAGE = 60;
-// 每天早上睡了一覺，勇氣會回來一點點
+// 每天早上睡了一覺，心靈能量會回來一點點
 export const OVERNIGHT = 5;
-export const BRAVE_THRESHOLD = 70;
 
 // 結局後揭露：帶頭的人也可能在害怕；但理解原因不等於可以原諒傷害，他要為自己的行為負責
 export const ZHIHAO_INNER = '其實……四年級的時候，被大家笑的人是我。\n我發現只要大家在笑別人，就不會有人笑我了。\n可是這個禮拜，我變成了以前我最討厭的那種人。\n這不是藉口。欺負別人，是我做錯了。下禮拜，我想跟他說對不起。';
@@ -47,4 +46,6 @@ export const HELP_LINES = [
   { name: '教育部防制校園霸凌專線', number: '1953', note: '24 小時，被欺負或看到別人被欺負都可以打' },
   { name: '安心專線', number: '1925', note: '24 小時，心情很不好、想傷害自己的時候' },
   { name: '保護專線', number: '113', note: '在家裡或其他地方被大人傷害的時候' },
+  // 已確認官網 https://i.win.org.tw/ 有「我要申訴」與網路霸凌專區；電話號碼未能確認，所以只列網站
+  { name: 'iWIN 網路內容防護機構', number: 'i.win.org.tw', note: '網路上被欺負（例如在群組被嘲笑、照片被亂傳），可以上網申訴' },
 ];

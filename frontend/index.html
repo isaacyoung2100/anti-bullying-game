@@ -15,7 +15,7 @@
     <header class="hud off" id="hud">
       <div class="courage">
         <span class="courage-label">心靈能量</span>
-        <span class="courage-bar"><span class="courage-fill" id="courageFill"></span></span>
+        <span class="courage-bar" id="courageBar" role="meter" aria-label="心靈能量" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60"><span class="courage-fill" id="courageFill"></span></span>
         <span class="mood-delta" id="courageDelta"></span>
       </div>
       <span class="chip" id="dayChip"></span>
@@ -23,12 +23,13 @@
     </header>
 
     <div class="scene">
-      <canvas id="screen" width="960" height="540" aria-label="遊戲畫面"></canvas>
+      <canvas id="screen" width="960" height="540" role="img" aria-label="遊戲畫面"></canvas>
     </div>
 
-    <section class="dialog pixel-box idle" id="dialog" aria-live="polite">
+    <p class="sr-only" id="srLine" aria-live="polite"></p>
+    <section class="dialog pixel-box idle" id="dialog">
       <div class="dialog-head">
-        <canvas class="portrait" id="portrait" width="96" height="96"></canvas>
+        <canvas class="portrait" id="portrait" width="96" height="96" aria-hidden="true"></canvas>
         <div class="speaker" id="speaker"></div>
       </div>
       <div class="line" id="line"></div>

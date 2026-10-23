@@ -1,0 +1,11 @@
+{
+  "name": "anti-bullying-game",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tools/tests/*.test.mjs",
+    "simulate": "node tools/simulate.mjs",
+    "docs": "node tools/export_script.mjs",
+    "build": "python tools/build_artifact.py"
+  }
+}

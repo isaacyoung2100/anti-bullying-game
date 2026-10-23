@@ -1,5 +1,5 @@
 import {
-  STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, ZHIHAO_INNER, BRAVE_THRESHOLD, HELP_LINES,
+  STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, ZHIHAO_INNER, HELP_LINES,
 } from './story.js';
 import { W, H, SCENES, FOREGROUNDS, drawChar, drawPortrait, sceneLabels } from './sprites.js';
 
@@ -12,6 +12,9 @@ const lg = low.getContext('2d');
 
 // 角色腳底的高度
 const FLOOR_Y = 100;
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+const SCENE_NAMES = { classroom: '教室', track: '操場', sportsday: '運動會', home: '家裡', title: '操場' };
 
 const state = {
   story: null,        // 目前玩的角色故事
@@ -23,7 +26,6 @@ const state = {
   flags: {},
   days: [],           // 每天結束時的勇氣 [{ day, courage }]
   day: null,
-  ending: null,
   view: { bg: 'title', chars: [], speaker: null },
   typing: null,
   paused: false,
@@ -38,7 +40,9 @@ function render(t) {
   const anySpeaker = speaking && state.view.chars.some((c) => c.id === speaking);
   state.view.chars.forEach((c, n) => {
     const talking = c.id === speaking;
-    const bob = talking ? (Math.floor(t / 260) % 2) : (Math.floor((t + n * 400) / 900) % 2);
+    // 系統設定「減少動態效果」時，角色不晃動
+    const bob = reducedMotion.matches ? 0
+      : talking ? (Math.floor(t / 260) % 2) : (Math.floor((t + n * 400) / 900) % 2);
     drawChar(lg, c.id, c.x, FLOOR_Y, c.emo, { bob: -bob, dim: anySpeaker && !talking });
   });
   FOREGROUNDS[state.view.bg]?.(lg, t);
@@ -52,6 +56,13 @@ function render(t) {
     g.textBaseline = 'middle';
     g.fillText(label.text, label.x * k, label.y * k);
   }
+}
+
+// 給螢幕閱讀器的場景描述：在哪裡、有誰。畫面內容改變時呼叫，不依賴動畫迴圈
+function describeScene() {
+  const label = [SCENE_NAMES[state.view.bg], state.view.chars.map((c) => nameOf(c.id)).join('、')]
+    .filter(Boolean).join('：');
+  screen.setAttribute('aria-label', label || '遊戲畫面');
 }
 
 let lastFrame = 0;
@@ -72,6 +83,10 @@ function updateHud(delta) {
   setHudVisible(true);
   const fill = $('courageFill');
   fill.style.width = `${state.courage}%`;
+  // 螢幕閱讀器用：不只靠長條和顏色
+  const bar = $('courageBar');
+  bar.setAttribute('aria-valuenow', String(state.courage));
+  bar.setAttribute('aria-valuetext', `${state.courage}（滿分 100）`);
   fill.style.background = state.courage >= 60 ? 'var(--good)' : state.courage >= 35 ? 'var(--gold)' : 'var(--bad)';
   $('dayChip').textContent = state.day || '';
   const d = $('courageDelta');
@@ -112,6 +127,10 @@ function showLine({ speaker, text, inner }) {
   const innerEl = $('inner');
   innerEl.textContent = inner ? `心裡想：${inner}` : '';
   innerEl.hidden = true;
+  // 打字效果會一直改動文字，所以螢幕閱讀器改念這一行完整的句子
+  $('srLine').textContent = [nameOf(speaker), text, inner ? `心裡想：${inner}` : '']
+    .filter(Boolean).join(' ');
+  describeScene();
   typeText(text, !!inner);
 }
 
@@ -157,6 +176,7 @@ function showPanel(html, cls = '') {
   panel.innerHTML = `<div class="card pixel-box ${cls}">${html}</div>`;
   panel.hidden = false;
   panel.scrollTop = 0;
+  describeScene();
   const card = panel.firstElementChild;
   card.addEventListener('click', (e) => e.stopPropagation());
   return card;
@@ -251,7 +271,7 @@ function stepSelect() {
     <div class="roles">
       ${STORIES.map((st) => `
         <button class="role" type="button" data-id="${st.id}">
-          <canvas width="64" height="64" data-p="${st.id}"></canvas>
+          <canvas width="64" height="64" data-p="${st.id}" aria-hidden="true"></canvas>
           <span class="role-text">
             <span class="role-name">${esc(st.name)}</span>
             <span class="role-blurb">${esc(st.blurb)}</span>
@@ -297,7 +317,8 @@ function stepChoice(step) {
         const locked = (o.need || 0) > state.courage;
         // 說不出口時，顯示心裡具體在怕什麼：說不出口是因為處境太難，不是因為不夠勇敢
         return locked
-          ? `<button class="choice locked" type="button" disabled><s>${esc(o.text)}</s><span class="why">（你現在說不出口）</span>${o.fear ? `<span class="fear">心裡想：${esc(o.fear)}</span>` : ''}</button>`
+          // 用 aria-disabled 而不是 disabled：螢幕閱讀器才會念到「說不出口」，不會直接跳過
+          ? `<button class="choice locked" type="button" aria-disabled="true"><s>${esc(o.text)}</s><span class="why">（你現在說不出口）</span>${o.fear ? `<span class="fear">心裡想：${esc(o.fear)}</span>` : ''}</button>`
           : `<button class="choice" type="button" data-n="${n}">${esc(o.text)}</button>`;
       }).join('')}
     </div>
@@ -316,9 +337,8 @@ function stepChoice(step) {
 // ---------- 結局與反思 ----------
 
 function stepEnding() {
-  const key = state.courage >= BRAVE_THRESHOLD ? 'brave' : 'heavy';
-  state.ending = key;
-  insertAfterCurrent([...state.story.endings[key], { k: 'zhihao' }, { k: 'reflect' }, { k: 'think' }, { k: 'closing' }]);
+  // 每個角色只有一個結局：欺負的人和旁觀者的行為固定，前面發生的事只透過旗標加入細節
+  insertAfterCurrent([...state.story.ending, { k: 'zhihao' }, { k: 'reflect' }, { k: 'think' }, { k: 'closing' }]);
   next();
 }
 
@@ -328,7 +348,7 @@ function stepZhihao() {
   state.view.chars = [{ id: 'zhihao', x: 96, emo: 'sad' }];
   state.view.speaker = null;
   const card = showPanel(`
-    <canvas class="portrait-lg" width="128" height="128"></canvas>
+    <canvas class="portrait-lg" width="128" height="128" aria-hidden="true"></canvas>
     <div>
       <div class="kicker">你可能不知道的事</div>
       <h2>志豪的內心話</h2>
@@ -350,7 +370,7 @@ function weatherOf(energy) {
 
 function stepReflect() {
   state.view.bg = 'track';
-  state.view.chars = [{ id: state.story.id, x: 96, emo: state.ending === 'brave' ? 'happy' : 'neutral' }];
+  state.view.chars = [{ id: state.story.id, x: 96, emo: 'neutral' }];
   const tiles = state.days.map((d) => {
     const w = weatherOf(d.courage);
     return `
@@ -365,8 +385,8 @@ function stepReflect() {
     <h2>你心裡的天氣</h2>
     <div class="wx-row" role="list" aria-label="每天心裡的天氣">${tiles}</div>
     <div class="facts">
-      <p><b class="num">${state.witness}</b> 次，有人看到了，卻沒有說話。</p>
-      <p><b class="num">${state.kind}</b> 次，有人對你伸出手。</p>
+      <p>有 <b class="num">${state.witness}</b> 人次，看到了，卻沒有說話。</p>
+      <p>有 <b class="num">${state.kind}</b> 次，有人對你伸出手。</p>
       <p class="quiet">對被欺負的人來說，一句「你還好嗎？」可能就改變了一整天。</p>
     </div>
     <div class="btn-row"><button class="btn" type="button" id="go">繼續 ▶</button></div>
@@ -532,7 +552,6 @@ function resetProgress() {
   state.flags = {};
   state.days = [];
   state.day = null;
-  state.ending = null;
 }
 
 // 回主畫面：標題 → 選角色
