@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>五年三班大隊接力</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="projector">
+  <main class="stage" id="stage">
+    <canvas id="screen" width="960" height="540" aria-label="遊戲畫面"></canvas>
+
+    <div class="hud" id="hud" hidden>
+      <div class="mood">
+        <span class="mood-label">班級氛圍</span>
+        <span class="mood-bar"><span class="mood-fill" id="moodFill"></span></span>
+        <span class="mood-delta" id="moodDelta"></span>
+      </div>
+      <div class="hud-right">
+        <span class="chip" id="chapterChip"></span>
+        <span class="chip" id="roomChip" hidden></span>
+        <span class="chip ai-chip" id="aiChip" hidden></span>
+      </div>
+    </div>
+
+    <div class="dialog pixel-box" id="dialog" hidden>
+      <canvas class="portrait" id="portrait" width="96" height="96"></canvas>
+      <div class="dialog-body">
+        <div class="speaker" id="speaker"></div>
+        <div class="line" id="line"></div>
+      </div>
+      <div class="next-hint" id="nextHint">▼</div>
+    </div>
+
+    <div class="panel" id="panel" hidden></div>
+  </main>
+
+  <nav class="teacher-bar" aria-label="老師控制列">
+    <button type="button" id="btnFullscreen">全螢幕</button>
+    <button type="button" id="btnRestart">重新開始</button>
+    <span class="hint">點畫面或按空白鍵繼續</span>
+  </nav>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>

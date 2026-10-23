@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>五年三班投票</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="voter">
+  <div class="voter-wrap">
+    <h1>五年三班大隊接力</h1>
+    <p class="sub">看前面的螢幕，在這裡投下你的選擇。</p>
+
+    <form class="box" id="joinBox">
+      <label for="code">輸入房間碼</label>
+      <input id="code" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
+      <button class="btn-big" type="submit">加入</button>
+      <div class="error" id="joinError"></div>
+    </form>
+
+    <div class="box" id="voteBox" hidden></div>
+  </div>
+
+  <script type="module">
+    const $ = (id) => document.getElementById(id);
+    let room = null;
+    let lastQid = null;
+    let myVote = {};
+
+    // 每台平板一個匿名代號；瀏覽器不允許儲存時就用這次的隨機值
+    let voter = Math.random().toString(36).slice(2, 12);
+    try {
+      voter = localStorage.getItem('voter') || voter;
+      localStorage.setItem('voter', voter);
+    } catch { /* 私密瀏覽等情況 */ }
+
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    async function getState() {
+      const res = await fetch(`/api/rooms/${room}`);
+      if (res.status === 404) throw new Error('notfound');
+      if (!res.ok) throw new Error('error');
+      return res.json();
+    }
+
+    function showWaiting(text) {
+      $('voteBox').innerHTML = `<div class="waiting">${text}</div>`;
+    }
+
+    function render(s) {
+      if (!s.open) {
+        showWaiting(lastQid && myVote[lastQid] ? '已送出！<br>看看前面的螢幕會發生什麼事。' : '等待老師開放投票……');
+        return;
+      }
+      if (s.qid === lastQid && $('voteBox').querySelector('.choice')) {
+        $('voteBox').querySelectorAll('.choice').forEach((b) => b.classList.toggle('picked', b.dataset.id === myVote[s.qid]));
+        return;
+      }
+      lastQid = s.qid;
+      $('voteBox').innerHTML = `
+        <p class="question">${esc(s.question)}</p>
+        ${s.options.map((o) => `
+          <button class="choice" type="button" data-id="${o.id}">
+            <span class="letter">${o.id.toUpperCase()}</span><span>${esc(o.text)}</span>
+          </button>`).join('')}
+        <div class="error" id="voteError"></div>`;
+      $('voteBox').querySelectorAll('.choice').forEach((btn) => {
+        btn.classList.toggle('picked', btn.dataset.id === myVote[s.qid]);
+        btn.onclick = () => vote(s.qid, btn.dataset.id);
+      });
+    }
+
+    async function vote(qid, option) {
+      try {
+        const res = await fetch(`/api/rooms/${room}/vote`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ voter, qid, option }),
+        });
+        if (!res.ok) throw new Error();
+        myVote[qid] = option;
+        $('voteBox').querySelectorAll('.choice').forEach((b) => b.classList.toggle('picked', b.dataset.id === option));
+        $('voteError').textContent = '已送出！投票結束前都可以改。';
+        $('voteError').style.color = 'var(--good)';
+      } catch {
+        $('voteError').textContent = '投票沒有送出，可能已經結束了。';
+      }
+    }
+
+    async function poll() {
+      try {
+        render(await getState());
+      } catch (e) {
+        if (e.message === 'notfound') {
+          $('voteBox').hidden = true;
+          $('joinBox').hidden = false;
+          $('joinError').textContent = '房間已經關閉了。';
+          return;
+        }
+      }
+      setTimeout(poll, 1500);
+    }
+
+    async function join(code) {
+      room = code;
+      try {
+        await getState();
+      } catch {
+        $('joinError').textContent = '找不到這個房間，請確認螢幕上的號碼。';
+        return;
+      }
+      $('joinBox').hidden = true;
+      $('voteBox').hidden = false;
+      showWaiting('等待老師開放投票……');
+      poll();
+    }
+
+    $('code').oninput = () => { $('joinError').textContent = ''; };
+    $('joinBox').onsubmit = (e) => {
+      e.preventDefault();
+      const code = $('code').value.trim();
+      if (!/^\d{4}$/.test(code)) {
+        $('joinError').textContent = '房間碼是 4 個數字。';
+        return;
+      }
+      join(code);
+    };
+
+    const fromUrl = new URLSearchParams(location.search).get('room');
+    if (fromUrl && /^\d{4}$/.test(fromUrl)) {
+      $('code').value = fromUrl;
+      join(fromUrl);
+    }
+  </script>
+</body>
+</html>

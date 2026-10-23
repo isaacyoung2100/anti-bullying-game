@@ -1,0 +1,641 @@
+:root {
+  --ink: #2b2030;
+  --paper: #fffaf0;
+  --paper-2: #f6ecd6;
+  --accent: #e8584a;
+  --accent-ink: #ffffff;
+  --gold: #ffd166;
+  --muted: #7a6a72;
+  --good: #3f9a4a;
+  --bad: #c0392b;
+  --opt-a: #e8584a;
+  --opt-b: #8a8296;
+  --opt-c: #3f9a4a;
+  --opt-d: #3b82c4;
+  --page: #1c1620;
+}
+
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--page);
+  color: var(--ink);
+  font-family: 'Noto Sans TC', system-ui, sans-serif;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+/* ---------- 投影畫面 ---------- */
+
+body.projector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.stage {
+  position: relative;
+  width: min(100vw, calc((100vh - 44px) * 16 / 9));
+  aspect-ratio: 16 / 9;
+  container-type: inline-size;
+  overflow: hidden;
+  user-select: none;
+  cursor: pointer;
+}
+
+.stage canvas#screen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+/* 像素風邊框：外框 + 內陰影 */
+.pixel-box {
+  background: var(--paper);
+  border: 0.45cqw solid var(--ink);
+  box-shadow: inset -0.45cqw -0.45cqw 0 var(--paper-2), 0 0.6cqw 0 rgba(0, 0, 0, 0.35);
+  border-radius: 0.6cqw;
+}
+
+/* HUD */
+.hud {
+  position: absolute;
+  top: 1.6cqw;
+  left: 1.6cqw;
+  right: 1.6cqw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  font-size: 1.45cqw;
+  font-weight: 700;
+}
+
+.mood {
+  display: flex;
+  align-items: center;
+  gap: 0.8cqw;
+  background: var(--paper);
+  border: 0.35cqw solid var(--ink);
+  border-radius: 0.6cqw;
+  padding: 0.5cqw 1cqw;
+}
+
+.mood-bar {
+  width: 16cqw;
+  height: 1.4cqw;
+  background: #e6d9c2;
+  border: 0.25cqw solid var(--ink);
+  border-radius: 0.3cqw;
+  overflow: hidden;
+}
+
+.mood-fill {
+  display: block;
+  height: 100%;
+  width: 50%;
+  background: var(--good);
+  transition: width 0.8s steps(8), background 0.3s;
+}
+
+.mood-delta {
+  min-width: 3cqw;
+  font-weight: 900;
+}
+
+.mood-delta.up { color: var(--good); }
+.mood-delta.down { color: var(--bad); }
+
+.hud-right {
+  display: flex;
+  gap: 0.6cqw;
+}
+
+.chip {
+  background: var(--paper);
+  border: 0.35cqw solid var(--ink);
+  border-radius: 0.6cqw;
+  padding: 0.4cqw 1cqw;
+}
+
+.ai-chip.offline {
+  background: var(--paper-2);
+  color: var(--muted);
+}
+
+/* 對話框 */
+.dialog {
+  position: absolute;
+  left: 2.5cqw;
+  right: 2.5cqw;
+  bottom: 2.2cqw;
+  min-height: 13cqw;
+  display: flex;
+  gap: 1.4cqw;
+  padding: 1.2cqw 1.6cqw;
+  align-items: flex-start;
+}
+
+.dialog .portrait {
+  width: 9cqw;
+  height: 9cqw;
+  flex: none;
+  image-rendering: pixelated;
+  background: var(--paper-2);
+  border: 0.3cqw solid var(--ink);
+  border-radius: 0.4cqw;
+}
+
+.dialog .portrait.empty { display: none; }
+
+.dialog-body { flex: 1; min-width: 0; }
+
+.speaker {
+  display: inline-block;
+  font-size: 1.6cqw;
+  font-weight: 900;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border: 0.3cqw solid var(--ink);
+  border-radius: 0.4cqw;
+  padding: 0.1cqw 1cqw;
+  margin-bottom: 0.6cqw;
+}
+
+.speaker:empty { display: none; }
+
+.line {
+  font-size: 2.3cqw;
+  line-height: 1.55;
+  font-weight: 700;
+  white-space: pre-line;
+}
+
+.next-hint {
+  position: absolute;
+  right: 1.6cqw;
+  bottom: 0.8cqw;
+  font-size: 1.6cqw;
+  animation: blink 0.8s steps(2) infinite;
+}
+
+.next-hint.hide { visibility: hidden; }
+
+@keyframes blink { 50% { opacity: 0; } }
+
+/* 面板（章節卡、投票、內心話、結局） */
+.panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(28, 22, 32, 0.55);
+  cursor: default;
+}
+
+.card {
+  width: 74cqw;
+  max-height: 50cqw;
+  padding: 2.4cqw 3cqw;
+  font-size: 1.9cqw;
+  font-weight: 700;
+  line-height: 1.6;
+  overflow: hidden;
+}
+
+.card h1, .card h2, .card h3 {
+  margin: 0 0 1cqw;
+  line-height: 1.25;
+}
+
+.card h1 { font-size: 4.6cqw; font-weight: 900; }
+.card h2 { font-size: 3cqw; font-weight: 900; }
+.card h3 { font-size: 2.2cqw; font-weight: 900; }
+
+.card p { margin: 0 0 1cqw; white-space: pre-line; }
+
+.kicker {
+  font-size: 1.5cqw;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6cqw;
+  font-size: 1.8cqw;
+  font-weight: 900;
+  padding: 0.6cqw 1.8cqw;
+  background: var(--gold);
+  color: var(--ink);
+  border: 0.35cqw solid var(--ink);
+  border-radius: 0.6cqw;
+  box-shadow: 0 0.45cqw 0 var(--ink);
+}
+
+.btn:active { transform: translateY(0.3cqw); box-shadow: 0 0.15cqw 0 var(--ink); }
+.btn.secondary { background: var(--paper); }
+.btn.small { font-size: 1.4cqw; padding: 0.3cqw 1.2cqw; }
+
+.btn-row {
+  display: flex;
+  gap: 1.2cqw;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 1.4cqw;
+}
+
+.error {
+  color: var(--bad);
+  font-size: 1.4cqw;
+  min-height: 2cqw;
+}
+
+/* 標題畫面 */
+.title-card { text-align: center; width: 62cqw; }
+.title-card .sub { color: var(--muted); font-size: 1.7cqw; }
+.title-card .btn-row { justify-content: center; }
+
+.teacher-code {
+  display: flex;
+  gap: 1cqw;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1cqw;
+  font-size: 1.6cqw;
+}
+
+.teacher-code input {
+  width: 18cqw;
+  font: inherit;
+  padding: 0.4cqw 0.8cqw;
+  border: 0.3cqw solid var(--ink);
+  border-radius: 0.4cqw;
+}
+
+/* 章節卡 */
+.chapter-card { text-align: center; width: 56cqw; }
+.chapter-card h1 { margin-top: 0.6cqw; }
+
+/* 投票 */
+.vote-card { width: 86cqw; max-height: none; padding: 1.8cqw 2.4cqw; }
+.vote-card h2 { font-size: 2.5cqw; }
+
+.vote-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1cqw;
+}
+
+.opt {
+  position: relative;
+  display: flex;
+  gap: 1cqw;
+  align-items: flex-start;
+  padding: 0.9cqw 1.1cqw 1.6cqw;
+  border: 0.35cqw solid var(--ink);
+  border-radius: 0.6cqw;
+  background: #ffffff;
+  font-size: 1.65cqw;
+  line-height: 1.45;
+  overflow: hidden;
+}
+
+.opt .letter {
+  flex: none;
+  width: 3cqw;
+  height: 3cqw;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 1.8cqw;
+  color: #ffffff;
+  border: 0.3cqw solid var(--ink);
+  border-radius: 0.4cqw;
+}
+
+.opt[data-id="a"] .letter, .opt[data-id="a"] .bar { background: var(--opt-a); }
+.opt[data-id="b"] .letter, .opt[data-id="b"] .bar { background: var(--opt-b); }
+.opt[data-id="c"] .letter, .opt[data-id="c"] .bar { background: var(--opt-c); }
+.opt[data-id="d"] .letter, .opt[data-id="d"] .bar { background: var(--opt-d); }
+
+.opt .opt-text { flex: 1; }
+
+.opt .tally {
+  display: flex;
+  align-items: center;
+  gap: 0.5cqw;
+  flex: none;
+  font-size: 1.8cqw;
+  font-weight: 900;
+}
+
+.opt .tally button {
+  width: 2.6cqw;
+  height: 2.6cqw;
+  padding: 0;
+  font-size: 1.6cqw;
+  font-weight: 900;
+  background: var(--paper);
+  border: 0.25cqw solid var(--ink);
+  border-radius: 0.3cqw;
+}
+
+.opt .bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 0.8cqw;
+  width: 0;
+  transition: width 0.4s;
+}
+
+.opt.winner { outline: 0.6cqw solid var(--gold); outline-offset: -0.2cqw; }
+.opt.loser { opacity: 0.55; }
+
+.vote-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.4cqw;
+  margin-top: 1.2cqw;
+}
+
+.join {
+  display: flex;
+  gap: 1.2cqw;
+  align-items: center;
+  font-size: 1.4cqw;
+  line-height: 1.4;
+}
+
+.join .qr {
+  width: 8cqw;
+  height: 8cqw;
+  padding: 0.3cqw;
+  background: #ffffff;
+  border: 0.25cqw solid var(--ink);
+}
+
+.join .qr img, .join .qr canvas { width: 100% !important; height: 100% !important; }
+.join .code { font-size: 2.6cqw; font-weight: 900; letter-spacing: 0.2em; }
+.join .url { color: var(--muted); }
+
+.result-line { font-size: 1.9cqw; margin-top: 1cqw; }
+
+/* 內心話：日記紙 */
+.inner-card {
+  display: flex;
+  gap: 2.4cqw;
+  align-items: center;
+  background: repeating-linear-gradient(#fffdf6 0 3.4cqw, #e8e0f0 3.4cqw 3.55cqw);
+}
+
+.inner-card .portrait-lg {
+  width: 16cqw;
+  height: 16cqw;
+  flex: none;
+  image-rendering: pixelated;
+  background: var(--paper-2);
+  border: 0.35cqw solid var(--ink);
+  border-radius: 0.6cqw;
+}
+
+.inner-card p { font-size: 2.1cqw; line-height: 1.65; }
+
+.info-card { background: #eef7ff; }
+.info-card .kicker { color: var(--opt-d); }
+
+/* 結局與討論 */
+.ending-card { text-align: center; }
+
+.trust-row {
+  display: flex;
+  justify-content: center;
+  gap: 3cqw;
+  margin: 1.4cqw 0;
+}
+
+.trust {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4cqw;
+  font-size: 1.5cqw;
+}
+
+.trust canvas {
+  width: 8cqw;
+  height: 8cqw;
+  image-rendering: pixelated;
+  background: var(--paper-2);
+  border: 0.3cqw solid var(--ink);
+  border-radius: 0.4cqw;
+}
+
+.hearts { letter-spacing: 0.1em; color: var(--accent); }
+
+.debrief-card { width: 86cqw; max-height: 52cqw; padding: 1.8cqw 2.4cqw; }
+
+.debrief-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 2cqw;
+}
+
+.recap {
+  font-size: 1.45cqw;
+  line-height: 1.45;
+}
+
+.recap-item { margin-bottom: 1cqw; }
+.recap-item .t { font-weight: 900; }
+
+.dist {
+  display: flex;
+  height: 1.4cqw;
+  border: 0.25cqw solid var(--ink);
+  border-radius: 0.3cqw;
+  overflow: hidden;
+  margin-top: 0.3cqw;
+}
+
+.dist span { height: 100%; }
+
+.legend {
+  display: flex;
+  gap: 1.2cqw;
+  font-size: 1.2cqw;
+  color: var(--muted);
+}
+
+.legend i {
+  display: inline-block;
+  width: 1cqw;
+  height: 1cqw;
+  margin-right: 0.3cqw;
+  border: 0.15cqw solid var(--ink);
+  vertical-align: -0.1cqw;
+}
+
+.questions ol {
+  margin: 0;
+  padding-left: 2.4cqw;
+  font-size: 1.7cqw;
+  line-height: 1.5;
+}
+
+.questions li { margin-bottom: 0.9cqw; }
+
+.loading { color: var(--muted); }
+
+/* 老師控制列 */
+.teacher-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  height: 44px;
+  padding: 0 16px;
+  color: #cfc4d6;
+  font-size: 14px;
+}
+
+.teacher-bar button {
+  background: transparent;
+  color: #f2eaf6;
+  border: 1px solid #5a4d63;
+  border-radius: 6px;
+  padding: 4px 12px;
+}
+
+.teacher-bar button:hover { background: #2e2534; }
+.teacher-bar .hint { color: #8d8096; }
+
+:fullscreen .teacher-bar { display: none; }
+
+/* ---------- 學生投票頁 ---------- */
+
+body.voter {
+  min-height: 100vh;
+  background: #f3e6c8;
+  display: flex;
+  justify-content: center;
+}
+
+.voter-wrap {
+  width: 100%;
+  max-width: 560px;
+  padding: 24px 16px 40px;
+}
+
+.voter h1 {
+  font-size: 22px;
+  font-weight: 900;
+  margin: 0 0 4px;
+}
+
+.voter .sub {
+  color: var(--muted);
+  margin: 0 0 20px;
+}
+
+.voter .box {
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+  padding: 20px;
+}
+
+.voter label { font-weight: 700; display: block; margin-bottom: 8px; }
+
+.voter input {
+  width: 100%;
+  font-size: 32px;
+  letter-spacing: 0.3em;
+  text-align: center;
+  padding: 8px;
+  border: 3px solid var(--ink);
+  border-radius: 8px;
+  font-family: inherit;
+}
+
+.voter .btn-big {
+  width: 100%;
+  margin-top: 14px;
+  font-size: 20px;
+  font-weight: 900;
+  padding: 12px;
+  background: var(--gold);
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  box-shadow: 0 4px 0 var(--ink);
+}
+
+.voter .question {
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+.voter .choice {
+  display: flex;
+  width: 100%;
+  gap: 12px;
+  align-items: flex-start;
+  text-align: left;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.5;
+  padding: 14px;
+  margin-bottom: 12px;
+  background: #ffffff;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  box-shadow: 0 4px 0 var(--ink);
+}
+
+.voter .choice .letter {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  font-weight: 900;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+}
+
+.voter .choice[data-id="a"] .letter { background: var(--opt-a); }
+.voter .choice[data-id="b"] .letter { background: var(--opt-b); }
+.voter .choice[data-id="c"] .letter { background: var(--opt-c); }
+.voter .choice[data-id="d"] .letter { background: var(--opt-d); }
+
+.voter .choice.picked { background: #fff3c4; outline: 4px solid var(--gold); }
+
+.voter .waiting {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.6;
+  padding: 24px 8px;
+}
+
+.voter .error { font-size: 15px; margin-top: 8px; min-height: 20px; }
