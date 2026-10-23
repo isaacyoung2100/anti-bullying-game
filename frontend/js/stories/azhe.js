@@ -34,7 +34,7 @@ const STORY = [
       fear: '如果我說了，他們會不會笑得更大聲？',
       then: [
         { speaker: 'azhe', emo: 'angry', text: '不要那樣叫我。' },
-        { speaker: 'zhihao', emo: 'happy', text: '開玩笑也不行喔？這麼兇幹嘛。' },
+        { speaker: 'zhihao', emo: 'happy', text: '開玩笑而已啦，幹嘛那麼兇。' },
         { speaker: 'narrator', emo: 'sad', text: '他聳聳肩走開了。', inner: '我說出來了。就算他沒有道歉，我也說出來了。' },
       ] },
   ] },
@@ -42,7 +42,7 @@ const STORY = [
   // ---------------- 週二 ----------------
   { k: 'day', day: '週二', title: '起跑線', bg: 'track' },
   { bg: 'track', chars: [{ id: 'azhe', x: 52, emo: 'happy' }, { id: 'jiajia', x: 140, emo: 'neutral' }],
-    speaker: 'jiajia', text: '下禮拜六就是運動會了！今天練大隊接力，每個人都要跑喔。' },
+    speaker: 'jiajia', text: '這禮拜六就是運動會了！今天練大隊接力，每個人都要跑喔。' },
   { speaker: 'azhe', emo: 'happy', text: '（你站上起跑線。你其實很喜歡跑步，跑步的時候不用坐著不動。）' },
   { speaker: 'narrator', emo: 'surprised', text: '「預備——」\n哨聲還沒響，你的腳就自己衝出去了。' },
   { bg: 'track', chars: CLASS_CHARS('surprised', 'angry'),
@@ -90,7 +90,7 @@ const STORY = [
       fear: '如果他們說不要，我會更丟臉。',
       then: [
         { speaker: 'azhe', emo: 'neutral', text: '我……我可以畫閃電嗎？' },
-        { speaker: 'zhihao', emo: 'happy', text: '你會畫什麼啦。' },
+        { speaker: 'zhihao', emo: 'happy', text: '你喔？不要啦，畫壞了怎麼辦。' },
         { speaker: 'narrator', text: '佳佳看了你的筆記本一眼，停了一下，但什麼都沒說。', inner: '她明明看到了。' },
       ] },
     { text: '下課去找老師，說你被排擠。', need: 25, flag: 'toldTeacher',

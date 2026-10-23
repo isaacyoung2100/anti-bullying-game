@@ -441,37 +441,121 @@ button {
 
 .inner-card p { font-size: 4.8cqw; line-height: 1.7; }
 
-/* 一週回顧 */
-.day-bars {
-  display: flex;
-  gap: 2cqw;
-  align-items: flex-end;
-  height: 30cqw;
+/* 一週回顧：心裡的天氣 */
+.wx-row {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1.6cqw;
   margin-bottom: 4cqw;
 }
 
-.day-bar {
-  flex: 1;
+.wx-day {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1cqw;
-  height: 100%;
+  padding: 2cqw 0 1.6cqw;
+  background: var(--paper-2);
+  border-radius: 1.2cqw;
 }
 
-.bar-wrap {
-  flex: 1;
-  width: 100%;
+.wx-word { font-size: 3.2cqw; font-weight: 900; }
+.wx-label { font-size: 3cqw; color: var(--muted); }
+
+/* 天氣圖示：用色塊拼成的小像素圖 */
+.wx {
+  position: relative;
+  width: 9cqw;
+  height: 7cqw;
+}
+
+.wx.sun::before {
+  content: "";
+  position: absolute;
+  left: 1.5cqw; top: 0.5cqw;
+  width: 6cqw; height: 6cqw;
+  background: var(--gold);
+  border: 0.5cqw solid #c9962e;
+  border-radius: 50%;
+}
+
+.wx.cloud::before, .wx.overcast::before, .wx.rain::before {
+  content: "";
+  position: absolute;
+  left: 0.5cqw; top: 1.5cqw;
+  width: 8cqw; height: 3.6cqw;
+  border-radius: 2cqw;
+}
+
+.wx.cloud::after {
+  content: "";
+  position: absolute;
+  right: 0; top: 0;
+  width: 4cqw; height: 4cqw;
+  background: var(--gold);
+  border-radius: 50%;
+  z-index: -0;
+}
+
+.wx.cloud::before { background: #ffffff; border: 0.5cqw solid #b9c3cf; z-index: 1; }
+.wx.overcast::before { background: #b5b0bd; border: 0.5cqw solid #8a8296; }
+.wx.rain::before { background: #8a8296; border: 0.5cqw solid #6b6378; }
+
+.wx.rain i, .wx.rain i::before, .wx.rain i::after {
+  position: absolute;
+  top: 5.6cqw;
+  width: 0.8cqw; height: 1.4cqw;
+  background: #5b8fd6;
+}
+
+.wx.rain i { left: 2.2cqw; display: block; }
+.wx.rain i::before, .wx.rain i::after { content: ""; top: 0; }
+.wx.rain i::before { left: 2cqw; }
+.wx.rain i::after { left: 4cqw; }
+
+/* 換你想一想 */
+.pick-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1.4cqw;
+}
+
+.pick-col {
   display: flex;
-  align-items: flex-end;
-  background: #efe5d2;
-  border: 0.5cqw solid var(--ink);
-  border-radius: 0.8cqw;
-  overflow: hidden;
+  flex-direction: column;
+  gap: 2cqw;
 }
 
-.bar-fill { width: 100%; background: var(--gold); }
-.bar-label { font-size: 3.2cqw; }
+.pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4cqw;
+  min-width: 0;
+  font-size: 4cqw;
+  font-weight: 900;
+  padding: 2cqw 0.6cqw;
+  background: #ffffff;
+  color: var(--ink);
+  border: 0.6cqw solid var(--ink);
+  border-radius: 1.4cqw;
+  box-shadow: 0 0.8cqw 0 var(--ink);
+}
+
+.pick small { font-size: 2.6cqw; overflow-wrap: anywhere; font-weight: 500; color: var(--muted); line-height: 1.3; text-align: center; }
+.pick-col .pick { align-items: flex-start; padding: 2.4cqw 3.6cqw; }
+.pick.picked { background: #fff3c4; outline: 0.8cqw solid var(--gold); }
+.pick:active { transform: translateY(0.5cqw); box-shadow: 0 0.3cqw 0 var(--ink); }
+
+.think-q { margin-top: 4cqw; font-weight: 900; }
+
+.think-result {
+  margin-top: 4cqw;
+  padding: 3cqw 4cqw;
+  background: var(--paper-2);
+  border-radius: 1.4cqw;
+  white-space: pre-line;
+}
 
 .facts .num { font-size: 8cqw; color: var(--accent); margin-right: 1cqw; }
 .facts .quiet { color: var(--muted); font-size: 4cqw; }

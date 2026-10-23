@@ -196,6 +196,7 @@ function run() {
     ending: stepEnding,
     zhihao: stepZhihao,
     reflect: stepReflect,
+    think: stepThink,
     closing: stepClosing,
   }[step.k] || stepLine;
   handler(step);
@@ -317,7 +318,7 @@ function stepChoice(step) {
 function stepEnding() {
   const key = state.courage >= BRAVE_THRESHOLD ? 'brave' : 'heavy';
   state.ending = key;
-  insertAfterCurrent([...state.story.endings[key], { k: 'zhihao' }, { k: 'reflect' }, { k: 'closing' }]);
+  insertAfterCurrent([...state.story.endings[key], { k: 'zhihao' }, { k: 'reflect' }, { k: 'think' }, { k: 'closing' }]);
   next();
 }
 
@@ -339,18 +340,30 @@ function stepZhihao() {
   card.querySelector('#go').onclick = next;
 }
 
+// 用「心裡的天氣」呈現每天的心情，而不是分數：心情低落不代表比較差
+function weatherOf(energy) {
+  if (energy >= 75) return { cls: 'sun', word: '晴天' };
+  if (energy >= 55) return { cls: 'cloud', word: '多雲' };
+  if (energy >= 35) return { cls: 'overcast', word: '陰天' };
+  return { cls: 'rain', word: '下雨' };
+}
+
 function stepReflect() {
   state.view.bg = 'track';
   state.view.chars = [{ id: state.story.id, x: 96, emo: state.ending === 'brave' ? 'happy' : 'neutral' }];
-  const bars = state.days.map((d) => `
-    <div class="day-bar">
-      <span class="bar-wrap"><span class="bar-fill" style="height:${d.courage}%"></span></span>
-      <span class="bar-label">${esc(d.day)}</span>
-    </div>`).join('');
+  const tiles = state.days.map((d) => {
+    const w = weatherOf(d.courage);
+    return `
+    <div class="wx-day">
+      <span class="wx ${w.cls}" aria-hidden="true"><i></i></span>
+      <span class="wx-word">${w.word}</span>
+      <span class="wx-label">${esc(d.day)}</span>
+    </div>`;
+  }).join('');
   showPanel(`
     <div class="kicker">這一個禮拜</div>
-    <h2>你的心靈能量，每天都不一樣</h2>
-    <div class="day-bars" role="img" aria-label="每天的心靈能量">${bars}</div>
+    <h2>你心裡的天氣</h2>
+    <div class="wx-row" role="list" aria-label="每天心裡的天氣">${tiles}</div>
     <div class="facts">
       <p><b class="num">${state.witness}</b> 次，有人看到了，卻沒有說話。</p>
       <p><b class="num">${state.kind}</b> 次，有人對你伸出手。</p>
@@ -358,6 +371,51 @@ function stepReflect() {
     </div>
     <div class="btn-row"><button class="btn" type="button" id="go">繼續 ▶</button></div>
   `, 'reflect-card').querySelector('#go').onclick = next;
+}
+
+// 換位思考：從被欺負的人回到旁觀者，想一件自己可以做的小事（不記錄、不評分）
+function stepThink() {
+  state.view.speaker = null;
+  const st = state.story;
+  const ta = st.pronoun || '他';
+  const days = st.story.filter((s) => s.k === 'day');
+  const actions = ['問一句：「你還好嗎？」', '不跟著笑', `陪${ta}一起走一段路`, '下課去告訴老師'];
+  const card = showPanel(`
+    <div class="kicker">換你想一想</div>
+    <h2>如果你是五年三班的同學，你會在哪一天，走過去找${esc(st.name)}？</h2>
+    <div class="pick-row" id="dayPick">
+      ${days.map((d, n) => `<button class="pick" type="button" data-n="${n}">${esc(d.day)}<small>${esc(d.title)}</small></button>`).join('')}
+    </div>
+    <div id="actionPart" hidden>
+      <p class="think-q">那天，你可以做什麼？</p>
+      <div class="pick-col" id="actionPick">
+        ${actions.map((a, n) => `<button class="pick" type="button" data-n="${n}">${esc(a)}</button>`).join('')}
+      </div>
+    </div>
+    <div id="thinkResult" hidden>
+      <p class="think-result" id="thinkText"></p>
+      <div class="btn-row"><button class="btn" type="button" id="go">繼續 ▶</button></div>
+    </div>
+  `, 'think-card');
+  let dayN = null;
+  const mark = (row, btn) => row.querySelectorAll('.pick').forEach((b) => b.classList.toggle('picked', b === btn));
+  card.querySelectorAll('#dayPick .pick').forEach((btn) => {
+    btn.onclick = () => {
+      dayN = Number(btn.dataset.n);
+      mark(card.querySelector('#dayPick'), btn);
+      card.querySelector('#actionPart').hidden = false;
+    };
+  });
+  card.querySelectorAll('#actionPick .pick').forEach((btn) => {
+    btn.onclick = () => {
+      mark(card.querySelector('#actionPick'), btn);
+      const day = days[dayN];
+      card.querySelector('#thinkText').textContent =
+        `${day.day}，「${day.title}」那天，你${actions[Number(btn.dataset.n)].replace('：', '')}。\n對${st.name}來說，這可能就是那個禮拜裡，最不一樣的一刻。\n現實中的你，也可以這樣做。`;
+      card.querySelector('#thinkResult').hidden = false;
+      card.querySelector('#go').onclick = next;
+    };
+  });
 }
 
 function stepClosing() {
@@ -437,7 +495,9 @@ function advance() {
   if (!step) return;
   // 卡片上的「繼續」也可以用空白鍵按；選擇題要自己點
   if (step.k) {
-    $('panel').querySelector('#go')?.click();
+    // 只按看得到的「繼續」：還沒選完的卡片，空白鍵不能跳過
+    const go = $('panel').querySelector('#go');
+    if (go && go.offsetParent !== null) go.click();
     return;
   }
   if (finishTyping()) return;

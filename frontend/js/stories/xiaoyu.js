@@ -189,6 +189,7 @@ const ENDINGS = {
 export default {
   id: 'xiaoyu',
   name: '小雨',
+  pronoun: '她',
   blurb: '跑步很快，話不多。每天放學去接弟弟。',
   story: STORY,
   endings: ENDINGS,

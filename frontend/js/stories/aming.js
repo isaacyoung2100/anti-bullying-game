@@ -59,7 +59,7 @@ const STORY = [
       effect: { courage: 5 },
       then: [
         { speaker: 'aming', emo: 'neutral', text: '這是我媽媽做的春捲，很好吃。' },
-        { speaker: 'zhihao', emo: 'happy', text: '好吃？聞起來就怪怪的。' },
+        { speaker: 'zhihao', emo: 'happy', text: '好吃？聞起來超怪的啦。' },
         { speaker: 'narrator', text: '你還是把春捲吃完了。', inner: '媽媽做的，就是很好吃。' },
       ] },
   ] },
