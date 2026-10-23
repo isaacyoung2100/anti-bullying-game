@@ -407,6 +407,10 @@ function stepThink() {
       ${days.map((d, n) => `<button class="pick" type="button" data-n="${n}">${esc(d.day)}<small>${esc(d.title)}</small></button>`).join('')}
     </div>
     <div id="actionPart" hidden>
+      <div class="think-recap">
+        <div class="round-label" id="recapHead"></div>
+        <p id="recapText"></p>
+      </div>
       <p class="think-q">那天，你可以做什麼？</p>
       <div class="pick-col" id="actionPick">
         ${actions.map((a, n) => `<button class="pick" type="button" data-n="${n}">${esc(a)}</button>`).join('')}
@@ -423,6 +427,12 @@ function stepThink() {
     btn.onclick = () => {
       dayN = Number(btn.dataset.n);
       mark(card.querySelector('#dayPick'), btn);
+      // 玩完一整週，很難記得每天發生什麼：先提醒那天的事和那天心裡的天氣
+      const day = days[dayN];
+      const mood = state.days.find((d) => d.day === day.day);
+      card.querySelector('#recapHead').textContent =
+        `${day.day}・${day.title}${mood ? `・${st.name}心裡的天氣：${weatherOf(mood.courage).word}` : ''}`;
+      card.querySelector('#recapText').textContent = day.recap || '';
       card.querySelector('#actionPart').hidden = false;
     };
   });

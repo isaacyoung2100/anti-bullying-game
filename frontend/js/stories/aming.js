@@ -11,7 +11,8 @@ const WITH_ZHIHAO = (you = 'neutral', zh = 'neutral') => [
 
 const STORY = [
   // ---------------- 週一 ----------------
-  { k: 'day', day: '週一', title: '加油口號', bg: 'classroom' },
+  { k: 'day', day: '週一', title: '加油口號', bg: 'classroom',
+    recap: '阿明帶喊口號時，不小心說出越南話「Cố lên」（加油）。志豪叫他「外星阿明」，下課後走廊上還有人這樣叫。' },
   { bg: 'classroom', chars: [{ id: 'aming', x: 52, emo: 'happy' }, { id: 'teacher', x: 140, emo: 'happy' }],
     speaker: 'narrator', text: '你叫阿明，五年三班。你數學很好。\n媽媽來自越南，在家裡你們會說越南話。每次你考完試，媽媽都會說「Cố lên」，意思是「加油」。' },
   { speaker: 'teacher', text: '我們來練運動會的加油口號！每個人輪流帶喊一句。下一個，阿明！' },
@@ -40,7 +41,8 @@ const STORY = [
   ] },
 
   // ---------------- 週二 ----------------
-  { k: 'day', day: '週二', title: '便當', bg: 'classroom' },
+  { k: 'day', day: '週二', title: '便當', bg: 'classroom',
+    recap: '午餐時，阿明帶了媽媽做的越南春捲。志豪說好臭，有兩個同學把桌子拉開。' },
   { bg: 'classroom', chars: [{ id: 'aming', x: 52, emo: 'happy' }],
     speaker: 'narrator', text: '午餐時間。今天媽媽幫你做了越南春捲，用米紙包著生菜和薄荷葉，還放了一小盒沾醬。是你最喜歡的。' },
   { bg: 'classroom', chars: WITH_ZHIHAO('surprised', 'angry'),
@@ -70,7 +72,8 @@ const STORY = [
     effect: { courage: 5, kind: 1 } },
 
   // ---------------- 週三 ----------------
-  { k: 'day', day: '週三', title: '我的家鄉', bg: 'classroom' },
+  { k: 'day', day: '週三', title: '我的家鄉', bg: 'classroom',
+    recap: '社會課報告「我的家鄉」，志豪說阿明的媽媽「是外國人，講話都怪怪的」，後面有人在偷笑。' },
   { bg: 'classroom', chars: [{ id: 'teacher', x: 96, emo: 'happy' }],
     speaker: 'teacher', text: '社會課的報告題目是「我的家鄉」。大家可以介紹爸爸媽媽長大的地方喔。' },
   { bg: 'classroom', chars: WITH_ZHIHAO('surprised', 'happy'),
@@ -96,7 +99,8 @@ const STORY = [
   ] },
 
   // ---------------- 週四 ----------------
-  { k: 'day', day: '週四', title: '晚餐', bg: 'home' },
+  { k: 'day', day: '週四', title: '晚餐', bg: 'home',
+    recap: '晚上媽媽說運動會要去加油。阿明想到「外星阿明」，擔心大家也會笑媽媽的口音。' },
   { bg: 'home', chars: [{ id: 'aming', x: 64, emo: 'neutral' }, { id: 'momM', x: 128, emo: 'happy' }],
     speaker: 'momM', text: 'Ăn cơm đi！吃飯囉！禮拜六運動會，媽媽也會去幫你們加油喔！' },
   { speaker: 'narrator', text: '你想到媽媽在觀眾席大聲喊加油的樣子。\n想到大家會聽到她的口音。',
@@ -126,7 +130,8 @@ const STORY = [
   ] },
 
   // ---------------- 週五 ----------------
-  { k: 'day', day: '週五', title: '收接力棒', bg: 'classroom' },
+  { k: 'day', day: '週五', title: '收接力棒', bg: 'classroom',
+    recap: '放學後，大家都走了，阿明一個人留在操場收接力棒。' },
   { bg: 'classroom', chars: [{ id: 'aming', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'neutral' }],
     speaker: 'narrator', text: '早自習的時候，林老師把你叫到走廊上。' },
   { speaker: 'teacher', text: '阿明，老師這幾天有注意到，有同學一直叫你綽號，還笑你的便當。' },

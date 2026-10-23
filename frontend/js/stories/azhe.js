@@ -10,7 +10,8 @@ const CLASS_CHARS = (you = 'neutral', zh = 'neutral') => [
 
 const STORY = [
   // ---------------- 週一 ----------------
-  { k: 'day', day: '週一', title: '忘記帶的作業本', bg: 'classroom' },
+  { k: 'day', day: '週一', title: '忘記帶的作業本', bg: 'classroom',
+    recap: '阿哲忘了帶數學作業本。志豪小聲叫他「過動兒」，老師制止了，可是後面還是有人在偷笑。' },
   { bg: 'classroom', chars: [{ id: 'azhe', x: 52, emo: 'happy' }, { id: 'teacher', x: 140, emo: 'neutral' }],
     speaker: 'narrator', text: '你叫阿哲，五年三班。你最喜歡畫畫，最討厭的是……坐著不動。' },
   { speaker: 'teacher', text: '請大家把數學作業本拿出來。' },
@@ -40,7 +41,8 @@ const STORY = [
   ] },
 
   // ---------------- 週二 ----------------
-  { k: 'day', day: '週二', title: '起跑線', bg: 'track' },
+  { k: 'day', day: '週二', title: '起跑線', bg: 'track',
+    recap: '練大隊接力時，阿哲起跑太早。志豪說「跟他同一隊真的很倒楣」，有人跟著笑，其他人都把眼睛轉開。' },
   { bg: 'track', chars: [{ id: 'azhe', x: 52, emo: 'happy' }, { id: 'jiajia', x: 140, emo: 'neutral' }],
     speaker: 'jiajia', text: '這禮拜六就是運動會了！今天練大隊接力，每個人都要跑喔。' },
   { speaker: 'azhe', emo: 'happy', text: '（你站上起跑線。你其實很喜歡跑步，跑步的時候不用坐著不動。）' },
@@ -71,7 +73,8 @@ const STORY = [
   ] },
 
   // ---------------- 週三 ----------------
-  { k: 'day', day: '週三', title: '加油海報', bg: 'classroom' },
+  { k: 'day', day: '週三', title: '加油海報', bg: 'classroom',
+    recap: '分組做加油海報，沒有人找阿哲一組。他明明最會畫畫，卻被叫去旁邊遞彩色筆。' },
   { bg: 'classroom', chars: [{ id: 'teacher', x: 96, emo: 'happy' }],
     speaker: 'teacher', text: '今天分組做運動會的加油海報！四個人一組，自己找組員。' },
   { bg: 'classroom', chars: [{ id: 'azhe', x: 52, emo: 'neutral' }],
@@ -107,7 +110,8 @@ const STORY = [
     effect: { courage: 5, kind: 1 } },
 
   // ---------------- 週四 ----------------
-  { k: 'day', day: '週四', title: '晚餐', bg: 'home' },
+  { k: 'day', day: '週四', title: '晚餐', bg: 'home',
+    recap: '這個禮拜的事都還壓在阿哲心裡。晚上媽媽問他學校怎麼樣，他看著碗裡的飯，不知道該怎麼說。' },
   { bg: 'home', chars: [{ id: 'azhe', x: 64, emo: 'neutral' }, { id: 'mom', x: 128, emo: 'happy' }],
     speaker: 'mom', text: '今天在學校怎麼樣？運動會快到了吧？' },
   { speaker: 'narrator', text: '你看著碗裡的飯。',
@@ -139,7 +143,8 @@ const STORY = [
   ] },
 
   // ---------------- 週五 ----------------
-  { k: 'day', day: '週五', title: '收接力棒', bg: 'classroom' },
+  { k: 'day', day: '週五', title: '收接力棒', bg: 'classroom',
+    recap: '放學後，大家都走了，阿哲一個人留在操場收接力棒。' },
   { bg: 'classroom', chars: [{ id: 'azhe', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'neutral' }],
     speaker: 'narrator', text: '早自習的時候，林老師把你叫到走廊上。' },
   { speaker: 'teacher', text: '阿哲，老師這幾天有注意到，練跑和分組的時候，你好像很不開心。' },

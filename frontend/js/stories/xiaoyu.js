@@ -10,7 +10,8 @@ const WITH_ZHIHAO = (you = 'neutral', zh = 'neutral') => [
 
 const STORY = [
   // ---------------- 週一 ----------------
-  { k: 'day', day: '週一', title: '班服', bg: 'classroom' },
+  { k: 'day', day: '週一', title: '班服', bg: 'classroom',
+    recap: '要訂班服了，小雨問可不可以不要訂。志豪笑她的外套「袖口都起毛球了，笑死」。' },
   { bg: 'classroom', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }, { id: 'jiajia', x: 140, emo: 'happy' }],
     speaker: 'narrator', text: '你叫小雨，五年三班。你跑步很快，話不多。\n家裡有你、媽媽和讀幼兒園的弟弟。每天放學，都是你去接弟弟。' },
   { speaker: 'jiajia', text: '老師說運動會要穿一樣的班服，一件 350 元，要訂的人禮拜五前跟我登記喔！' },
@@ -37,7 +38,8 @@ const STORY = [
   ] },
 
   // ---------------- 週二 ----------------
-  { k: 'day', day: '週二', title: '班級群組', bg: 'home' },
+  { k: 'day', day: '週二', title: '班級群組', bg: 'home',
+    recap: '晚上，有人把小雨外套的照片傳到班級群組，寫「復古風女王」。24 個人已讀，群組裡沒有人說「不要這樣」。' },
   { bg: 'home', chars: [{ id: 'xiaoyu', x: 96, emo: 'neutral' }],
     speaker: 'narrator', text: '晚上九點。媽媽還在上班，弟弟已經睡了。你一個人在餐桌寫功課。' },
   { speaker: 'narrator', emo: 'surprised', text: '手機震了一下。是班級群組。\n有人傳了一張照片：你那件起毛球的外套，旁邊加了一行字——「復古風女王」。' },
@@ -66,7 +68,8 @@ const STORY = [
   { speaker: 'narrator', text: '只有一句話。可是你看了好多次。' },
 
   // ---------------- 週三 ----------------
-  { k: 'day', day: '週三', title: '生日邀請卡', bg: 'classroom' },
+  { k: 'day', day: '週三', title: '生日邀請卡', bg: 'classroom',
+    recap: '佳佳發生日派對的邀請卡，走過小雨的座位沒有停。旁邊的女生小聲說「她哪有錢買禮物」。' },
   { bg: 'classroom', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }, { id: 'jiajia', x: 140, emo: 'happy' }],
     speaker: 'narrator', text: '下課時，佳佳拿著一疊粉紅色的卡片走過每個座位。是她禮拜天的生日派對邀請卡。' },
   { speaker: 'narrator', text: '她走到你的座位。停了一秒。然後走向下一個人。',
@@ -89,7 +92,8 @@ const STORY = [
   ] },
 
   // ---------------- 週四 ----------------
-  { k: 'day', day: '週四', title: '很晚的晚餐', bg: 'home' },
+  { k: 'day', day: '週四', title: '很晚的晚餐', bg: 'home',
+    recap: '群組的照片還在。晚上媽媽八點半才下班，問小雨怎麼臉臭臭的。' },
   { bg: 'home', chars: [{ id: 'xiaoyu', x: 64, emo: 'neutral' }, { id: 'momX', x: 128, emo: 'happy' }],
     speaker: 'narrator', text: '媽媽八點半才下班，手上提著店裡多出來的玉米濃湯。' },
   { speaker: 'momX', emo: 'happy', text: '快，趁熱喝！弟弟今天在幼兒園把襪子穿在手上，老師笑到不行。' },
@@ -123,7 +127,8 @@ const STORY = [
   ] },
 
   // ---------------- 週五 ----------------
-  { k: 'day', day: '週五', title: '號碼布', bg: 'classroom' },
+  { k: 'day', day: '週五', title: '號碼布', bg: 'classroom',
+    recap: '老師私下處理了群組和班服的事。下午練跑時，小雨一口氣超過了兩個人。' },
   { bg: 'classroom', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'neutral' }],
     speaker: 'narrator', text: '早自習的時候，林老師把你叫到走廊上。' },
   { speaker: 'teacher', text: '小雨，老師這幾天有注意到，班上的群組有一些不好的事情。' },

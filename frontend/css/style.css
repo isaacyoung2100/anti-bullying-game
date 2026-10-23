@@ -559,6 +559,16 @@ button {
 
 .think-q { margin-top: 4cqw; font-weight: 900; }
 
+.think-recap {
+  margin-top: 4cqw;
+  padding: 3cqw 4cqw;
+  background: #eef3fb;
+  border-left: 1cqw solid #8aa6d6;
+}
+
+.think-recap .round-label { margin: 0 0 1cqw; }
+.think-recap p { margin: 0; font-weight: 500; line-height: 1.7; }
+
 .think-result {
   margin-top: 4cqw;
   padding: 3cqw 4cqw;

@@ -47,6 +47,14 @@ test('劇本格式：每一步都是認得的類型，說話的人都存在', ()
   }
 });
 
+test('「換你想一想」可以選的每一天，都有那天發生了什麼的摘要', () => {
+  for (const { st } of ALL) {
+    for (const d of st.story.filter((s) => s.k === 'day')) {
+      assert.ok(d.recap && d.recap.trim(), `${st.id} ${d.day} 缺少 recap（玩家回想那天時需要）`);
+    }
+  }
+});
+
 test('劇本格式：if 用到的旗標，一定有某個選項會設定', () => {
   for (const { st } of ALL) {
     const set = new Set();
