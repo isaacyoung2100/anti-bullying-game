@@ -45,6 +45,8 @@ const CHECK = `
     if (r.right > vw + 1 || r.left < -1) issues.push('跑出螢幕：' + name(e));
     if (e.children.length === 0 && e.textContent.trim() && !['INPUT', 'TEXTAREA'].includes(e.tagName)) {
       const fs = parseFloat(getComputedStyle(e).fontSize);
+      // 大螢幕不能大得誇張：標題以外的字超過 32px 就算太大
+      if (fs > 32 && !e.closest('h1, .wx, .face, .photo-pic, .num, .big')) issues.push('字太大（' + fs.toFixed(0) + 'px）：' + name(e) + ' ' + e.textContent.trim().slice(0, 10));
       if (fs < 11) issues.push('字太小（' + fs.toFixed(1) + 'px）：' + name(e) + ' ' + e.textContent.trim().slice(0, 10));
     }
     if (!tapeOk && e.scrollWidth > e.clientWidth + 2 && e.clientWidth > 0 && !['hidden', 'clip'].includes(getComputedStyle(e).overflowX) && !['CANVAS', 'INPUT', 'TEXTAREA'].includes(e.tagName)) issues.push('文字橫向溢出：' + name(e));

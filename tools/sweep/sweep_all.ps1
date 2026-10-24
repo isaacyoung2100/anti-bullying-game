@@ -6,7 +6,7 @@ $here = $PSScriptRoot; $sp = Join-Path $here 'out'; New-Item -ItemType Directory
 $sizes = @(
   @('phoneSE', 375, 667, 2, 1), @('iphone', 390, 844, 3, 1), @('android', 412, 915, 2.6, 1), @('phoneLand', 844, 390, 3, 1), @('phoneSELand', 667, 375, 2, 1),
   @('ipadMini', 744, 1133, 2, 0), @('ipadP', 820, 1180, 2, 0), @('ipadL', 1180, 820, 2, 0), @('ipadProL', 1366, 1024, 2, 0),
-  @('laptop', 1366, 768, 1, 0), @('desktop', 1920, 1080, 1, 0)
+  @('laptop', 1366, 768, 1, 0), @('desktop', 1920, 1080, 1, 0), @('desktopTall', 2000, 1130, 1, 0), @('wide1600', 1600, 900, 1, 0), @('monitor2k', 2560, 1440, 1, 0)
 )
 if (-not $env:SUFFIX) { Remove-Item "$sp\shot_sw_*.png", "$sp\sweep_*.txt" -ErrorAction SilentlyContinue }
 foreach ($s in $sizes) {
