@@ -9,6 +9,7 @@
  *        createAdultOnly    只建一般成人版
  *        createExpertOnly   只建教育專業版
  *        createChildOnly    只建學童版
+ *        createAdultEnglishOnly  只建一般成人版（英文，給外國受試者）
  *   4. 第一次會要求授權：選你的 Google 帳號 →「進階」→「前往（不安全）」→ 允許
  *      （這是你自己寫的程式，Google 才會這樣提醒）
  *   5. 下方「執行記錄」會列出每份表單的填寫網址、編輯網址，以及收集回覆的試算表
@@ -236,6 +237,109 @@ function createAdultForm() {
 
   return { form, sheet: linkSheet(form, '《五年三班大隊接力》一般成人版回覆') };
 }
+
+// ========== A2. 一般成人版（英文）：給外國受試者，玩英文版遊戲（網址加 ?lang=en） ==========
+// 題目代號（E1、C1……）和中文成人版相同，兩份資料可以合併分析；分析時加一欄「語言」
+
+function addScaleEn(form, title, max = 5, helpText = '') {
+  const item = form.addScaleItem()
+    .setTitle(title)
+    .setBounds(1, max)
+    .setLabels('Strongly disagree', 'Strongly agree')
+    .setRequired(true);
+  if (helpText) item.setHelpText(helpText);
+  return item;
+}
+
+function createAdultEnglishForm() {
+  const form = newForm('Class 5-3 Relay: Player Feedback Survey (English)',
+    'Thank you for playing Class 5-3 Relay, an anti-bullying story game set in a Taiwanese elementary school ' +
+    '(grades 5–6). You play in the first person as a student who is being teased and left out during the week before Sports Day.\n\n' +
+    'This survey asks how the game felt to you. It takes about 6 minutes.\n' +
+    'Please play the English version of the game: https://isaacyoung2100.github.io/anti-bullying-game/?lang=en');
+  form.setConfirmationMessage(
+    'Thank you for your feedback!\n\n' +
+    'If the game or this survey brought up difficult feelings, please talk to someone you trust, ' +
+    'or contact a local support service. In Taiwan, you can call the Taiwan Mental Health Hotline at 1925 (24 hours).');
+
+  const consent = form.addMultipleChoiceItem().setTitle('About this study and consent').setRequired(true)
+    .setHelpText(
+      '- Anonymous: we do not collect your name, email, or anything that could identify you.\n' +
+      '- Purpose: academic research only. Results will be submitted to the 4th International Conference on Affective Education (ICAE4).\n' +
+      '- Voluntary: you can stop at any time, with no consequences.\n' +
+      '- The game and this survey are about school bullying. If you recall upsetting experiences, please feel free to stop.\n' +
+      'Researcher contact: (please add your name and contact information)');
+  consent.setChoices([
+    consent.createChoice('I agree. Start the survey.', FormApp.PageNavigationType.CONTINUE),
+    consent.createChoice('I do not agree. (The survey ends here.)', FormApp.PageNavigationType.SUBMIT),
+  ]);
+
+  form.addPageBreakItem().setTitle('About you');
+  form.addMultipleChoiceItem().setTitle('Your age').setRequired(true)
+    .setChoiceValues(['18–22', '23–29', '30–39', '40–49', '50 or older']);
+  form.addMultipleChoiceItem().setTitle('Your gender').setRequired(true)
+    .setChoiceValues(['Male', 'Female', 'Other / prefer not to say']);
+  form.addMultipleChoiceItem().setTitle('You are a…').setRequired(true)
+    .setChoiceValues(['Undergraduate student', 'Graduate student', 'Parent', 'Other']).showOtherOption(true);
+  form.addCheckboxItem().setTitle('Which characters did you play? (Select all that apply)').setRequired(true)
+    .setChoiceValues([
+      'Azhe (loves drawing, can’t sit still, forgets things a lot)',
+      'Xiaoyu (fast runner, quiet, picks up her little brother every day)',
+      'Aming (great at math; his mom is from Vietnam and they speak Vietnamese at home)',
+      'Kai (loves to dance, speaks softly)',
+      'Qing (loves dinosaurs, very sensitive to sound)',
+      'Pinyu (used to watch from the side; left out after standing up for a classmate)',
+    ]);
+  form.addMultipleChoiceItem().setTitle('Did you play at least one character’s whole week to the last page?').setRequired(true)
+    .setChoiceValues(['Yes, to the last page', 'No, I stopped partway']);
+  form.addMultipleChoiceItem()
+    .setTitle('When you were in school, which was closest to your experience?')
+    .setHelpText('You may choose “Prefer not to say.”')
+    .setRequired(true)
+    .setChoiceValues([
+      'I was teased, isolated, or left out by classmates',
+      'I was mostly a bystander (I saw others left out but wasn’t directly involved)',
+      'I didn’t notice much bullying or exclusion',
+      'Prefer not to say',
+    ]);
+  form.addMultipleChoiceItem().setTitle('Where did you go to elementary school?').setRequired(true)
+    .setChoiceValues(['Taiwan', 'Another country']);
+
+  form.addPageBreakItem().setTitle('Playing the game')
+    .setHelpText('Please answer based on how the game felt to use (1 = strongly disagree, 7 = strongly agree).');
+  [
+    'G1. The game was easy to use.',
+    'G2. I knew what to tap on each screen (continue, choices, back, pause).',
+    'G3. The text size and typing speed were comfortable to read.',
+    'G4. One character’s week (including the daily diary) was a good length, not too long.',
+    'G5. The visual style (diary notebook, hand-drawn) made me want to keep playing.',
+  ].forEach((text) => addScaleEn(form, text, 7));
+
+  form.addPageBreakItem().setTitle('How the game felt')
+    .setHelpText('Please rate how you felt while playing (1 = strongly disagree, 5 = strongly agree).');
+  addScaleEn(form, 'E1. The first-person “you” made me feel like I was really in that classroom or on that field.');
+  addScaleEn(form, 'E2. I could feel the main character’s hurt, nervousness, and helplessness when teased or isolated.');
+  addScaleEn(form, 'C1. Seeing choices crossed out, with what the character was afraid of, helped me understand why bullied students often don’t ask for help.', 5,
+    'When the character’s Heart Energy is too low, some choices are crossed out and the game shows what they are afraid of.');
+  addScaleEn(form, 'C2. I understood why the main character sometimes looked down, laughed along, or said “I’m fine.”');
+  addScaleEn(form, 'C3. This design made me rethink the idea that bullied students just need to be brave and speak up.');
+  addScaleEn(form, 'R1. The game clearly showed that bullying is the responsibility of the person doing the harm, not the person being bullied.');
+  addScaleEn(form, 'R2. The teacher stepping in on Friday made me feel the bullied student didn’t have to carry this alone.');
+  addScaleEn(form, 'B1. “Your turn to think” made me realize that asking “Are you okay?” or not laughing along can make a big difference.');
+  addScaleEn(form, 'B2. The small kindnesses of an ordinary classmate, Guanyu (lending a marker, messaging “I didn’t laugh”), showed me that bystanders really can do something.');
+  addScaleEn(form, 'D1. Writing the diary (choosing a mood and naming the feeling) made me pause and notice how the character felt.', 5,
+    'At the end of each day, you choose a mood box, name the feeling, and answer a question.');
+  addScaleEn(form, 'S1. At some point while playing, I felt overwhelmingly uncomfortable.', 5,
+    'This question checks whether the game is safe for players. Please answer honestly.');
+
+  form.addPageBreakItem().setTitle('Your thoughts (optional)');
+  form.addParagraphTextItem().setTitle('Which scene, line, or inner thought stayed with you the most? Why?');
+  form.addParagraphTextItem().setTitle('Was anything unrealistic, uncomfortable, or worth improving?');
+
+  return { form, sheet: linkSheet(form, 'Class 5-3 Relay: English adult responses') };
+}
+
+function createAdultEnglishOnly() { logForm(createAdultEnglishForm()); }
 
 // ========== B. 教育專業版 ==========
 
