@@ -497,6 +497,117 @@ function title(g) { track(g); }
 export const SCENES = { classroom, track, sportsday, home, title };
 export const FOREGROUNDS = { home: homeFront };
 
+// ---------- 道具 ----------
+// 台詞可以帶 props: ['pencils', ...]，畫在角色前面；位置配合劇本裡主角站的地方（x 52）
+
+const PENCILS = ['#3b4a9a', '#4f7fd0', '#5fb8e0', '#4fae7a', '#9ccf5a', '#f2d24a', '#f3a640', '#ec6a4a', '#d8506e', '#b46ac8', '#8a5a3a', '#4a4a4a'];
+
+// 主角前面的課桌
+function desk(g) {
+  box(g, 32, 84, 40, 3.4, { fill: '#e8bf7e', shade: '#c79a55' });
+  box(g, 35, 87.4, 34, 9, { fill: '#d9a868', shade: '#b8844a' });
+  line(g, [[37, 96.4], [37, 108]], INK, 0.9);
+  line(g, [[67, 96.4], [67, 108]], INK, 0.9);
+}
+
+function pencil(g, x, y, angle, color, len = 9) {
+  g.save();
+  g.translate(x, y);
+  g.rotate(angle);
+  box(g, -len / 2, -0.7, len - 1.6, 1.4, { fill: color, width: 0.3 });
+  shape(g, [[len / 2 - 1.6, -0.7], [len / 2, 0], [len / 2 - 1.6, 0.7]], { fill: '#f3d9b0', width: 0.3, amp: 0.05 });
+  g.restore();
+}
+
+const PROPS = {
+  desk,
+  // 十二色鉛筆從深排到淺
+  pencilsRow(g) {
+    desk(g);
+    PENCILS.forEach((c, i) => pencil(g, 38.5 + i * 2.5, 82.6, -Math.PI / 2, c, 6));
+  },
+  // 鉛筆掉了一地
+  pencils(g) {
+    desk(g);
+    PENCILS.forEach((c, i) => {
+      const x = 22 + ((i * 37) % 120) + rnd() * 6;
+      const y = 98 + ((i * 5) % 6);
+      pencil(g, x, y, (i * 1.7) % Math.PI, c);
+    });
+  },
+  // 冠宇推到桌上的金色的筆
+  goldpen(g) {
+    desk(g);
+    g.save();
+    g.translate(60, 83);
+    g.rotate(-0.25);
+    box(g, -6, -0.9, 10.5, 1.8, { fill: '#f2c84b', shade: '#c9962a', width: 0.35 });
+    box(g, -6, -0.9, 2, 1.8, { fill: '#8a6420', width: 0.3 });
+    shape(g, [[4.5, -0.9], [6.6, 0], [4.5, 0.9]], { fill: '#fff2c0', width: 0.3, amp: 0.05 });
+    g.restore();
+    // 一閃一閃
+    for (const [sx, sy] of [[66, 78], [55, 79.5]]) {
+      line(g, [[sx - 1.2, sy], [sx + 1.2, sy]], '#e8b23c', 0.45);
+      line(g, [[sx, sy - 1.2], [sx, sy + 1.2]], '#e8b23c', 0.45);
+    }
+  },
+  // 還沒畫完的加油海報和一盒彩色筆
+  poster(g) {
+    shape(g, [[34, 86], [92, 86], [96, 104], [30, 104]], { fill: '#ffffff', width: 0.6 });
+    box(g, 44, 89, 34, 5, { fill: '#ffd4d8', stroke: null });
+    line(g, [[46, 91.5], [76, 91.5]], '#e05a50', 0.9);
+    oval(g, 52, 99, 3, 2.4, { stroke: '#4f7fd0', width: 0.6 });
+    line(g, [[62, 97], [84, 100]], '#4fae7a', 0.6);
+    box(g, 100, 98, 18, 6, { fill: '#f6e6c8', width: 0.5 });
+    PENCILS.slice(0, 8).forEach((c, i) => pencil(g, 102 + i * 2, 97, -Math.PI / 2, c, 5));
+  },
+  // 佳佳手上的一疊粉紅色邀請卡
+  cards(g) {
+    [[-0.35, '#ffc2d6'], [-0.1, '#ffb0c8'], [0.18, '#ff9fbd']].forEach(([a, c]) => {
+      g.save();
+      g.translate(131, 82);
+      g.rotate(a);
+      box(g, -3.4, -5, 6.8, 5, { fill: c, width: 0.4 });
+      shape(g, ellipsePts(0, -2.8, 1.1, 1, 6), { fill: '#e0507a', stroke: null });
+      g.restore();
+    });
+  },
+  // 阿嬤剪好的金色彩帶
+  ribbon(g) {
+    desk(g);
+    for (let i = 0; i < 4; i++) {
+      line(g, [[38 + i * 3, 83.4], [44 + i * 3, 82], [50 + i * 3, 83.6], [56 + i * 3, 82.2], [62 + i * 2, 83.4]], i % 2 ? '#e8b23c' : '#f6d36a', 0.9);
+    }
+  },
+};
+
+export function drawProps(g, props, boil = 0) {
+  props.forEach((p, i) => {
+    seed(hash(p) + i * 31 + boil * 613);
+    PROPS[p]?.(g);
+  });
+}
+
+// 光線：家裡的戲都在晚上，燈下亮、四周暗
+export function drawLight(g, bg) {
+  if (bg !== 'home') return;
+  g.save();
+  const dark = g.createRadialGradient(96, 14, 6, 96, 40, 120);
+  dark.addColorStop(0, 'rgba(40, 36, 80, 0.06)');
+  dark.addColorStop(0.5, 'rgba(36, 34, 80, 0.26)');
+  dark.addColorStop(1, 'rgba(24, 24, 64, 0.58)');
+  g.fillStyle = dark;
+  g.fillRect(0, 0, W, H);
+  // 吊燈的暖光
+  const warm = g.createRadialGradient(96, 16, 2, 96, 30, 60);
+  warm.addColorStop(0, 'rgba(255, 196, 110, 0.16)');
+  warm.addColorStop(1, 'rgba(255, 210, 120, 0)');
+  g.globalCompositeOperation = 'lighter';
+  g.fillStyle = warm;
+  g.fillRect(0, 0, W, H);
+  g.restore();
+}
+
 // 換一張背景前，先設好種子（同一個場景每次畫出來都一樣）
 export function drawScene(g, bg, boil = 0) {
   seed(hash(bg) + boil * 104729);

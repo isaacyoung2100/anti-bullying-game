@@ -1,7 +1,7 @@
 import {
   STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, ZHIHAO_INNER, HELP_LINES,
 } from './story.js?v=dev';
-import { W, drawScene, drawForeground, drawChar, drawPortrait, sceneLabels } from './sprites.js?v=dev';
+import { W, drawScene, drawForeground, drawProps, drawLight, drawChar, drawPortrait, sceneLabels } from './sprites.js?v=dev';
 import { t, tr, getLang, setLang } from './i18n.js?v=dev';
 
 const $ = (id) => document.getElementById(id);
@@ -29,7 +29,7 @@ const state = {
   history: [],        // 看過的台詞（和當時的畫面），給「上一句」重看
   back: null,         // 正在重看：{ index, from: 'line' | 'panel' }
   anim: null,         // 場景動作：{ type: 'run' | 'shake' | 'jump' | 'cheer', who, t0 }
-  view: { bg: 'title', chars: [], speaker: null, phone: null },
+  view: { bg: 'title', chars: [], speaker: null, phone: null, props: [] },
   typing: null,
   paused: false,
 };
@@ -121,6 +121,8 @@ function render(time) {
     state.anim = null;
   }
   drawForeground(g, state.view.bg, boil);
+  drawProps(g, state.view.props, boil);
+  drawLight(g, state.view.bg);
   for (const label of sceneLabels(state.view.bg)) {
     g.font = `700 ${label.size}px ${getComputedStyle(document.body).fontFamily}`;
     g.fillStyle = label.color;
@@ -373,8 +375,10 @@ function stepLine(step) {
       });
     }
   }
-  if (step.bg) state.view.phone = null;
+  if (step.bg) { state.view.phone = null; state.view.props = []; }
   if ('phone' in step) state.view.phone = step.phone;
+  // 場景道具：散落的鉛筆、金色的筆、海報……（換場景就收起來）
+  if (step.props) state.view.props = step.props;
   // 劇情裡加上的裝扮，例如戴上耳罩
   if (step.wear) {
     for (const [id, items] of Object.entries(step.wear)) {
@@ -403,7 +407,7 @@ function stepLine(step) {
     applyEffect(step.effect);
     step.applied = true;
   }
-  state.history.push({ step, bg: state.view.bg, phone: state.view.phone, chars: state.view.chars.map(({ enter, ...c }) => ({ ...c })) });
+  state.history.push({ step, bg: state.view.bg, phone: state.view.phone, props: state.view.props, chars: state.view.chars.map(({ enter, ...c }) => ({ ...c })) });
   showLine(step);
 }
 
@@ -414,6 +418,7 @@ function showPast() {
   const e = state.history[state.back.index];
   state.view.bg = e.bg;
   state.view.phone = e.phone;
+  state.view.props = e.props;
   state.view.chars = e.chars.map((c) => ({ ...c }));
   showLine(e.step);
   finishTyping();
@@ -447,6 +452,7 @@ function goForward() {
     const e = state.history[last];
     state.view.bg = e.bg;
     state.view.phone = e.phone;
+    state.view.props = e.props;
     state.view.chars = e.chars.map((c) => ({ ...c }));
     showLine(e.step);
     finishTyping();
@@ -465,6 +471,7 @@ function stepTitle() {
   renderPhone();
   $('sceneCaption').textContent = '';
   state.view.bg = 'title';
+  state.view.props = [];
   state.view.chars = [
     { id: 'xiaoyu', x: 40, emo: 'neutral' },
     { id: 'jiajia', x: 68, emo: 'happy' },
@@ -539,6 +546,7 @@ function stepDay(step) {
   $('sceneCaption').textContent = t('dayTitle', tr(step.day), tr(step.title));
   state.view.bg = step.bg;
   state.view.chars = [];
+  state.view.props = [];
   state.view.speaker = null;
   updateHud();
   showPanel(`
@@ -707,6 +715,7 @@ function stepZhihao() {
   renderPhone();
   state.days.push({ day: state.day, courage: state.courage });
   state.view.bg = 'classroom';
+  state.view.props = [];
   state.view.chars = [{ id: 'zhihao', x: 96, emo: 'sad' }];
   state.view.speaker = null;
   const card = showPanel(`
@@ -734,6 +743,7 @@ const shortDay = (day) => (getLang() === 'en' ? tr(day).slice(0, 3) : tr(day));
 
 function stepReflect() {
   state.view.bg = 'track';
+  state.view.props = [];
   state.view.chars = [{ id: state.story.id, x: 96, emo: 'neutral' }];
   const tiles = state.days.map((d) => {
     const w = weatherOf(d.courage);

@@ -137,7 +137,7 @@ const STORY = [
     effect: { courage: -10, witness: 6 } },
   { speaker: 'narrator', emo: 'sad', text: '最後，老師把你分到志豪那一組。' },
   { bg: 'classroom', chars: CLASS_CHARS('sad', 'neutral'),
-    speaker: 'zhihao', text: '好啦好啦。你不要亂畫就好，在旁邊遞彩色筆。' },
+    speaker: 'zhihao', props: ['poster'], text: '好啦好啦。你不要亂畫就好，在旁邊遞彩色筆。' },
   { speaker: 'narrator', text: '你其實是全班最會畫畫的人。你的筆記本裡畫滿了閃電和賽跑的人。',
     inner: '我可以畫一隻超帥的閃電……' },
   { k: 'choice', prompt: '你會怎麼做？', options: [
@@ -160,7 +160,7 @@ const STORY = [
       ] },
   ] },
   { bg: 'classroom', chars: [{ id: 'azhe', x: 52, emo: 'surprised' }, { id: 'guanyu', x: 140, emo: 'neutral' }],
-    speaker: 'narrator', text: '下課前，隔壁組的冠宇偷偷把一支金色的筆推到你桌上。' },
+    speaker: 'narrator', props: ['goldpen'], text: '下課前，隔壁組的冠宇偷偷把一支金色的筆推到你桌上。' },
   { speaker: 'guanyu', text: '（小聲）給你。我看過你畫的閃電，超帥的。',
     effect: { courage: 5, kind: 1 } },
 

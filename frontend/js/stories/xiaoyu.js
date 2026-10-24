@@ -140,7 +140,7 @@ const STORY = [
       { text: '決定明天早上主動跟她說早安', result: '隔天早上，她小聲回了一句：「早安。」' },
     ] },
   { bg: 'classroom', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }, { id: 'jiajia', x: 140, emo: 'happy' }],
-    speaker: 'narrator', text: '下課時，佳佳拿著一疊粉紅色的卡片走過每個座位。是她禮拜天的生日派對邀請卡。' },
+    speaker: 'narrator', props: ['cards'], text: '下課時，佳佳拿著一疊粉紅色的卡片走過每個座位。是她禮拜天的生日派對邀請卡。' },
   { speaker: 'narrator', text: '她走到你的座位。停了一秒。然後走向下一個人。',
     effect: { courage: -10, witness: 6 } },
   { speaker: 'class', text: '（佳佳旁邊的女生小聲說：「她來的話氣氛會很怪啦……而且她哪有錢買禮物。」）' },
