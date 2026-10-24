@@ -361,18 +361,27 @@ function runner(g, x, y, c) {
   line(g, [[x - 2, y + 3.4], [x + 2, y + 2.4]], c, 0.45);
 }
 
-function classroom(g) {
+// 傍晚的天空：上面偏紫，靠近地平線是橘黃色
+function duskSky(g, y0, y1) {
+  const grad = g.createLinearGradient(0, y0, 0, y1);
+  grad.addColorStop(0, '#9a86c4');
+  grad.addColorStop(0.55, '#f4a072');
+  grad.addColorStop(1, '#ffd79a');
+  return grad;
+}
+
+function classroom(g, boil, time) {
   paper(g);
   box(g, -2, -2, W + 4, 68, { fill: '#f6ead0', shade: '#e6d4ae', stroke: null });
   box(g, -2, 66, W + 4, 44, { fill: '#e0bd92', shade: '#c49a6c' });
   for (let y = 76; y < H; y += 9) line(g, [[0, y], [W, y]], '#b48a5e', 0.35);
   // 窗戶
   for (const wx of [24, 146]) {
-    box(g, wx, 12, 22, 32, { fill: '#d6edf9', shade: '#9fcfee' });
+    box(g, wx, 12, 22, 32, time === 'dusk' ? { fill: duskSky(g, 12, 44), shade: '#e88a5a' } : { fill: '#d6edf9', shade: '#9fcfee' });
     line(g, [[wx + 11, 12], [wx + 11, 44]]);
     line(g, [[wx, 28], [wx + 22, 28]]);
   }
-  cloud(g, 27, 19);
+  if (time !== 'dusk') cloud(g, 27, 19);
   // 黑板與粉筆畫的跑步小人
   box(g, 54, 9, 84, 37, { fill: '#46705c', shade: '#335a48', width: 0.8 });
   box(g, 52, 46, 88, 2.4, { fill: '#9a6a40' });
@@ -394,7 +403,17 @@ function classroom(g) {
   }
 }
 
-function sky(g) {
+function sky(g, time) {
+  if (time === 'dusk') {
+    // 太陽快下山了：大大的，一半落在學校屋頂後面
+    box(g, -2, -2, W + 4, 44, { fill: duskSky(g, 0, 42), shade: '#e8906a', stroke: null });
+    oval(g, 146, 15, 7.5, 7.5, { fill: '#ff9a4a', shade: '#f0702e', stroke: '#d9652a' });
+    for (const [cx, cy] of [[40, 9], [104, 6]]) {
+      const o = { fill: '#ffc4b0', stroke: '#d98a8a', width: 0.45 };
+      oval(g, cx, cy, 5, 3, o); oval(g, cx + 5, cy - 1.5, 5, 3.6, o); oval(g, cx + 10, cy, 4.5, 3, o);
+    }
+    return;
+  }
   box(g, -2, -2, W + 4, 44, { fill: '#dff0fa', shade: '#a9d6f2', stroke: null });
   oval(g, 150, 11, 5, 5, { fill: '#ffd76a', shade: '#f2b13c', stroke: '#d9962e' });
   for (let i = 0; i < 8; i++) {
@@ -421,9 +440,9 @@ function trackGround(g) {
   for (const y of [72, 83, 94, 105]) line(g, [[0, y], [W, y]], '#fffaf0', 0.8);
 }
 
-function track(g) {
+function track(g, boil, time) {
   paper(g);
-  sky(g);
+  sky(g, time);
   schoolAndField(g);
   trackGround(g);
 }
@@ -588,8 +607,18 @@ export function drawProps(g, props, boil = 0) {
   });
 }
 
-// 光線：家裡的戲都在晚上，燈下亮、四周暗
-export function drawLight(g, bg) {
+// 光線：家裡的戲都在晚上，燈下亮、四周暗；放學後的傍晚，整個畫面染上橘色
+export function drawLight(g, bg, time = null) {
+  if (time === 'dusk') {
+    g.save();
+    const warm = g.createLinearGradient(W, 30, 0, H);
+    warm.addColorStop(0, 'rgba(255, 150, 70, 0.24)');
+    warm.addColorStop(1, 'rgba(150, 90, 150, 0.2)');
+    g.fillStyle = warm;
+    g.fillRect(0, 0, W, H);
+    g.restore();
+    return;
+  }
   if (bg !== 'home') return;
   g.save();
   const dark = g.createRadialGradient(96, 14, 6, 96, 40, 120);
@@ -609,9 +638,10 @@ export function drawLight(g, bg) {
 }
 
 // 換一張背景前，先設好種子（同一個場景每次畫出來都一樣）
-export function drawScene(g, bg, boil = 0) {
+// time：'dusk' 是放學後的傍晚
+export function drawScene(g, bg, boil = 0, time = null) {
   seed(hash(bg) + boil * 104729);
-  (SCENES[bg] || SCENES.classroom)(g, boil);
+  (SCENES[bg] || SCENES.classroom)(g, boil, time);
 }
 
 export function drawForeground(g, bg, boil = 0) {

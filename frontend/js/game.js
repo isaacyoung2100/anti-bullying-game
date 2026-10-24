@@ -29,7 +29,7 @@ const state = {
   history: [],        // 看過的台詞（和當時的畫面），給「上一句」重看
   back: null,         // 正在重看：{ index, from: 'line' | 'panel' }
   anim: null,         // 場景動作：{ type: 'run' | 'shake' | 'jump' | 'cheer', who, t0 }
-  view: { bg: 'title', chars: [], speaker: null, phone: null, props: [] },
+  view: { bg: 'title', chars: [], speaker: null, phone: null, props: [], time: null },
   typing: null,
   paused: false,
 };
@@ -38,15 +38,15 @@ const state = {
 
 // 背景每次重畫很花時間，先畫好存起來；boil 是手繪線條輕輕抖動的三個畫格
 const backdrops = new Map();
-function backdrop(bg, boil) {
-  const key = `${bg}:${boil}`;
+function backdrop(bg, boil, time) {
+  const key = `${bg}:${boil}:${time}`;
   if (!backdrops.has(key)) {
     const cv = document.createElement('canvas');
     cv.width = screen.width; cv.height = screen.height;
     const bg2 = cv.getContext('2d');
     const k = screen.width / W;
     bg2.setTransform(k, 0, 0, k, 0, 0);
-    drawScene(bg2, bg, boil);
+    drawScene(bg2, bg, boil, time);
     backdrops.set(key, cv);
   }
   return backdrops.get(key);
@@ -115,7 +115,7 @@ function render(time) {
   g.fillStyle = '#fbf7ee';
   g.fillRect(0, 0, screen.width, screen.height);
   g.setTransform(z, 0, 0, z, ox, oy);
-  g.drawImage(backdrop(state.view.bg, boil), 0, 0);
+  g.drawImage(backdrop(state.view.bg, boil, state.view.time), 0, 0);
   g.setTransform(k * z, 0, 0, k * z, ox, oy);
   const speaking = state.view.speaker;
   const anySpeaker = speaking && state.view.chars.some((c) => c.id === speaking);
@@ -153,7 +153,7 @@ function render(time) {
   }
   drawForeground(g, state.view.bg, boil);
   drawProps(g, state.view.props, boil);
-  drawLight(g, state.view.bg);
+  drawLight(g, state.view.bg, state.view.time);
   for (const label of sceneLabels(state.view.bg)) {
     g.font = `700 ${label.size}px ${getComputedStyle(document.body).fontFamily}`;
     g.fillStyle = label.color;
@@ -407,7 +407,8 @@ function stepLine(step) {
       });
     }
   }
-  if (step.bg) { state.view.phone = null; state.view.props = []; }
+  // 時間：放學後的傍晚（time: 'dusk'），換場景時重新設定
+  if (step.bg) { state.view.phone = null; state.view.props = []; state.view.time = step.time ?? null; }
   if ('phone' in step) state.view.phone = step.phone;
   // 場景道具：散落的鉛筆、金色的筆、海報……（換場景就收起來）
   if (step.props) state.view.props = step.props;
@@ -439,7 +440,7 @@ function stepLine(step) {
     applyEffect(step.effect);
     step.applied = true;
   }
-  state.history.push({ step, bg: state.view.bg, phone: state.view.phone, props: state.view.props, chars: state.view.chars.map(({ enter, ...c }) => ({ ...c })) });
+  state.history.push({ step, bg: state.view.bg, phone: state.view.phone, props: state.view.props, time: state.view.time, chars: state.view.chars.map(({ enter, ...c }) => ({ ...c })) });
   showLine(step);
 }
 
@@ -451,6 +452,7 @@ function showPast() {
   state.view.bg = e.bg;
   state.view.phone = e.phone;
   state.view.props = e.props;
+  state.view.time = e.time;
   state.view.chars = e.chars.map((c) => ({ ...c }));
   showLine(e.step);
   finishTyping();
@@ -485,6 +487,7 @@ function goForward() {
     state.view.bg = e.bg;
     state.view.phone = e.phone;
     state.view.props = e.props;
+    state.view.time = e.time;
     state.view.chars = e.chars.map((c) => ({ ...c }));
     showLine(e.step);
     finishTyping();
@@ -505,6 +508,7 @@ function stepTitle() {
   state.view.bg = 'title';
   state.view.props = [];
   state.view.zoom = null;
+  state.view.time = null;
   state.view.chars = [
     { id: 'xiaoyu', x: 40, emo: 'neutral' },
     { id: 'jiajia', x: 68, emo: 'happy' },
@@ -581,6 +585,7 @@ function stepDay(step) {
   state.view.chars = [];
   state.view.props = [];
   state.view.zoom = null;
+  state.view.time = null;
   state.view.speaker = null;
   updateHud();
   showPanel(`
@@ -751,6 +756,7 @@ function stepZhihao() {
   state.view.bg = 'classroom';
   state.view.props = [];
   state.view.zoom = null;
+  state.view.time = null;
   state.view.chars = [{ id: 'zhihao', x: 96, emo: 'sad' }];
   state.view.speaker = null;
   const card = showPanel(`
@@ -780,6 +786,7 @@ function stepReflect() {
   state.view.bg = 'track';
   state.view.props = [];
   state.view.zoom = null;
+  state.view.time = null;
   state.view.chars = [{ id: state.story.id, x: 96, emo: 'neutral' }];
   const tiles = state.days.map((d) => {
     const w = weatherOf(d.courage);
