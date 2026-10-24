@@ -29,10 +29,13 @@ body {
 .hud { padding-top: 2.4cqw; }
 .panel { padding-top: 15cqw; }
 /* 平板橫拿、電腦：攤開成左右兩頁（覆寫上面的直向寬度） */
-@media (min-width: 900px) and (min-aspect-ratio: 5/4) {
+@media (min-width: 640px) and (min-aspect-ratio: 5/4) {
   .stage { max-width: none; width: min(100%, calc(100dvh * 1.5), 1400px); }
   .panel { padding: 6cqw 5cqw; }
   .hud { padding-top: calc(2.6cqw + env(safe-area-inset-top)); }
+}
+@media (min-width: 640px) and (min-aspect-ratio: 5/4) and (max-height: 500px) {
+  .stage { width: min(100%, calc(100dvh * 2.4)); }
 }
 /* Artifacts 不允許頁面下載檔案：分享圖改用長按存圖或複製連結 */
 #download { display: none; }

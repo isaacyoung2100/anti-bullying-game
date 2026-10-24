@@ -251,7 +251,8 @@ function renderPhone() {
     if (m.system) return `<p class="sys${cls}">${esc(tr(m.system))}</p>`;
     if (m.toast) return `<p class="toast${cls}">${esc(tr(m.toast))}</p>`;
     if (m.me) return `<div class="msg me${cls}">${seen(m)}${body(m)}</div>`;
-    return `<div class="msg${cls}"><span class="avatar" aria-hidden="true"></span><span class="col"><span class="from">${esc(tr(m.from))}</span>${body(m)}</span>${seen(m)}</div>`;
+    // 別人的訊息：已讀人數放在照片下面，不要從旁邊擠窄照片
+    return `<div class="msg${cls}"><span class="avatar" aria-hidden="true"></span><span class="col"><span class="from">${esc(tr(m.from))}</span>${body(m)}${seen(m)}</span></div>`;
   }).join('');
   el.innerHTML = p.off
     ? '<div class="screen off"></div>'
