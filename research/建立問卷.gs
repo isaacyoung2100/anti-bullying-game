@@ -18,7 +18,7 @@
  *   B. 教育專業版：國小教師、輔導教師、特教教師、師培生。以「專家」身分評估教育適切性與課堂可行性
  *   C. 學童版：國小五、六年級。簡短量表 + 開放題 + 心情打勾（勾選需要幫忙的會看到求助說明）
  *
- * 操作感受用 UMUX-Lite（2 題，7 點量尺），可以換算成 SUS 等級，見 research/問卷說明與分析.md
+ * 遊戲操作 5 題（7 點量尺）是針對這個遊戲自編的題目；已建好的表單可以用 updateGameItems 原地更新
  * 三份表單都不收集姓名和 email。
  */
 
@@ -91,24 +91,77 @@ function addScale(form, title, max = 5) {
     .setRequired(true);
 }
 
-// 一組題目：先放一個小標題，再一題一題的量尺
-// （不用「選擇題格」：表格左邊的題目欄寬度固定，題目一長就擠成一直條，手機上也難按）
+// 一組題目：一題一題的量尺。組名只寫在程式裡，不放進表單
+// （不用「選擇題格」：表格左邊的題目欄寬度固定，題目一長就擠成一直條；
+//   也不用「標題說明」當組名：在表單上看起來像一張沒有選項的題目卡，容易讓人以為漏填）
+// 需要說明的組，說明放在該組第一題底下的小字
 function addGroup(form, title, helpText, rows) {
-  form.addSectionHeaderItem().setTitle(title).setHelpText(helpText || '');
-  rows.forEach((row) => addScale(form, row));
+  rows.forEach((row, n) => {
+    const item = addScale(form, row);
+    if (n === 0 && helpText) item.setHelpText(helpText);
+  });
 }
 
-// 遊戲操作，共 5 題、7 點量尺：
-// U1、U2 是 UMUX-Lite（Lewis, Utesch, & Maher, 2013），可以換算成 SUS 分數、和其他研究比較
-// G1–G3 是針對這個遊戲自己設計的，用來找出要修改的地方
-function addUmuxLite(form) {
+// 遊戲操作，共 5 題、7 點量尺，全部針對這個遊戲自己設計，用來找出要修改的地方
+// （不用 UMUX-Lite / SUS 的標準題：「功能符合我的需求」這類軟體量表的說法，放在遊戲上受試者看不懂）
+const GAME_ITEMS = [
+  'G1. 這個遊戲很容易使用。',
+  'G2. 我知道每個畫面該按哪裡（繼續、選擇、上一句、暫停）。',
+  'G3. 字的大小和出現的速度，讀起來很舒服。',
+  'G4. 一個角色玩一週的長度（含每天的日記）剛好，不會太長。',
+  'G5. 遊戲的畫面風格（日記本、手繪）讓我想繼續玩下去。',
+];
+
+function addGameItems(form) {
   form.addPageBreakItem().setTitle('遊戲操作')
     .setHelpText('請依照剛剛操作遊戲的感受作答（1 非常不同意，7 非常同意）。');
-  addScale(form, 'U1. 這個遊戲的功能符合我的需求。', 7);
-  addScale(form, 'U2. 這個遊戲很容易使用。', 7);
-  addScale(form, 'G1. 我知道每個畫面該按哪裡（繼續、選擇、上一句、暫停）。', 7);
-  addScale(form, 'G2. 字的大小和出現的速度，讀起來很舒服。', 7);
-  addScale(form, 'G3. 一個角色玩一週的長度（含每天的日記）剛好，不會太長。', 7);
+  GAME_ITEMS.forEach((text) => addScale(form, text, 7));
+}
+
+/**
+ * 已經建好的一般成人版、教育專業版，原地修正，表單網址不變：
+ *   1. 把「遊戲操作」的 5 題換成上面的新題目
+ *   2. 拿掉看起來像空白題目的組名卡；組名卡上的說明移到下一題底下的小字
+ * 用法：選函式 fixExistingForms，按「執行」
+ */
+function fixExistingForms() {
+  updateGameItems();
+  removeGroupHeaders();
+}
+
+function removeGroupHeaders() {
+  Object.entries(EXISTING_FORMS).forEach(([name, id]) => {
+    const form = FormApp.openById(id);
+    const headers = form.getItems(FormApp.ItemType.SECTION_HEADER);
+    // 從後面往前刪，前面題目的位置才不會跑掉
+    headers.reverse().forEach((header) => {
+      const help = header.getHelpText();
+      const at = header.getIndex();
+      const next = form.getItems()[at + 1];
+      if (help && next && next.getType() === FormApp.ItemType.SCALE) next.asScaleItem().setHelpText(help);
+      form.deleteItem(at);
+    });
+    Logger.log('%s：拿掉 %s 個組名卡', name, headers.length);
+  });
+}
+
+const EXISTING_FORMS = {
+  '一般成人版': '14IZT2qjo5EhLl3AM98ioSSp7nDvaA3qalG82U60TpWc',
+  '教育專業版': '1MmNkIvozTDxO3XGXdwaIkHDfyHrGG9PkBI0FqEsGQpE',
+};
+
+function updateGameItems() {
+  Object.entries(EXISTING_FORMS).forEach(([name, id]) => {
+    const form = FormApp.openById(id);
+    const old = form.getItems(FormApp.ItemType.SCALE)
+      .filter((item) => /^(U1|U2|G1|G2|G3)\. /.test(item.getTitle()));
+    if (old.length !== GAME_ITEMS.length) {
+      Logger.log('%s：找到 %s 題，不是 5 題，沒有修改', name, old.length);
+      return;
+    }
+    old.forEach((item, n) => item.setTitle(GAME_ITEMS[n]));
+    Logger.log('%s：已更新遊戲操作 5 題', name);
+  });
 }
 
 function addPlayedQuestions(form) {
@@ -149,7 +202,7 @@ function createAdultForm() {
       '不想回答',
     ]);
 
-  addUmuxLite(form);
+  addGameItems(form);
 
   form.addPageBreakItem().setTitle('玩的時候的感受')
     .setHelpText('請評估你在遊玩過程中的感受與想法（1 非常不同意，5 非常同意）。');
@@ -204,7 +257,7 @@ function createExpertForm() {
     .setChoiceValues(['有，多次', '有，一兩次', '沒有']);
   addPlayedQuestions(form);
 
-  addUmuxLite(form);
+  addGameItems(form);
 
   form.addPageBreakItem().setTitle('教育適切性評估')
     .setHelpText('請以國小五、六年級學生為對象來評估（1 非常不同意，5 非常同意）。');
