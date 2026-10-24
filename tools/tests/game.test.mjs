@@ -8,6 +8,7 @@ import {
   STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, HELP_LINES, ZHIHAO_INNER,
 } from '../../frontend/js/story.js';
 import { enumeratePaths, lockRates } from '../lib/paths.mjs';
+import { dayMoods, longestWithoutGood } from '../lib/days.mjs';
 
 const ALL = STORIES.map((st) => ({ st, paths: enumeratePaths(st, { start: START_COURAGE, overnight: OVERNIGHT }) }));
 
@@ -224,5 +225,13 @@ test('劇情一致：接力棒次在每個故事裡都一樣', () => {
         assert.ok(s.text.includes(who) || s.text.includes(`${leg}的${name}`) || s.text.includes('你跑'), `${st.id}：「${s.text}」的${leg}應該是${name}`);
       }
     });
+  }
+});
+
+test('不會連續三天都沒有好事：最多連續兩天，就要有人主動伸出手（每條路徑都有）', () => {
+  for (const { st } of ALL) {
+    const days = dayMoods(st);
+    const run = longestWithoutGood(days);
+    assert.ok(run <= 2, `${st.id} 有連續 ${run} 天沒有好事：${days.map((d) => `${d.day}${d.good ? '好' : ''}`).join(' ')}`);
   }
 });

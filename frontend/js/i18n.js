@@ -87,7 +87,6 @@ const UI = {
     diaryOwnWord: '或者自己寫一個詞：',
     diaryOwnPlaceholder: '例如：怕被笑',
     diaryNext: '下一步 ▶',
-    diarySkip: '今天先不寫',
     diaryFeel: (word) => `今天的心情：${word}`,
     diaryPrompts: [
       '今天哪一刻，你心裡最不舒服？那時候你在想什麼？',
@@ -190,7 +189,6 @@ const UI = {
     diaryOwnWord: 'Or write your own word:',
     diaryOwnPlaceholder: 'e.g. left out',
     diaryNext: 'Next ▶',
-    diarySkip: 'Skip writing today',
     diaryFeel: (word) => `Today’s feeling: ${word}`,
     diaryPrompts: [
       'Which moment today felt the worst inside? What were you thinking then?',

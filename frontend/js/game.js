@@ -379,7 +379,7 @@ function stepChoice(step) {
 
 // 每天結束前寫日記（社會情緒學習的自我覺察）：
 // 先找到心情在情緒象限的哪一格，再替它命名（選一個詞或自己寫），最後回答一兩個引導問題
-// 日記只留在這次遊戲裡，不上傳、不記錄；寫字的部分可以按「今天先不寫」跳過
+// 日記只留在這次遊戲裡，不上傳、不記錄；選心情和情緒詞是必要的，寫字可以留白
 const QUADS = ['red', 'yellow', 'blue', 'green'];  // 左上、右上、左下、右下
 
 function stepDiary() {
@@ -461,16 +461,10 @@ function stepDiary() {
         <textarea class="diary-text" id="ans${i}" maxlength="300" placeholder="${t('diaryTextPlaceholder')}"></textarea>`).join('')}
       <div class="btn-row">
         <button class="btn" type="button" id="go">${t('diaryDone')}</button>
-        <button class="btn secondary" type="button" id="skip">${t('diarySkip')}</button>
       </div>
     `, 'diary-card', { page: true });
     card.querySelector('#go').onclick = () => {
       entry.answers = prompts.map((_, i) => card.querySelector(`#ans${i}`).value.trim());
-      state.diary.push(entry);
-      next();
-    };
-    // 今天先不寫：心情和情緒詞留著，只是不寫字
-    card.querySelector('#skip').onclick = () => {
       state.diary.push(entry);
       next();
     };

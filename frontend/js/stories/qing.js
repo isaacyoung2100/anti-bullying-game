@@ -119,6 +119,13 @@ const STORY = [
         { speaker: 'narrator', text: '教室安靜了一下。志豪聳聳肩走開了。', inner: '事實不會騙人。' },
       ] },
   ] },
+  // 連續兩天的壞事之後，這一天一定要有好事（不讓孩子連續三天只遇到糟糕的事）
+  { bg: 'classroom', chars: [{ id: 'qing', x: 52, emo: 'surprised' }, { id: 'kai', x: 140, emo: 'happy' }],
+    speaker: 'narrator', text: '放學前，阿凱走過來，手上拿著一張恐龍貼紙。' },
+  { speaker: 'kai', text: '你講化石的那段好厲害。這張三角龍給你。',
+    effect: { courage: 5, kind: 1 } },
+  { speaker: 'narrator', emo: 'happy', text: '貼紙上的三角龍，有三根角，畫得很正確。',
+    inner: '他聽懂了我說的話。' },
 
   // ---------------- 週四 ----------------
   { k: 'day', day: '週四', title: '爸爸的計程車', bg: 'home',
