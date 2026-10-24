@@ -25,7 +25,7 @@ const STORY = [
   { speaker: 'narrator', text: '放學後，你常在阿嬤的修改衣服店，對著大鏡子練習。' },
   { speaker: 'teacher', text: '運動會的進場舞，阿凱節奏感很好，請他當編舞小老師！' },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'qing', text: '下課經過小晴的座位，你看見她的鉛筆掉了一地。',
+  { speaker: 'narrator', glimpse: 'qing', seenEmo: 'cry', text: '下課經過小晴的座位，你看見她的鉛筆掉了一地。',
     inner: '發生什麼事了？',
     react: [
       { text: '撿起滾到你腳邊的一支筆，放在她桌上。', result: '那支筆回到了桌上。' },
@@ -182,7 +182,7 @@ const STORY = [
   { speaker: 'guanyu', text: '（小聲）這個很好黏。你做的花環很好看。',
     effect: { courage: 5, kind: 1 } },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'pinyu', text: '午餐時，你看見品妤端著便當站在走道，她的位子上放著欣儀的外套。',
+  { speaker: 'narrator', glimpse: 'pinyu', seenEmo: 'sad', text: '午餐時，你看見品妤端著便當站在走道，她的位子上放著欣儀的外套。',
     react: [
       { text: '走過她旁邊時，對她點點頭。', result: '品妤也點了一下頭，抓緊了便當。' },
       { text: '跟她說：「你跳舞的時候，拍子很準喔。」', result: '品妤愣了一下，小聲說：「真的嗎？」' },

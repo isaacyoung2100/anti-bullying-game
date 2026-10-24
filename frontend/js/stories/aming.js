@@ -50,7 +50,7 @@ const STORY = [
       ] },
   ] },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'xiaoyu', text: '下課時，你聽到志豪笑小雨的外套：「袖口都起毛球了。」',
+  { speaker: 'narrator', glimpse: 'xiaoyu', seenEmo: 'sad', text: '下課時，你聽到志豪笑小雨的外套：「袖口都起毛球了。」',
     react: [
       { text: '沒有跟著笑，把頭轉開。', result: '志豪的笑聲裡，少了你的聲音。' },
       { text: '經過小雨旁邊時，對她點點頭。', result: '小雨看了你一眼，沒有說話。' },
@@ -95,7 +95,7 @@ const STORY = [
   { speaker: 'guanyu', text: '那是越南春捲嗎？跟河粉店賣的一樣嗎？……看起來好像滿好吃的。',
     effect: { courage: 5, kind: 1 } },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'qing', text: '下午打掃時，後面突然「碰」一聲，你看見小晴摀住耳朵，全身僵住。',
+  { speaker: 'narrator', glimpse: 'qing', seenEmo: 'cry', text: '下午打掃時，後面突然「碰」一聲，你看見小晴摀住耳朵，全身僵住。',
     inner: '發生什麼事了？',
     react: [
       { text: '把手上的掃把，輕輕靠牆放好。', result: '你的旁邊安安靜靜的，沒有再多一點聲音。' },

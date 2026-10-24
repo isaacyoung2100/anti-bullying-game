@@ -65,7 +65,7 @@ const STORY = [
     ] },
   // 背景一瞥（不影響能量和分支）
   { bg: 'classroom', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }],
-    speaker: 'narrator', glimpse: 'aming', text: '午餐時，坐你旁邊的阿明打開一盒春捲，有兩個同學把桌子拉開。',
+    speaker: 'narrator', glimpse: 'aming', seenEmo: 'sad', text: '午餐時，坐你旁邊的阿明打開一盒春捲，有兩個同學把桌子拉開。',
     inner: '那是什麼？看起來很好吃啊。',
     react: [
       { text: '你的桌子沒有動，繼續坐在他旁邊。', result: '阿明看了你的桌角一眼，肩膀鬆了一點。' },
@@ -229,7 +229,7 @@ const STORY = [
   { time: 'dusk', bg: 'track', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '下午練大隊接力。你跑第三棒，一口氣超過了兩個人。' },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'azhe', text: '等棒子的時候，你看見阿哲蹲在起跑線，等哨聲響了才衝出去。',
+  { speaker: 'narrator', glimpse: 'azhe', seenEmo: 'happy', text: '等棒子的時候，你看見阿哲蹲在起跑線，等哨聲響了才衝出去。',
     react: [
       { text: '對他喊：「這次沒有搶跑！」', result: '阿哲回頭對你笑了。' },
       { text: '對他比一個讚。', result: '阿哲看到了，抓抓頭笑了。' },

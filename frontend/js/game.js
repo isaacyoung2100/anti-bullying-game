@@ -125,6 +125,7 @@ function render(time) {
   const order = anim?.type === 'run'
     ? [...state.view.chars].sort((a, b) => anim.who.includes(a.id) - anim.who.includes(b.id))
     : state.view.chars;
+  const tags = [];
   order.forEach((c, n) => {
     const talking = c.id === speaking;
     let bob = still ? 0
@@ -147,6 +148,7 @@ function render(time) {
       bob = -Math.abs(Math.sin((time - anim.t0) / 120)) * 5 * (1 - ap);
     }
     drawChar(g, c.id, x, FLOOR_Y, c.emo, { bob, dim: anySpeaker && !talking, boil, stride, sports, outfit: c.outfit || [] });
+    tags.push({ x, id: c.id, dim: anySpeaker && !talking });
   });
   // 動作做完：跑完的人停在終點
   if (anim && ap >= 1) {
@@ -163,6 +165,34 @@ function render(time) {
     g.textBaseline = 'middle';
     g.fillText(t(label.key), label.x, label.y);
   }
+  drawNameTags(tags);
+}
+
+// 每個人腳下的名字（像照片下面寫名字），一看就知道誰是誰；
+// 畫在桌子和燈光之後，才不會被蓋住。標題畫面不畫
+let tagFont = '';
+function drawNameTags(tags) {
+  if (state.view.bg === 'title' || !state.story) return;
+  tagFont ||= getComputedStyle(document.body).fontFamily;
+  g.font = `700 6px ${tagFont}`;
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  for (const { x, id, dim } of tags) {
+    const name = nameOf(id);
+    const w = g.measureText(name).width + 3.6;
+    const y = FLOOR_Y + 3.8;
+    g.globalAlpha = dim ? 0.6 : 1;
+    g.fillStyle = 'rgba(255, 252, 244, 0.92)';
+    g.strokeStyle = 'rgba(58, 49, 64, 0.35)';
+    g.lineWidth = 0.35;
+    g.beginPath();
+    g.roundRect(x - w / 2, y - 3.6, w, 7.2, 1.8);
+    g.fill();
+    g.stroke();
+    g.fillStyle = '#3a3140';
+    g.fillText(name, x, y + 0.2);
+  }
+  g.globalAlpha = 1;
 }
 
 // 給螢幕閱讀器的場景描述：在哪裡、有誰。畫面內容改變時呼叫，不依賴動畫迴圈
@@ -417,7 +447,20 @@ function stepLine(step) {
     }
   }
   // 時間：放學後的傍晚（time: 'dusk'），換場景時重新設定
-  if (step.bg) { state.view.phone = null; state.view.props = []; state.view.time = step.time ?? null; }
+  if (step.bg) { state.view.phone = null; state.view.props = []; state.view.time = step.time ?? null; state.view.beforeGlimpse = null; }
+  // 背景一瞥：注意到的那個人從旁邊走進畫面；一瞥（和回應的結果）結束後，回到原本的畫面
+  if (step.glimpse && !state.view.beforeGlimpse) {
+    state.view.beforeGlimpse = state.view.chars.map(({ enter, ...c }) => ({ ...c }));
+    const me = state.view.chars.find((c) => c.id === state.story.id) || { id: state.story.id, emo: 'neutral' };
+    state.view.chars = [{ ...me, x: 52 }, { id: step.glimpse, x: 140, emo: step.seenEmo || 'neutral', enter: { t0: performance.now(), dx: 50 } }];
+  } else if (step.glimpse && step.seenEmo) {
+    // 回應的結果：對方的表情跟著變（例如鬆了一口氣）
+    const seen = state.view.chars.find((c) => c.id === step.glimpse);
+    if (seen) seen.emo = step.seenEmo;
+  } else if (!step.glimpse && state.view.beforeGlimpse) {
+    if (!step.bg) state.view.chars = state.view.beforeGlimpse;
+    state.view.beforeGlimpse = null;
+  }
   if ('phone' in step) state.view.phone = step.phone;
   // 場景道具：散落的鉛筆、金色的筆、海報……（換場景就收起來）
   if (step.props) state.view.props = step.props;
@@ -520,6 +563,7 @@ function stepTitle() {
   state.view.props = [];
   state.view.zoom = null;
   state.view.time = null;
+  state.view.beforeGlimpse = null;
   state.view.chars = [
     { id: 'xiaoyu', x: 40, emo: 'neutral' },
     { id: 'jiajia', x: 68, emo: 'happy' },
@@ -597,6 +641,7 @@ function stepDay(step) {
   state.view.props = [];
   state.view.zoom = null;
   state.view.time = null;
+  state.view.beforeGlimpse = null;
   state.view.speaker = null;
   updateHud();
   showPanel(`
@@ -658,7 +703,7 @@ function stepReact(step) {
       const o = step.options[Number(btn.dataset.n)];
       state.noticed += 1;
       if (!o.none) state.reached += 1;
-      insertAfterCurrent([{ speaker: 'narrator', glimpse: step.who, text: o.result }]);
+      insertAfterCurrent([{ speaker: 'narrator', glimpse: step.who, seenEmo: o.none ? undefined : 'happy', text: o.result }]);
       next();
     };
   });
@@ -793,6 +838,7 @@ function stepZhihao() {
   state.view.props = [];
   state.view.zoom = null;
   state.view.time = null;
+  state.view.beforeGlimpse = null;
   state.view.chars = [{ id: 'zhihao', x: 96, emo: 'sad' }];
   state.view.speaker = null;
   const card = showPanel(`
@@ -852,6 +898,7 @@ function stepReflect() {
   state.view.props = [];
   state.view.zoom = null;
   state.view.time = null;
+  state.view.beforeGlimpse = null;
   state.view.chars = [{ id: state.story.id, x: 96, emo: 'neutral' }];
   const tiles = state.days.map((d) => {
     const w = weatherOf(d.courage);

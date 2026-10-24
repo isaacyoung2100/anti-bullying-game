@@ -360,6 +360,12 @@ button { cursor: pointer; }
   background: linear-gradient(transparent 50%, #cfe4f5 50%, #cfe4f5 92%, transparent 92%);
 }
 .dialog.glimpse .line { color: var(--ink-soft); }
+.dialog.glimpse .speaker { animation: glimpse-in 0.7s ease-out; }
+@keyframes glimpse-in {
+  0% { transform: translateY(calc(1 * var(--u))); opacity: 0; }
+  40% { background-color: #cfe4f5; }
+}
+@media (prefers-reduced-motion: reduce) { .dialog.glimpse .speaker { animation: none; } }
 
 .line {
   font-size: calc(5.3 * var(--u));

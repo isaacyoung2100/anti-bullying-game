@@ -50,7 +50,7 @@ const STORY = [
   { speaker: 'guanyu', text: '最後兩支滾到這裡了。是放在這個位置嗎？',
     effect: { courage: 5, kind: 1 } },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'azhe', text: '數學課，你看見阿哲在書包裡翻了好久，一直找不到作業本。',
+  { speaker: 'narrator', glimpse: 'azhe', seenEmo: 'sad', text: '數學課，你看見阿哲在書包裡翻了好久，一直找不到作業本。',
     react: [
       { text: '小聲告訴他：「作業本放書包第二層。」', result: '阿哲愣了一下，說：「……好。」' },
       { text: '寫一張「明天帶作業本」的紙條給他。', result: '阿哲看著紙條，把它夾進聯絡簿。' },
@@ -164,7 +164,7 @@ const STORY = [
       ] },
   ] },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'kai', text: '做進場道具時，你看見阿凱站在空掉的桌子前，手握得緊緊的。',
+  { speaker: 'narrator', glimpse: 'kai', seenEmo: 'sad', text: '做進場道具時，你看見阿凱站在空掉的桌子前，手握得緊緊的。',
     react: [
       { text: '走過去說：「彩帶在掃把上。」', result: '阿凱看了看掃把，握緊了拳頭。' },
       { text: '把桌上的剪刀和膠帶排整齊，推給他。', result: '阿凱看著排好的工具，深呼吸了一下。' },

@@ -86,7 +86,7 @@ const STORY = [
       ] },
   ] },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'xiaoyu', text: '練跑休息時，你看見小雨一個人站在終點線旁，一直抓著外套拉鍊。',
+  { speaker: 'narrator', glimpse: 'xiaoyu', seenEmo: 'sad', text: '練跑休息時，你看見小雨一個人站在終點線旁，一直抓著外套拉鍊。',
     inner: '她不熱嗎？',
     react: [
       { text: '遠遠地對她揮揮手。', result: '小雨看見了，抓著拉鍊的手鬆開了一點。' },
@@ -230,7 +230,7 @@ const STORY = [
       effect: { courage: 5 } },
   ] },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'aming', text: '老師對全班說完那段話，你看見前面的阿明，慢慢把頭抬了起來。',
+  { speaker: 'narrator', glimpse: 'aming', seenEmo: 'neutral', text: '老師對全班說完那段話，你看見前面的阿明，慢慢把頭抬了起來。',
     react: [
       { text: '回頭對阿明笑了一下。', result: '阿明愣了一下，也對你笑了。' },
       { text: '下課時，撕一張你畫的小閃電給他。', result: '阿明看著閃電，小聲說：「好帥。」' },

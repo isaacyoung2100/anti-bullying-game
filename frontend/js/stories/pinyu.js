@@ -56,7 +56,7 @@ const STORY = [
       ] },
   ] },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'azhe', text: '數學課，你看見阿哲在書包裡翻了好久，耳朵都紅了。',
+  { speaker: 'narrator', glimpse: 'azhe', seenEmo: 'sad', text: '數學課，你看見阿哲在書包裡翻了好久，耳朵都紅了。',
     react: [
       { text: '小聲說：「要不要看看前面的夾層？」', result: '阿哲翻了翻，還是沒找到，可是沒那麼慌了。' },
       { text: '推一張便利貼給他，寫「沒關係」。', result: '阿哲看了好久，把它收進口袋。' },
@@ -177,7 +177,7 @@ const STORY = [
       ] },
   ] },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'xiaoyu', text: '下課時，佳佳發邀請卡走到小雨的座位，停了一秒，又走開了。',
+  { speaker: 'narrator', glimpse: 'xiaoyu', seenEmo: 'sad', text: '下課時，佳佳發邀請卡走到小雨的座位，停了一秒，又走開了。',
     react: [
       { text: '悄悄放一顆糖在小雨的桌角。', result: '小雨愣了一下，把糖收進口袋。' },
       { text: '走過去時，對小雨點點頭。', result: '小雨看了你一眼，又低下頭。' },
