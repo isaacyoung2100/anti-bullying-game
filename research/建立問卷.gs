@@ -98,12 +98,17 @@ function addGroup(form, title, helpText, rows) {
   rows.forEach((row) => addScale(form, row));
 }
 
-// UMUX-Lite（Lewis, Utesch, & Maher, 2013）：兩題、7 點量尺
+// 遊戲操作，共 5 題、7 點量尺：
+// U1、U2 是 UMUX-Lite（Lewis, Utesch, & Maher, 2013），可以換算成 SUS 分數、和其他研究比較
+// G1–G3 是針對這個遊戲自己設計的，用來找出要修改的地方
 function addUmuxLite(form) {
-  form.addPageBreakItem().setTitle('操作感受')
+  form.addPageBreakItem().setTitle('遊戲操作')
     .setHelpText('請依照剛剛操作遊戲的感受作答（1 非常不同意，7 非常同意）。');
   addScale(form, 'U1. 這個遊戲的功能符合我的需求。', 7);
   addScale(form, 'U2. 這個遊戲很容易使用。', 7);
+  addScale(form, 'G1. 我知道每個畫面該按哪裡（繼續、選擇、上一句、暫停）。', 7);
+  addScale(form, 'G2. 字的大小和出現的速度，讀起來很舒服。', 7);
+  addScale(form, 'G3. 一個角色玩一週的長度（含每天的日記）剛好，不會太長。', 7);
 }
 
 function addPlayedQuestions(form) {
