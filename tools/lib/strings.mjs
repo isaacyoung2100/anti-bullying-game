@@ -8,6 +8,7 @@ export function storyStrings() {
   const walk = (list) => {
     for (const s of list) {
       add(s.text); add(s.inner); add(s.prompt); add(s.day); add(s.title); add(s.recap);
+      (s.react || []).forEach((r) => { add(r.text); add(r.result); });
       (s.help || []).forEach((h) => { add(h.text); add(h.result); });
       (s.diary || []).forEach(add);
       if (s.phone) {

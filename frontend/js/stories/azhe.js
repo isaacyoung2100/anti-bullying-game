@@ -48,7 +48,12 @@ const STORY = [
   ] },
   // 背景一瞥（不影響能量和分支）
   { speaker: 'narrator', glimpse: 'pinyu', text: '下課時，你看見欣儀和佳佳手牽手走出教室，把品妤留在後面。',
-    inner: '她們吵架了嗎？' },
+    inner: '她們吵架了嗎？',
+    react: [
+      { text: '對品妤揮揮手。', result: '品妤看了你一眼，也輕輕揮了一下手。' },
+      { text: '經過她旁邊時，扮一個好笑的鬼臉。', result: '品妤愣了一下，嘴角好像動了一點點。' },
+      { text: '抓抓頭，走回自己的座位。', result: '你剛剛才被大家笑，心裡還亂糟糟的。', none: true },
+    ] },
 
   // ---------------- 週二 ----------------
   { k: 'day', day: '週二', title: '起跑線', bg: 'track',
@@ -90,7 +95,12 @@ const STORY = [
   ] },
   // 背景一瞥（不影響能量和分支）
   { speaker: 'narrator', glimpse: 'xiaoyu', text: '練跑休息時，你看見小雨一個人站在終點線旁，一直抓著外套拉鍊。',
-    inner: '她不熱嗎？' },
+    inner: '她不熱嗎？',
+    react: [
+      { text: '遠遠地對她揮揮手。', result: '小雨看見了，抓著拉鍊的手鬆開了一點。' },
+      { text: '走過去說：「你剛剛跑超快。」', result: '小雨小聲說：「……謝謝。」又低下頭。' },
+      { text: '坐在操場角落，看著地上。', result: '你剛才搶跑被罵，現在只想躲起來。', none: true },
+    ] },
 
   // ---------------- 週三（好的一天：連續兩天被欺負之後，這一天不會再被欺負）----------------
   { k: 'day', day: '週三', title: '午休的筆記本', bg: 'classroom',
@@ -125,7 +135,12 @@ const STORY = [
       ] },
   ] },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'kai', text: '下午彩排進場舞，阿凱站在最前面帶大家跳，跳完大家都拍手了。' },
+  { speaker: 'narrator', glimpse: 'kai', text: '下午彩排進場舞，阿凱站在最前面帶大家跳，跳完大家都拍手了。',
+    react: [
+      { text: '跟大家一起用力拍手。', result: '掌聲好大，阿凱笑得有點不好意思。' },
+      { text: '大聲喊：「阿凱，帥喔！」', result: '阿凱轉頭看過來，笑得好開心。' },
+      { text: '跟著拍子，默默踏步。', result: '今天不用躲誰，你覺得踏步也很好玩。', none: true },
+    ] },
   { speaker: 'narrator', emo: 'happy', text: '今天，沒有人笑你。', inner: '如果每天都像今天就好了。' },
 
   // ---------------- 週四（白天在學校，晚上和家人）----------------
@@ -172,7 +187,12 @@ const STORY = [
   { speaker: 'guanyu', text: '（小聲）給你。我看過你畫的閃電，超帥的。',
     effect: { courage: 5, kind: 1 } },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'qing', text: '放學前，你看見小晴坐在位子上，很專心地翻著恐龍百科。' },
+  { speaker: 'narrator', glimpse: 'qing', text: '放學前，你看見小晴坐在位子上，很專心地翻著恐龍百科。',
+    react: [
+      { text: '經過她旁邊時，把腳步放輕。', result: '小晴沒有被吵到，又翻了一頁。' },
+      { text: '在她看得到的地方，比一個讚。', result: '小晴看了你的手一眼，又低頭看書。' },
+      { text: '抱著書包，快步走過去。', result: '你心裡還想著那張不能畫的海報。', none: true },
+    ] },
 
   // 晚上
   { bg: 'home', chars: [{ id: 'azhe', x: 64, emo: 'neutral' }, { id: 'mom', x: 128, emo: 'happy' }],
@@ -232,7 +252,12 @@ const STORY = [
       effect: { courage: 5 } },
   ] },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'aming', text: '老師對全班說完那段話，你看見前面的阿明，慢慢把頭抬了起來。' },
+  { speaker: 'narrator', glimpse: 'aming', text: '老師對全班說完那段話，你看見前面的阿明，慢慢把頭抬了起來。',
+    react: [
+      { text: '回頭對阿明笑了一下。', result: '阿明愣了一下，也對你笑了。' },
+      { text: '下課時，撕一張你畫的小閃電給他。', result: '阿明看著閃電，小聲說：「好帥。」' },
+      { text: '低下頭，看著自己的桌子。', result: '你剛剛也才跟老師談完，心還跳得好快。', none: true },
+    ] },
   { time: 'dusk', bg: 'track', chars: [{ id: 'azhe', x: 52, emo: 'sad' }],
     speaker: 'narrator', text: '放學後，大家都走了。你一個人在操場收接力棒。' },
   { time: 'dusk', bg: 'track', chars: [{ id: 'azhe', x: 52, emo: 'surprised' }, { id: 'aming', x: 140, emo: 'neutral' }],
@@ -278,7 +303,12 @@ const ENDING = [
   { speaker: 'narrator', emo: 'happy', text: '你把接力棒交到下一個人手上。沒有犯規。',
     inner: '我做到了。' },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'pinyu', text: '第六棒的品妤從阿凱手中接過棒子，一路往前衝。' },
+  { speaker: 'narrator', glimpse: 'pinyu', text: '第六棒的品妤從阿凱手中接過棒子，一路往前衝。',
+    react: [
+      { text: '大聲喊：「品妤，衝啊！」', result: '你的聲音混在加油聲裡，品妤跑得好快。' },
+      { text: '跟著大家一起拍手。', result: '掌聲好大，你覺得自己也是隊伍的一份子。' },
+      { text: '坐下來喘氣，看著跑道。', result: '你剛跑完第一棒，腿還在抖，心裡卻好輕。', none: true },
+    ] },
   { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'happy' }],
     speaker: 'teacher', text: '阿哲，下禮拜一午休，要不要來找老師聊聊？可以帶你的畫冊來。',
     inner: '這個禮拜很難。可是我不是一個人。' },

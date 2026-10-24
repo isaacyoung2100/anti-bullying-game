@@ -294,3 +294,16 @@ test('對照頁：上面那張就是自己那天的一瞥，六個角色串成�
   assert.equal(cur, STORIES[0].id, '對照頁沒有串成一圈');
   assert.equal(seen.size, STORIES.length, '對照頁的圈沒有經過每個角色');
 });
+
+test('背景一瞥的小回應：每則三個，剛好一個「沒做」，每句 40 字以內', () => {
+  for (const { st } of ALL) {
+    for (const g of glimpsesByDay(st)) {
+      assert.equal(g.react?.length, 3, `${st.id} ${g.day} 的一瞥要有三個回應`);
+      assert.equal(g.react.filter((r) => r.none).length, 1, `${st.id} ${g.day} 要剛好一個「沒做」`);
+      for (const r of g.react) {
+        assert.ok(r.text && r.result, `${st.id} ${g.day} 的回應缺文字`);
+        for (const x of [r.text, r.result]) assert.ok(x.length <= 40, `${st.id}：${x.length} 字「${x}」`);
+      }
+    }
+  }
+});

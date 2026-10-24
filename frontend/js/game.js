@@ -18,6 +18,8 @@ const state = {
   i: 0,
   courage: START_COURAGE,
   witness: 0,         // 有人看到卻沒說話的次數
+  noticed: 0,         // 背景一瞥：注意到別人的次數
+  reached: 0,         // 注意到之後，做了一點什麼的次數
   kind: 0,            // 有人伸出手的次數
   flags: {},
   days: [],           // 每天結束時的勇氣 [{ day, courage }]
@@ -384,6 +386,7 @@ function run() {
     if: stepIf,
     ending: stepEnding,
     zhihao: stepZhihao,
+    react: stepReact,
     contrast: stepContrast,
     reflect: stepReflect,
     think: stepThink,
@@ -446,6 +449,8 @@ function stepLine(step) {
     applyEffect(step.effect);
     step.applied = true;
   }
+  // 背景一瞥之後，讓主角對看到的事做一點小回應
+  if (step.react) insertAfterCurrent([{ k: 'react', who: step.glimpse, options: step.react }]);
   state.history.push({ step, bg: state.view.bg, phone: state.view.phone, props: state.view.props, time: state.view.time, chars: state.view.chars.map(({ enter, ...c }) => ({ ...c })) });
   showLine(step);
 }
@@ -469,9 +474,9 @@ function goBack() {
   if (!state.back) {
     // 在選擇題這類卡片上，最後一句就是剛剛的台詞；在台詞上，要看的是前一句
     const k = state.steps[state.i]?.k;
-    // 卡片裡只有選擇題可以回去看（標題卡、日記重跑一次會重複加能量或清掉內容）
-    if (k && k !== 'choice') return;
-    const onPanel = k === 'choice';
+    // 卡片裡只有選擇題和一瞥的小回應可以回去看（標題卡、日記重跑一次會重複加能量或清掉內容）
+    const onPanel = k === 'choice' || k === 'react';
+    if (k && !onPanel) return;
     const index = state.history.length - (onPanel ? 1 : 2);
     if (index < 0) return;
     finishTyping();
@@ -630,6 +635,30 @@ function stepChoice(step) {
       if (o.flag) state.flags[o.flag] = true;
       applyEffect(o.effect);
       insertAfterCurrent(o.then);
+      next();
+    };
+  });
+}
+
+// 背景一瞥的小回應：主角自己也在難受，可是還是可以做一點小事（一個眼神、一句小聲的話）
+// 「什麼都沒做」也是正常的選項：不劃掉、不扣能量，回顧時只說「注意到幾次、做了幾次」
+function stepReact(step) {
+  state.view.speaker = null;
+  const card = showPanel(`
+    <div class="kicker">${esc(t('glimpse', nameOf(step.who)))}</div>
+    <h2>${t('reactQ')}</h2>
+    <div class="choices">
+      ${step.options.map((o, n) => `<button class="choice" type="button" data-n="${n}">${esc(tr(o.text))}</button>`).join('')}
+    </div>
+    <button class="text-btn" type="button" id="review">${t('reviewBtn')}</button>
+  `, 'choice-card react-card');
+  card.querySelector('#review').addEventListener('click', goBack);
+  card.querySelectorAll('.choice').forEach((btn) => {
+    btn.onclick = () => {
+      const o = step.options[Number(btn.dataset.n)];
+      state.noticed += 1;
+      if (!o.none) state.reached += 1;
+      insertAfterCurrent([{ speaker: 'narrator', glimpse: step.who, text: o.result }]);
       next();
     };
   });
@@ -840,6 +869,7 @@ function stepReflect() {
     <div class="facts">
       <p>${t('witnessFact', state.witness)}</p>
       <p>${t('kindFact', state.kind)}</p>
+      ${state.noticed ? `<p>${t('reachFact', state.noticed, state.reached)}</p>` : ''}
       <p class="quiet">${t('weekQuiet')}</p>
     </div>
     ${state.diary.length ? `<h2>${t('diaryWeekTitle')}</h2><div class="diary-week">${diaryWeekHtml()}</div>` : ''}
@@ -1211,6 +1241,8 @@ function resetProgress() {
   state.courage = START_COURAGE;
   state.witness = 0;
   state.kind = 0;
+  state.noticed = 0;
+  state.reached = 0;
   state.flags = {};
   state.days = [];
   state.day = null;

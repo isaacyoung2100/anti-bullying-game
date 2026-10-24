@@ -50,7 +50,12 @@ const STORY = [
   { speaker: 'guanyu', text: '最後兩支滾到這裡了。是放在這個位置嗎？',
     effect: { courage: 5, kind: 1 } },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'azhe', text: '數學課，你看見阿哲在書包裡翻了好久，一直找不到作業本。' },
+  { speaker: 'narrator', glimpse: 'azhe', text: '數學課，你看見阿哲在書包裡翻了好久，一直找不到作業本。',
+    react: [
+      { text: '小聲告訴他：「作業本放書包第二層。」', result: '阿哲愣了一下，說：「……好。」' },
+      { text: '寫一張「明天帶作業本」的紙條給他。', result: '阿哲看著紙條，把它夾進聯絡簿。' },
+      { text: '把自己的鉛筆排回原來的順序。', result: '你的鉛筆剛被弄亂，你要先讓世界恢復順序。', none: true },
+    ] },
 
   // ---------------- 週二 ----------------
   { k: 'day', day: '週二', title: '突然的巨響', bg: 'classroom',
@@ -63,7 +68,12 @@ const STORY = [
       { text: '陪她去保健室，喝一杯溫水', result: '在安靜的保健室坐了十分鐘，她好多了。' },
     ] },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'aming', text: '午餐時，志豪大叫「好臭」，有兩個同學把桌子從阿明旁邊拉開。' },
+  { speaker: 'narrator', glimpse: 'aming', text: '午餐時，志豪大叫「好臭」，有兩個同學把桌子從阿明旁邊拉開。',
+    react: [
+      { text: '小聲說：「那是春捲，是越南的食物。」', result: '旁邊的人看了你一眼，沒有說話。' },
+      { text: '你的桌子沒有動。', result: '你的桌子，還在原來的位置。' },
+      { text: '摀住耳朵，等志豪的聲音停下來。', result: '他的聲音太大了，你只能先保護耳朵。', none: true },
+    ] },
   { bg: 'classroom', chars: [{ id: 'qing', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '下午打掃時間，教室裡都是拖椅子的聲音。你的耳朵有點痛。' },
   { speaker: 'narrator', text: '志豪拿著一張鐵椅子，走到你後面，用力往地上一摔！' },
@@ -127,7 +137,12 @@ const STORY = [
   { speaker: 'qing', text: '好。一、二、三、四。每一拍都一樣長。' },
   { speaker: 'narrator', emo: 'happy', anim: 'jump', text: '第二次，全班跳得整整齊齊。大家都拍手了。', inner: '我的耳朵，也可以幫上忙。' },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'xiaoyu', text: '體育課計時，你聽到老師大聲說：「小雨，全班最快！」' },
+  { speaker: 'narrator', glimpse: 'xiaoyu', text: '體育課計時，你聽到老師大聲說：「小雨，全班最快！」',
+    react: [
+      { text: '跟小雨說：「十四秒二，是全班第一。」', result: '小雨笑了：「你記得好清楚。」' },
+      { text: '跟大家一起拍手，可是拍得輕輕的。', result: '你拍得很輕，可是很認真。' },
+      { text: '站在旁邊，看著碼錶上的數字。', result: '今天的哨聲不刺耳，你覺得好舒服。', none: true },
+    ] },
   { speaker: 'narrator', emo: 'happy', text: '今天，沒有人故意嚇你。', inner: '如果每天都像今天就好了。' },
 
   // ---------------- 週四（白天在學校，晚上和家人）----------------
@@ -163,7 +178,12 @@ const STORY = [
       ] },
   ] },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'kai', text: '做進場道具時，你看見阿凱站在空掉的桌子前，手握得緊緊的。' },
+  { speaker: 'narrator', glimpse: 'kai', text: '做進場道具時，你看見阿凱站在空掉的桌子前，手握得緊緊的。',
+    react: [
+      { text: '走過去說：「彩帶在掃把上。」', result: '阿凱看了看掃把，握緊了拳頭。' },
+      { text: '把桌上的剪刀和膠帶排整齊，推給他。', result: '阿凱看著排好的工具，深呼吸了一下。' },
+      { text: '回到座位，把恐龍卡片照年代排好。', result: '卡片排好了，你的心裡才安靜一點。', none: true },
+    ] },
   // 被騙之後，阿凱來找她：昨天彩排一起數拍子，今天是朋友了
   { bg: 'classroom', chars: [{ id: 'qing', x: 52, emo: 'surprised' }, { id: 'kai', x: 140, emo: 'happy' }],
     speaker: 'narrator', text: '放學前，阿凱走過來，手上拿著一張恐龍貼紙。' },
@@ -229,7 +249,12 @@ const STORY = [
       effect: { courage: 5 } },
   ] },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'pinyu', text: '打掃完，你看見阿明拿了一包糖，送給品妤。' },
+  { speaker: 'narrator', glimpse: 'pinyu', text: '打掃完，你看見阿明拿了一包糖，送給品妤。',
+    react: [
+      { text: '跟品妤說：「那是椰子糖，很香。」', result: '品妤笑著點點頭。' },
+      { text: '對阿明和品妤點點頭。', result: '他們兩個都對你笑了一下。' },
+      { text: '照順序，把書包裡的東西收好。', result: '明天可以戴耳塞跑，你心裡很踏實。', none: true },
+    ] },
   { time: 'dusk', bg: 'classroom', chars: [{ id: 'qing', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '放學前，大家在走廊排路隊。' },
   { time: 'dusk', bg: 'classroom', chars: [{ id: 'qing', x: 52, emo: 'surprised' }, { id: 'azhe', x: 140, emo: 'happy' }],
@@ -271,7 +296,12 @@ const ENDING = [
       speaker: 'narrator', anim: 'cheer', text: '你看到爸爸站在圍欄邊，對你比了一個「三角龍衝鋒」。' },
   ] },
   // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'aming', text: '比賽前，你看見阿明一直往觀眾席看，好像在找人。' },
+  { speaker: 'narrator', glimpse: 'aming', text: '比賽前，你看見阿明一直往觀眾席看，好像在找人。',
+    react: [
+      { text: '跟他說：「觀眾席很大，慢慢找。」', result: '阿明點點頭，又往觀眾席看。' },
+      { text: '對他比一個讚。', result: '阿明看到了，對你笑了一下。' },
+      { text: '戴好耳塞，看著跑道上的白線。', result: '聲音變得軟軟的，你準備好跑第四棒了。', none: true },
+    ] },
   { bg: 'sportsday', chars: [{ id: 'qing', x: 52, emo: 'neutral' }, { id: 'xiaoyu', x: 140, emo: 'happy' }],
     speaker: 'narrator', text: '第三棒的小雨衝過來了。你在心裡數著步伐。' },
   { bg: 'sportsday', chars: [{ id: 'qing', x: 52, emo: 'happy' }, { id: 'azhe', x: 140, emo: 'happy' }],
