@@ -115,7 +115,7 @@ const SKIN = '#f8d4b0';
 const SKIN_TAN = '#e2ae82';
 
 // 每個角色的配色與髮型。C 上衣、D 上衣筆觸、P 褲子、H 頭髮
-const PALETTES = {
+export const PALETTES = {
   azhe:    { hair: 'messy',    H: '#5a3a28', S: SKIN,     C: '#f39a4c', D: '#d0702a', P: '#4a5a8a' },
   xiaoyu:  { hair: 'ponytail', H: '#2a2430', S: SKIN,     C: '#9db2c6', D: '#71879c', P: '#4a5a8a' },
   aming:   { hair: 'neat',     H: '#2a2430', S: SKIN_TAN, C: '#62b77e', D: '#3e8f58', P: '#4a5a8a' },
@@ -538,7 +538,7 @@ function pencil(g, x, y, angle, color, len = 9) {
   g.restore();
 }
 
-const PROPS = {
+export const PROPS = {
   desk,
   // 十二色鉛筆從深排到淺
   pencilsRow(g) {

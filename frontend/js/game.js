@@ -39,10 +39,22 @@ const state = {
 // ---------- 繪圖 ----------
 
 // 背景每次重畫很花時間，先畫好存起來；boil 是手繪線條輕輕抖動的三個畫格
+// 每張背景約 5 MB：只留最近用到的 9 張（3 個場景 × 3 個畫格），舊平板的記憶體才不會被塞滿
 const backdrops = new Map();
+const BACKDROP_MAX = 9;
 function backdrop(bg, boil, time) {
   const key = `${bg}:${boil}:${time}`;
-  if (!backdrops.has(key)) {
+  if (backdrops.has(key)) {
+    const cv = backdrops.get(key);
+    backdrops.delete(key);
+    backdrops.set(key, cv);
+  } else {
+    if (backdrops.size >= BACKDROP_MAX) {
+      // 把最舊的一張的大小設成 0：Safari 才會馬上把那塊記憶體還回去
+      const [oldKey, old] = backdrops.entries().next().value;
+      old.width = 0; old.height = 0;
+      backdrops.delete(oldKey);
+    }
     const cv = document.createElement('canvas');
     cv.width = screen.width; cv.height = screen.height;
     const bg2 = cv.getContext('2d');

@@ -44,3 +44,38 @@ test('日記：兩種語言的情緒象限、情緒詞、每天的引導問題�
   assert.deepEqual(Object.keys(zh.quads), ['red', 'yellow', 'blue', 'green']);
   assert.equal(zh.prompts, 5, '週一到週五，每天一題');
 });
+
+// 英文版一致性：人名、數字、標點（逐句和中文比對）
+const NAMES_EN = { 阿哲: 'Azhe', 小雨: 'Xiaoyu', 阿明: 'Aming', 阿凱: 'Kai', 小晴: 'Qing', 品妤: 'Pinyu', 志豪: 'Zhihao', 冠宇: 'Guanyu', 佳佳: 'Jiajia', 欣儀: 'Xinyi' };
+
+test('英文版：中文提到的人名，英文也要提到（同一個拼法）', () => {
+  const bad = [];
+  for (const zh of storyStrings()) {
+    const en = STORY_EN[zh];
+    for (const [z, e] of Object.entries(NAMES_EN)) if (zh.includes(z) && !en.includes(e)) bad.push(`${e}：${zh} ⇒ ${en}`);
+  }
+  assert.deepEqual(bad, []);
+});
+
+test('英文版：數字和中文一樣（350 元、24 人、14.2 秒、專線號碼）', () => {
+  const bad = [];
+  // 中文寫成阿拉伯數字的（350、24、1953……），英文一定要有；中文數字（五年三班、八點半）英文可以寫成 5-3、8:30
+  for (const zh of storyStrings()) {
+    const en = STORY_EN[zh];
+    for (const n of zh.match(/\d+(\.\d+)?/g) || []) if (!en.includes(n)) bad.push(`少了 ${n}：${zh} ⇒ ${en}`);
+  }
+  assert.deepEqual(bad, []);
+});
+
+test('英文版：用彎引號，沒有全形標點、多餘空白、重複的字', () => {
+  const bad = [];
+  for (const zh of storyStrings()) {
+    const en = STORY_EN[zh];
+    if (/[　-〿＀-￯]/.test(en)) bad.push(`全形標點：${en}`);
+    if (/"/.test(en)) bad.push(`直引號：${en}`);
+    if (/ {2,}| [,.!?]|^\s|\s$/.test(en)) bad.push(`空白：「${en}」`);
+    if (/\b(\w+) \1\b/i.test(en) && !/\b(Bang|ha|no) \1\b/i.test(en)) bad.push(`重複字：${en}`);
+    if ((en.match(/“/g) || []).length !== (en.match(/”/g) || []).length) bad.push(`引號沒有成對：${en}`);
+  }
+  assert.deepEqual(bad, []);
+});

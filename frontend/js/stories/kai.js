@@ -165,7 +165,8 @@ const STORY = [
       fear: '被大家看到，會不會說我愛打小報告？',
       effect: { courage: 5 },
       then: [
-        { speaker: 'kai', emo: 'sad', text: '老師，進場要用的彩帶被拿去玩了。' },
+        { bg: 'classroom', chars: [{ id: 'kai', x: 52, emo: 'sad' }, { id: 'teacher', x: 140, emo: 'neutral' }],
+          speaker: 'kai', emo: 'sad', text: '老師，進場要用的彩帶被拿去玩了。' },
         { speaker: 'teacher', emo: 'neutral', text: '謝謝你告訴老師。老師會處理，也不會說是你講的。' },
         { speaker: 'narrator', props: ['ribbon'], text: '下課前，彩帶回到了你的桌上。' },
       ] },

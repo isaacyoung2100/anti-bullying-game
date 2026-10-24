@@ -41,6 +41,19 @@ npm test
 
 窮舉六個角色所有的選擇路徑，檢查不會卡關、結局固定內容在每條路徑都相同、週五老師一定介入、劇情前後一致等規則；英文版也會檢查劇本每一句都有翻譯。GitHub Actions 會在每次推送時自動執行。改了數值後，路徑統計快照會失敗；確認是刻意的，再用 `UPDATE_SNAPSHOT=1 npm test` 更新。
 
+另外還會沿著每個分支模擬畫面上有誰（說話的人要站在畫面上、欄位的值要認得），並逐句比對英文版的人名、數字和標點。
+
+### 在真的瀏覽器裡試玩（Windows，需要 Edge 和 Python）
+
+先在 `frontend` 資料夾開本機伺服器（`python -m http.server 8000`），再執行：
+
+```bash
+powershell -ExecutionPolicy Bypass -File tools/sweep/sweep_all.ps1
+```
+
+會用 14 種螢幕大小（手機直拿和橫拿、iPad、筆電、2K 螢幕）各從頭玩到尾，每一步檢查版面（東西跑出頁面、按鈕被蓋住或切掉、字太小或太大、整頁可以橫向捲動），截圖和問題清單放在 `tools/sweep/out`。
+`tools/sweep/s_fuzz.mjs` 是亂玩壓力測試（亂按上一句、暫停、重新開始、日記亂打 HTML 和表情符號、分享、再玩一次）；`s_keys.mjs` 只用鍵盤玩；`s_artifact.mjs` 打開單檔版玩一次。環境變數 `CPU=4` 模擬舊平板、`BLOCK=fonts` 模擬學校網路擋掉 Google 字型、`MOTION=reduce` 模擬「減少動態效果」。
+
 ## 部署
 
 整個 `frontend` 資料夾就是網站，可以部署到任何靜態網站服務，免費而且不會休眠：
@@ -68,6 +81,7 @@ tools/build_artifact.py  打包成單一 HTML 檔
 tools/simulate.mjs       模擬所有選擇路徑，檢查數值平衡
 tools/lib/paths.mjs      窮舉選擇路徑（測試與模擬共用）
 tools/tests/             自動化測試與路徑統計快照
+tools/sweep/             在真的瀏覽器裡試玩：多種螢幕大小、亂玩壓力測試、鍵盤、單檔版
 tools/export_script.mjs  產生 docs/劇本.md 和給協作 AI 的合併文件
 tools/lib/strings.mjs    收集劇本所有會顯示的文字（翻譯檢查用）
 docs/角色擴充簡報.md      給協作 AI：新角色與角色交織的構想（手寫）

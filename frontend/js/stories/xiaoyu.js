@@ -47,7 +47,8 @@ const STORY = [
     { text: '小聲跟佳佳說：「我家最近不方便，可以晚一點再說嗎？」', need: 45, flag: 'askedLater',
       fear: '如果被別人聽到，大家就都知道我家沒錢了。',
       then: [
-        { speaker: 'xiaoyu', emo: 'neutral', text: '我家最近不方便……可以晚一點再說嗎？' },
+        { bg: 'classroom', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }, { id: 'jiajia', x: 140, emo: 'neutral' }],
+          speaker: 'xiaoyu', emo: 'neutral', text: '我家最近不方便……可以晚一點再說嗎？' },
         { speaker: 'jiajia', emo: 'neutral', text: '……喔，好，我先不寫你的名字。' },
         { speaker: 'narrator', text: '志豪在旁邊「噗」地笑了一聲。', inner: '至少佳佳沒有笑。' },
       ] },
@@ -273,6 +274,10 @@ const ENDING = [
   { bg: 'sportsday', chars: [{ id: 'xiaoyu', x: 52, emo: 'happy' }, { id: 'azhe', x: 140, emo: 'happy' }],
     speaker: 'azhe', anim: 'cheer', text: '閃電女王！',
     inner: '這個外號，我喜歡。' },
+  // 週五問了「你也會被他們笑嗎？」：阿哲記得兩個人說好要一起跑快
+  { k: 'if', flag: 'friend', then: [
+    { speaker: 'azhe', emo: 'happy', text: '我說過吧！我們兩個都跑超快，嚇死他們！' },
+  ] },
   { bg: 'sportsday', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'happy' }],
     speaker: 'teacher', text: '小雨，下禮拜輔導老師想找你聊聊群組的事。你想說多少都可以，慢慢來。',
     inner: '這個禮拜很難。可是好像……有人站在我這邊了。' },

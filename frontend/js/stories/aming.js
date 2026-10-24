@@ -44,7 +44,8 @@ const STORY = [
     { text: '走過去說：「我叫阿明，不是外星人。」', need: 55, flag: 'stoodUp',
       fear: '如果我開口，他們又會笑我講越南話。',
       then: [
-        { speaker: 'aming', emo: 'angry', text: '我叫阿明，不是外星人。' },
+        { bg: 'classroom', chars: [{ id: 'aming', x: 52, emo: 'angry' }, { id: 'zhihao', x: 140, emo: 'happy' }],
+          speaker: 'aming', emo: 'angry', text: '我叫阿明，不是外星人。' },
         { speaker: 'zhihao', emo: 'happy', text: '「勾雷～」哈哈哈，外星人生氣了！' },
         { speaker: 'narrator', emo: 'sad', text: '笑聲更大了。', inner: '我說出來了。就算他們還在笑，我也說出來了。' },
       ] },
@@ -91,7 +92,8 @@ const STORY = [
         { speaker: 'narrator', text: '你還是把春捲吃完了。', inner: '媽媽做的，就是很好吃。' },
       ] },
   ] },
-  { speaker: 'narrator', emo: 'surprised', text: '收餐盒的時候，冠宇轉過頭，小聲問你：' },
+  { bg: 'classroom', chars: [{ id: 'aming', x: 52, emo: 'surprised' }, { id: 'guanyu', x: 140, emo: 'neutral' }],
+    speaker: 'narrator', emo: 'surprised', text: '收餐盒的時候，冠宇轉過頭，小聲問你：' },
   { speaker: 'guanyu', text: '那是越南春捲嗎？跟河粉店賣的一樣嗎？……看起來好像滿好吃的。',
     effect: { courage: 5, kind: 1 } },
   // 背景一瞥（不影響能量和分支）
@@ -147,7 +149,7 @@ const STORY = [
       { text: '傳訊息給他：「明天可以教我一句越南話嗎？」', result: '他回：「好啊！」然後傳來一串你看不懂的字。' },
       { text: '決定明天早上主動跟他打招呼', result: '隔天早上，他說：「Chào！」是越南話的「你好」。' },
     ] },
-  { bg: 'classroom', chars: [{ id: 'teacher', x: 96, emo: 'happy' }],
+  { bg: 'classroom', chars: [{ id: 'aming', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'happy' }],
     speaker: 'teacher', text: '社會課的報告題目是「我的家鄉」。大家可以介紹爸爸媽媽長大的地方喔。' },
   { bg: 'classroom', chars: WITH_ZHIHAO('surprised', 'happy'),
     speaker: 'zhihao', text: '阿明的家鄉在越南啦！他媽媽是外國人，講話都怪怪的！',
@@ -256,6 +258,10 @@ const ENDING = [
     speaker: 'narrator', text: '比賽前，你、小雨、阿哲，還有幾個同學圍在一起。你深吸一口氣。' },
   { speaker: 'aming', emo: 'happy', text: 'Cố lên！五年三班！' },
   { speaker: 'class', anim: 'jump', text: '「Cố lên！五年三班！」\n（幾個人跟著你喊，發音都怪怪的，大家都笑了。\n志豪沒有跟著喊，但這一次，他也沒有笑你。）' },
+  // 週五問了「你也會被他們笑嗎？」：小雨真的去學了越南話的加油
+  { k: 'if', flag: 'friend', then: [
+    { speaker: 'xiaoyu', emo: 'happy', text: 'Cố lên！你看，我昨天回家練了好久喔。' },
+  ] },
   { k: 'if', flag: 'askedMomAway', then: [
     { bg: 'sportsday', chars: [{ id: 'aming', x: 52, emo: 'surprised' }, { id: 'momM', x: 140, emo: 'neutral' }],
       speaker: 'narrator', wear: { momM: ['hat'] }, text: '你看向觀眾席。最後面，有一個戴著帽子的人。是媽媽。她還是來了。' },
