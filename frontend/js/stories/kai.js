@@ -24,6 +24,9 @@ const STORY = [
     speaker: 'narrator', text: '你叫阿凱，五年三班。你喜歡音樂，更喜歡跳舞。' },
   { speaker: 'narrator', text: '放學後，你常在阿嬤的修改衣服店，對著大鏡子練習。' },
   { speaker: 'teacher', text: '運動會的進場舞，阿凱節奏感很好，請他當編舞小老師！' },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'qing', text: '下課經過小晴的座位，你看見她的鉛筆掉了一地。',
+    inner: '發生什麼事了？' },
   { bg: 'classroom', chars: [{ id: 'kai', x: 52, emo: 'happy' }],
     speaker: 'narrator', text: '午休後的走廊，你忍不住對著窗戶的倒影練動作。' },
   { bg: 'classroom', chars: CLASS_CHARS('surprised', 'happy'),
@@ -90,6 +93,8 @@ const STORY = [
           inner: '這一組讓我加入了。可是一開始被推開，還是好難受。' },
       ] },
   ] },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'azhe', text: '等球的時候，你看見阿哲哨聲還沒響就衝出去，志豪在大聲抱怨。' },
 
   // ---------------- 週三（好的一天：連續兩天被欺負之後，這一天不會再被欺負）----------------
   // 同一幕也出現在小晴的故事裡（小晴幫忙數拍子）
@@ -128,6 +133,8 @@ const STORY = [
   { bg: 'track', chars: [{ id: 'kai', x: 52, emo: 'happy' }, { id: 'guanyu', x: 140, emo: 'happy' }],
     speaker: 'class', anim: 'jump', text: '（跳完的時候，大家都拍手了。有人喊：「阿凱，帥喔！」）',
     effect: { courage: 5, kind: 1 } },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'aming', text: '早上數學課，你看見佳佳跑去請阿明教她難題。' },
   { speaker: 'narrator', emo: 'happy', text: '今天，沒有人學你的動作。', inner: '如果每天都像今天就好了。' },
 
   // ---------------- 週四（白天在學校，晚上和家人）----------------
@@ -173,6 +180,8 @@ const STORY = [
     speaker: 'narrator', text: '午休前，前排的冠宇轉過頭，放了一卷雙面膠在你桌上。' },
   { speaker: 'guanyu', text: '（小聲）這個很好黏。你做的花環很好看。',
     effect: { courage: 5, kind: 1 } },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'pinyu', text: '午餐時，你看見品妤端著便當站在走道，她的位子上放著欣儀的外套。' },
 
   // 晚上
   { bg: 'home', chars: [{ id: 'kai', x: 64, emo: 'neutral' }, { id: 'grandma', x: 128, emo: 'happy' }],
@@ -234,6 +243,8 @@ const STORY = [
     { speaker: 'narrator', emo: 'happy', text: '你想起昨天晚上，阿嬤摸你頭的手。',
       effect: { courage: 5 } },
   ] },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'xiaoyu', text: '下午練跑，你看見小雨一口氣超過兩個人，大家都看呆了。' },
   { time: 'dusk', bg: 'classroom', chars: [{ id: 'kai', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '放學後，大家陸續背起書包。' },
   { time: 'dusk', bg: 'classroom', chars: [{ id: 'kai', x: 52, emo: 'surprised' }, { id: 'pinyu', x: 140, emo: 'happy' }],
@@ -278,6 +289,8 @@ const ENDING = [
     { speaker: 'pinyu', text: '我們是最有氣勢的一班！' },
   ] },
   { speaker: 'narrator', text: '志豪在隊伍後面跟著跳完了。這一次，他沒有再學你。' },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'qing', text: '第四棒的小晴戴著耳塞，一步一步朝你跑過來。' },
   { speaker: 'narrator', emo: 'happy', anim: 'run', text: '大隊接力，你跑第五棒。接過棒子，你像風一樣衝出去。',
     inner: '這就是我的力量。' },
   { bg: 'sportsday', chars: [{ id: 'kai', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'happy' }],
@@ -291,4 +304,8 @@ export default {
   blurb: '喜歡跳舞，說話輕聲。跟著音樂就停不下來。',
   story: STORY,
   ending: ENDING,
+  // 結尾的對照頁「同一天，在別人眼中」：上面是自己週四看到的一瞥，下面是對方那天的真相
+  contrast: { who: 'pinyu', day: '週四', seen: '午餐時，你看見品妤端著便當站在走道，她的位子上放著欣儀的外套。',
+    truth: '週一，品妤替被取綽號的阿明說了一句話。後來，原本的好朋友把她踢出群組，午餐也不讓她坐。',
+    lead: '不知道要坐哪裡的那個人，可能是因為她勇敢過。' },
 };

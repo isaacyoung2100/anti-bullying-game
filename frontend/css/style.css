@@ -353,6 +353,14 @@ button { cursor: pointer; }
 
 .speaker:empty { display: none; }
 
+/* 背景一瞥：旁觀的角度，名字框改成淡藍色的「你注意到」 */
+.dialog.glimpse .speaker {
+  font-size: calc(4.4 * var(--u));
+  color: var(--ink-soft);
+  background: linear-gradient(transparent 50%, #cfe4f5 50%, #cfe4f5 92%, transparent 92%);
+}
+.dialog.glimpse .line { color: var(--ink-soft); }
+
 .line {
   font-size: calc(5.3 * var(--u));
   line-height: var(--lh);
@@ -710,6 +718,38 @@ button { cursor: pointer; }
 }
 
 .inner-card p { font-size: calc(4.7 * var(--u)); line-height: 1.75; }
+
+/* 同一天，在別人眼中：上面是你看到的（便條紙），下面是真相（白紙） */
+.cmp {
+  margin: 0 0 calc(3 * var(--u));
+  padding: calc(3 * var(--u)) calc(3.6 * var(--u));
+  border-radius: calc(1 * var(--u));
+}
+.cmp b { display: block; margin-bottom: calc(1 * var(--u)); font-size: calc(4.2 * var(--u)); }
+.cmp p { margin: 0; }
+.cmp-seen {
+  display: flex;
+  gap: calc(3 * var(--u));
+  align-items: flex-start;
+  background: #eef3f8;
+  border: 1px dashed #9fb3c4;
+}
+.cmp-seen b { color: #5b6b8c; }
+.cmp-face {
+  flex: none;
+  width: calc(16 * var(--u));
+  height: calc(16 * var(--u));
+  background: #ffffff;
+  border-radius: 50%;
+}
+.cmp-truth {
+  background: #fff7e0;
+  border: 1px solid #ecd9a6;
+  box-shadow: calc(0.4 * var(--u)) calc(0.8 * var(--u)) calc(1.4 * var(--u)) rgba(58, 49, 64, 0.12);
+}
+.cmp-truth b { color: #b0582e; }
+.cmp-lead { font-weight: 700; }
+.cmp-try { font-size: max(12px, calc(3.8 * var(--u))); color: var(--ink-soft); }
 
 /* 一週回顧：心裡的天氣（天氣貼紙） */
 .wx-row {

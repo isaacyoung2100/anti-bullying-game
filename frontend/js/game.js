@@ -274,18 +274,22 @@ function showLine(step) {
   const inner = tr(step.inner);
   hidePanel();
   $('dialog').classList.remove('idle');
-  $('speaker').textContent = nameOf(speaker);
+  // 背景一瞥：旁觀的角度看到另一個角色，名字框寫「你注意到：小雨」，頭像換成那個人
+  const label = step.glimpse ? t('glimpse', nameOf(step.glimpse)) : nameOf(speaker);
+  $('speaker').textContent = label;
+  $('dialog').classList.toggle('glimpse', !!step.glimpse);
   state.view.speaker = speaker;
   state.view.zoom = step.zoom ?? null;
   const portrait = $('portrait');
-  const who = state.view.chars.find((c) => c.id === speaker);
+  const face = step.glimpse || speaker;
+  const who = state.view.chars.find((c) => c.id === face);
   const look = { sports: state.view.bg === 'sportsday', outfit: who?.outfit || [] };
-  portrait.classList.toggle('empty', !drawPortrait(portrait, speaker, who?.emo || 'neutral', look));
+  portrait.classList.toggle('empty', !drawPortrait(portrait, face, who?.emo || 'neutral', look));
   const innerEl = $('inner');
   innerEl.textContent = inner ? `${t('innerPrefix')}${inner}` : '';
   innerEl.hidden = true;
   // 打字效果會一直改動文字，所以螢幕閱讀器改念這一行完整的句子
-  $('srLine').textContent = [nameOf(speaker), text, inner ? `${t('innerPrefix')}${inner}` : '']
+  $('srLine').textContent = [label, text, inner ? `${t('innerPrefix')}${inner}` : '']
     .filter(Boolean).join(' ');
   describeScene();
   renderPhone();
@@ -380,6 +384,7 @@ function run() {
     if: stepIf,
     ending: stepEnding,
     zhihao: stepZhihao,
+    contrast: stepContrast,
     reflect: stepReflect,
     think: stepThink,
     closing: stepClosing,
@@ -746,7 +751,8 @@ function diaryWeekHtml() {
 
 function stepEnding() {
   // 每個角色只有一個結局：欺負的人和旁觀者的行為固定，前面發生的事只透過旗標加入細節
-  insertAfterCurrent([...state.story.ending, { k: 'zhihao' }, { k: 'reflect' }, { k: 'think' }, { k: 'closing' }]);
+  const contrast = state.story.contrast ? [{ k: 'contrast' }] : [];
+  insertAfterCurrent([...state.story.ending, { k: 'zhihao' }, ...contrast, { k: 'reflect' }, { k: 'think' }, { k: 'closing' }]);
   next();
 }
 
@@ -770,6 +776,35 @@ function stepZhihao() {
     </div>
   `, 'inner-card');
   drawPortrait(card.querySelector('canvas'), 'zhihao', 'sad');
+  card.querySelector('#go').onclick = next;
+}
+
+// 同一天，在別人眼中：上面是這個禮拜自己看到的一瞥，下面是對方那天真正經歷的事
+// 進班時每組玩不同角色，六個角色的對照頁串成一圈，剛好可以互相對照
+function stepContrast() {
+  const c = state.story.contrast;
+  const name = nameOf(c.who);
+  state.view.chars = [{ id: state.story.id, x: 60, emo: 'neutral' }, { id: c.who, x: 132, emo: 'neutral' }];
+  state.view.speaker = null;
+  const card = showPanel(`
+    <div class="kicker">${t('contrastKicker')}</div>
+    <h2>${t('contrastTitle')}</h2>
+    <div class="cmp cmp-seen">
+      <canvas class="cmp-face" width="96" height="96" aria-hidden="true"></canvas>
+      <div>
+        <b>${esc(t('contrastSeen', name, tr(c.day)))}</b>
+        <p>${esc(tr(c.seen))}</p>
+      </div>
+    </div>
+    <div class="cmp cmp-truth">
+      <b>${esc(t('contrastTruth', name))}</b>
+      <p>${esc(tr(c.truth))}</p>
+    </div>
+    <p class="cmp-lead">${esc(tr(c.lead))}</p>
+    <p class="cmp-try">${esc(t('contrastTry', name))}</p>
+    <div class="btn-row"><button class="btn" type="button" id="go">${t('cont')}</button></div>
+  `, 'contrast-card');
+  drawPortrait(card.querySelector('canvas'), c.who, 'neutral');
   card.querySelector('#go').onclick = next;
 }
 

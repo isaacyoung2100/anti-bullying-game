@@ -49,6 +49,8 @@ const STORY = [
     speaker: 'narrator', props: ['desk'], text: '冠宇蹲下來，從講台下面撿起兩支深藍色的筆。' },
   { speaker: 'guanyu', text: '最後兩支滾到這裡了。是放在這個位置嗎？',
     effect: { courage: 5, kind: 1 } },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'azhe', text: '數學課，你看見阿哲在書包裡翻了好久，一直找不到作業本。' },
 
   // ---------------- 週二 ----------------
   { k: 'day', day: '週二', title: '突然的巨響', bg: 'classroom',
@@ -60,6 +62,8 @@ const STORY = [
       { text: '輕輕敲她的桌角：「深呼吸，聲音已經停了。」', result: '她跟著你的節奏吸氣、吐氣，慢慢鬆開拳頭。' },
       { text: '陪她去保健室，喝一杯溫水', result: '在安靜的保健室坐了十分鐘，她好多了。' },
     ] },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'aming', text: '午餐時，志豪大叫「好臭」，有兩個同學把桌子從阿明旁邊拉開。' },
   { bg: 'classroom', chars: [{ id: 'qing', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '下午打掃時間，教室裡都是拖椅子的聲音。你的耳朵有點痛。' },
   { speaker: 'narrator', text: '志豪拿著一張鐵椅子，走到你後面，用力往地上一摔！' },
@@ -122,6 +126,8 @@ const STORY = [
     effect: { courage: 5, kind: 1 } },
   { speaker: 'qing', text: '好。一、二、三、四。每一拍都一樣長。' },
   { speaker: 'narrator', emo: 'happy', anim: 'jump', text: '第二次，全班跳得整整齊齊。大家都拍手了。', inner: '我的耳朵，也可以幫上忙。' },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'xiaoyu', text: '體育課計時，你聽到老師大聲說：「小雨，全班最快！」' },
   { speaker: 'narrator', emo: 'happy', text: '今天，沒有人故意嚇你。', inner: '如果每天都像今天就好了。' },
 
   // ---------------- 週四（白天在學校，晚上和家人）----------------
@@ -156,6 +162,8 @@ const STORY = [
         { speaker: 'narrator', text: '教室安靜了一下。志豪聳聳肩走開了。', inner: '事實不會騙人。' },
       ] },
   ] },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'kai', text: '做進場道具時，你看見阿凱站在空掉的桌子前，手握得緊緊的。' },
   // 被騙之後，阿凱來找她：昨天彩排一起數拍子，今天是朋友了
   { bg: 'classroom', chars: [{ id: 'qing', x: 52, emo: 'surprised' }, { id: 'kai', x: 140, emo: 'happy' }],
     speaker: 'narrator', text: '放學前，阿凱走過來，手上拿著一張恐龍貼紙。' },
@@ -220,6 +228,8 @@ const STORY = [
     { speaker: 'narrator', emo: 'happy', text: '你想起爸爸早上幫你放進書包的耳塞盒。',
       effect: { courage: 5 } },
   ] },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'pinyu', text: '打掃完，你看見阿明拿了一包糖，送給品妤。' },
   { time: 'dusk', bg: 'classroom', chars: [{ id: 'qing', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '放學前，大家在走廊排路隊。' },
   { time: 'dusk', bg: 'classroom', chars: [{ id: 'qing', x: 52, emo: 'surprised' }, { id: 'azhe', x: 140, emo: 'happy' }],
@@ -260,6 +270,8 @@ const ENDING = [
     { bg: 'sportsday', chars: [{ id: 'qing', x: 52, emo: 'surprised' }, { id: 'dadQ', x: 140, emo: 'happy' }],
       speaker: 'narrator', anim: 'cheer', text: '你看到爸爸站在圍欄邊，對你比了一個「三角龍衝鋒」。' },
   ] },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'aming', text: '比賽前，你看見阿明一直往觀眾席看，好像在找人。' },
   { bg: 'sportsday', chars: [{ id: 'qing', x: 52, emo: 'neutral' }, { id: 'xiaoyu', x: 140, emo: 'happy' }],
     speaker: 'narrator', text: '第三棒的小雨衝過來了。你在心裡數著步伐。' },
   { bg: 'sportsday', chars: [{ id: 'qing', x: 52, emo: 'happy' }, { id: 'azhe', x: 140, emo: 'happy' }],
@@ -282,4 +294,8 @@ export default {
   pronoun: '她',
   story: STORY,
   ending: ENDING,
+  // 結尾的對照頁「同一天，在別人眼中」：上面是自己週四看到的一瞥，下面是對方那天的真相
+  contrast: { who: 'kai', day: '週四', seen: '做進場道具時，你看見阿凱站在空掉的桌子前，手握得緊緊的。',
+    truth: '那捲金色彩帶，是阿嬤前一天晚上戴著老花眼鏡，一條一條幫全班剪好的。',
+    lead: '被拿走的不只是一樣東西，還有家人的用心。' },
 };

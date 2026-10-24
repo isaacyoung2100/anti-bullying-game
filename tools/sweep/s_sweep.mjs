@@ -90,7 +90,7 @@ const CHECK = `
       + ($('#panel .quad') ? ($('#wordArea .word') ? '-words' : '-quad') : '')
       + ($('#panel textarea') ? '-write' : '') + ($('#panel .choice') ? '-choice' : '');
   } else {
-    key = 'line' + (!$('#phone').hidden ? '-phone' : '') + (!$('#inner').hidden ? '-inner' : '') + ($('#portrait.empty') ? '' : '-portrait');
+    key = 'line' + ($('#dialog.glimpse') ? '-glimpse' : '') + (!$('#phone').hidden ? '-phone' : '') + (!$('#inner').hidden ? '-inner' : '') + ($('#portrait.empty') ? '' : '-portrait');
   }
   return { issues: [...new Set(issues)], key };
 `;

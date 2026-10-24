@@ -21,6 +21,7 @@ export function storyStrings() {
   for (const st of STORIES) {
     add(st.name); add(st.blurb); add(st.pronoun);
     walk(st.story); walk(st.ending);
+    if (st.contrast) { add(st.contrast.day); add(st.contrast.seen); add(st.contrast.truth); add(st.contrast.lead); }
   }
   Object.values(CHARACTERS).forEach((c) => add(c.name));
   add(ZHIHAO_INNER);

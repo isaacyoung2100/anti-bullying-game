@@ -243,3 +243,54 @@ test('最多連續兩天被欺負：連續兩天之後的那一天，整天都�
     assert.equal(bad, null, `${st.id} 的${bad?.day}「${bad?.title}」接在連續兩天被欺負之後，卻${bad?.bad ? '又被欺負' : '沒有好事'}：${days.map((d) => `${d.day}${d.bad ? '壞' : ''}${d.good ? '好' : ''}`).join(' ')}`);
   }
 });
+
+// 背景一瞥：用旁觀同學的眼睛看到另一個角色（多視角交織）
+// 只放在主線（不在選項或條件裡），每個玩家都會看到；不加減能量
+const DAYS = ['週一', '週二', '週三', '週四', '週五', '週六'];
+function glimpsesByDay(st) {
+  const out = [];
+  let day = '週一';
+  for (const s of st.story) {
+    if (s.k === 'day') day = s.day;
+    if (s.glimpse) out.push({ day, ...s });
+  }
+  for (const s of st.ending) if (s.glimpse) out.push({ day: '週六', ...s });
+  return out;
+}
+
+test('背景一瞥：每個角色每天剛好一則，都在主線上，不影響能量', () => {
+  for (const { st } of ALL) {
+    const list = glimpsesByDay(st);
+    assert.deepEqual(list.map((g) => g.day), DAYS, `${st.id} 的背景一瞥：${list.map((g) => g.day).join('、')}`);
+    for (const g of list) {
+      assert.ok(g.glimpse in CHARACTERS && g.glimpse !== st.id, `${st.id}：看到的人 ${g.glimpse} 不對`);
+      assert.ok(!g.effect, `${st.id} ${g.day} 的背景一瞥不能加減能量`);
+    }
+    // 選項和條件裡不能有一瞥（不然有的玩家看不到）
+    for (const s of [...st.story, ...st.ending]) {
+      if (s.k === 'choice') s.options.forEach((o) => walkSteps(o.then, (x) => assert.ok(!x.glimpse, `${st.id}：一瞥放進了選項裡`)));
+      if (s.k === 'if') walkSteps(s.then, (x) => assert.ok(!x.glimpse, `${st.id}：一瞥放進了條件裡`));
+    }
+    // 看到的角色要分散：六天至少看到四個不同的人
+    assert.ok(new Set(list.map((g) => g.glimpse)).size >= 4, `${st.id} 的一瞥都在看同一兩個人`);
+  }
+});
+
+test('對照頁：上面那張就是自己那天的一瞥，六個角色串成一圈', () => {
+  const next = {};
+  for (const { st } of ALL) {
+    const c = st.contrast;
+    assert.ok(c && c.seen && c.truth && c.lead, `${st.id} 缺對照頁`);
+    const g = glimpsesByDay(st).find((x) => x.day === c.day);
+    assert.equal(g.glimpse, c.who, `${st.id} 對照頁的人和${c.day}的一瞥不同`);
+    assert.equal(g.text, c.seen, `${st.id} 對照頁上面那張要和${c.day}的一瞥一模一樣`);
+    assert.ok(STORIES.some((x) => x.id === c.who), `${st.id} 的對照頁要對照一個可以玩的角色`);
+    next[st.id] = c.who;
+  }
+  // 從任何一個角色出發，沿著對照頁走六步回到自己，而且每個角色都經過
+  const seen = new Set();
+  let cur = STORIES[0].id;
+  for (let i = 0; i < STORIES.length; i++) { seen.add(cur); cur = next[cur]; }
+  assert.equal(cur, STORIES[0].id, '對照頁沒有串成一圈');
+  assert.equal(seen.size, STORIES.length, '對照頁的圈沒有經過每個角色');
+});

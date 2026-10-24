@@ -29,7 +29,9 @@ function effectNote(effect) {
 function line(step, player, indent) {
   const who = step.speaker === player ? '你' : (CHARACTERS[step.speaker]?.name || '');
   const text = step.text.replace(/\n/g, ' ');
-  const head = who ? `**${who}**：${text}` : `*${text}*`;
+  // 背景一瞥：用旁觀的角度看到另一個角色
+  const head = step.glimpse ? `👀 *你注意到${CHARACTERS[step.glimpse]?.name || ''}：${text}*`
+    : who ? `**${who}**：${text}` : `*${text}*`;
   const inner = step.inner ? `　💭 心裡想：${step.inner}` : '';
   return `${indent}- ${head}${inner}${effectNote(step.effect)}`;
 }
@@ -87,7 +89,8 @@ const doc = [
   '- 週五早上，老師一定會發現並私下找你談，不取決於你有沒有說出來；如果你有告訴媽媽，會多一份家人的支持。',
   '- **結局**：每個角色只有一個結局。欺負的人和旁觀者在每條路徑都一樣；前面發生的事只用來加入細節（例如有告訴媽媽，媽媽就在觀眾席喊加油）。結局一定有朋友和老師，並約好下禮拜再聊。',
   '- 每天的劇情結束後寫一篇日記：情緒象限選一格 → 替情緒命名（選詞或自己寫）→ 回答引導問題（可以不寫字，也可以整篇跳過）。',
-  '- 結局之後：志豪的內心話 → 一週回顧（心裡的天氣、有人看到卻沒說話的次數、有人伸出手的次數、五篇日記）→ 換你想一想（回到旁觀者的角度）→ 最後一頁（可以「聽完分享，再想一次」）。',
+  '- 每天會有一則「背景一瞥」（👀）：用旁觀同學的角度，看到另一個角色那天發生的事。只寫看得到的樣子，不加減能量、不影響分支。',
+  '- 結局之後：志豪的內心話 → 同一天，在別人眼中（對照頁：自己看到的一瞥，和對方那天真正經歷的事；六個角色串成一圈）→ 一週回顧（心裡的天氣、有人看到卻沒說話的次數、有人伸出手的次數、五篇日記）→ 換你想一想（回到旁觀者的角度）→ 最後一頁（可以「聽完分享，再想一次」）。',
   '- 標記說明：**粗體**是說話的人；*斜體*是旁白；💭 是你心裡真正的想法；〔 〕是這句話對數值的影響。',
   '',
 ];
@@ -96,6 +99,15 @@ for (const st of STORIES) {
   doc.push('---', '', `## ${st.name}的故事`, '', `> ${st.blurb}`);
   doc.push(...steps(st.story, st.id));
   doc.push(...steps(st.ending, st.id));
+  if (st.contrast) {
+    const c = st.contrast;
+    const name = CHARACTERS[c.who]?.name || c.who;
+    doc.push('', '### 結尾的對照頁：同一天，在別人眼中', '',
+      `- **你看見的${name}（${c.day}）**：${c.seen}`,
+      `- **同一天，在${name}身上的事**：${c.truth}`,
+      `- **引導語**：${c.lead}`,
+      `- 小字：想知道${name}的這一個禮拜嗎？下次可以選${name}玩玩看。`);
+  }
   doc.push('');
 }
 

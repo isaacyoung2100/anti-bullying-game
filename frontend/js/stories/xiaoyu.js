@@ -52,6 +52,8 @@ const STORY = [
         { speaker: 'narrator', text: '志豪在旁邊「噗」地笑了一聲。', inner: '至少佳佳沒有笑。' },
       ] },
   ] },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'kai', text: '倒垃圾時，你看見阿凱對著走廊的窗戶練舞，幾個男生在旁邊笑他。' },
 
   // ---------------- 週二 ----------------
   { k: 'day', day: '週二', title: '班級群組', bg: 'home',
@@ -63,6 +65,10 @@ const STORY = [
       { text: '把群組截圖給爸媽或老師看', result: '隔天，老師說：「謝謝你，這件事老師會處理。」' },
       { text: '不按讚、不傳貼圖', result: '那天晚上，已讀的人裡面，有一個沒有笑。' },
     ] },
+  // 背景一瞥（不影響能量和分支）
+  { bg: 'classroom', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }],
+    speaker: 'narrator', glimpse: 'aming', text: '午餐時，坐你旁邊的阿明打開一盒春捲，有兩個同學把桌子拉開。',
+    inner: '那是什麼？看起來很好吃啊。' },
   { bg: 'home', chars: [{ id: 'xiaoyu', x: 48, emo: 'neutral' }],
     speaker: 'narrator', text: '晚上九點。媽媽還在上班，弟弟已經睡了。你一個人在餐桌寫功課。' },
   { speaker: 'narrator', emo: 'surprised', phone: { ...CLASS_GROUP, upto: 1 }, text: '手機震了一下。是班級群組。\n有人傳了一張照片：你那件起毛球的外套，旁邊加了一行字——「復古風女王」。' },
@@ -127,6 +133,8 @@ const STORY = [
         { speaker: 'pinyu', emo: 'happy', text: '原來是這樣！謝謝你！' },
       ] },
   ] },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'qing', text: '彩排進場舞時，小晴幫阿凱數拍子，一拍都沒有數錯。' },
   { speaker: 'narrator', emo: 'happy', text: '今天，沒有人笑你的外套。', inner: '如果每天都像今天就好了。' },
 
   // ---------------- 週四（白天在學校，晚上和家人）----------------
@@ -159,6 +167,9 @@ const STORY = [
         { speaker: 'narrator', text: '她一直沒有再提起這件事。', inner: '我知道答案了。' },
       ] },
   ] },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'pinyu', text: '午餐時，你看見品妤端著便當站在走道，不知道要坐哪裡。',
+    inner: '她不是都跟欣儀一起吃嗎？' },
 
   // 晚上
   { bg: 'home', chars: [{ id: 'xiaoyu', x: 64, emo: 'neutral' }, { id: 'momX', x: 128, emo: 'happy' }],
@@ -219,6 +230,8 @@ const STORY = [
   ] },
   { time: 'dusk', bg: 'track', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '下午練大隊接力。你跑第三棒，一口氣超過了兩個人。' },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'azhe', text: '等棒子的時候，你看見阿哲蹲在起跑線，等哨聲響了才衝出去。' },
   { time: 'dusk', bg: 'track', chars: [{ id: 'xiaoyu', x: 52, emo: 'surprised' }, { id: 'azhe', x: 140, emo: 'happy' }],
     speaker: 'azhe', text: '小雨！你跑超快的耶！' },
   { speaker: 'azhe', text: '欸，我幫你在號碼布上畫一隻閃電好不好？一定超帥！',
@@ -253,6 +266,8 @@ const ENDING = [
   { k: 'if', flag: 'toldMom', then: [
     { speaker: 'momX', anim: 'cheer', text: '小雨——媽媽在這裡！加油！' },
   ] },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'aming', text: '比賽前，大家圍成一圈，跟著阿明用越南話喊「Cố lên！」' },
   { speaker: 'narrator', emo: 'happy', anim: 'run', text: '「砰！」\n第三棒。你接過接力棒，一口氣超過了兩個人。' },
   { bg: 'sportsday', chars: [{ id: 'xiaoyu', x: 52, emo: 'happy' }, { id: 'azhe', x: 140, emo: 'happy' }],
     speaker: 'azhe', anim: 'cheer', text: '閃電女王！',
@@ -269,4 +284,8 @@ export default {
   blurb: '跑步很快，話不多。每天放學去接弟弟。',
   story: STORY,
   ending: ENDING,
+  // 結尾的對照頁「同一天，在別人眼中」：上面是自己週二看到的一瞥，下面是對方那天的真相
+  contrast: { who: 'aming', day: '週二', seen: '午餐時，坐你旁邊的阿明打開一盒春捲，有兩個同學把桌子拉開。',
+    truth: '那是媽媽幫他做的越南春捲，是他最喜歡的。志豪大叫「好臭」，有人捏著鼻子看他。',
+    lead: '一個便當盒裡，裝的可能是一整個家的心意。' },
 };

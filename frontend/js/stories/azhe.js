@@ -46,6 +46,9 @@ const STORY = [
         { speaker: 'narrator', emo: 'sad', text: '他聳聳肩走開了。', inner: '我說出來了。就算他沒有道歉，我也說出來了。' },
       ] },
   ] },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'pinyu', text: '下課時，你看見欣儀和佳佳手牽手走出教室，把品妤留在後面。',
+    inner: '她們吵架了嗎？' },
 
   // ---------------- 週二 ----------------
   { k: 'day', day: '週二', title: '起跑線', bg: 'track',
@@ -85,6 +88,9 @@ const STORY = [
         { speaker: 'narrator', text: '這一次，你沒有犯規。', inner: '心跳得好快。可是我說出來了。' },
       ] },
   ] },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'xiaoyu', text: '練跑休息時，你看見小雨一個人站在終點線旁，一直抓著外套拉鍊。',
+    inner: '她不熱嗎？' },
 
   // ---------------- 週三（好的一天：連續兩天被欺負之後，這一天不會再被欺負）----------------
   { k: 'day', day: '週三', title: '午休的筆記本', bg: 'classroom',
@@ -118,6 +124,8 @@ const STORY = [
         { speaker: 'guanyu', emo: 'happy', text: '哪有，比我好一百倍。', inner: '真的嗎？' },
       ] },
   ] },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'kai', text: '下午彩排進場舞，阿凱站在最前面帶大家跳，跳完大家都拍手了。' },
   { speaker: 'narrator', emo: 'happy', text: '今天，沒有人笑你。', inner: '如果每天都像今天就好了。' },
 
   // ---------------- 週四（白天在學校，晚上和家人）----------------
@@ -163,6 +171,8 @@ const STORY = [
     speaker: 'narrator', props: ['goldpen'], text: '下課前，隔壁組的冠宇偷偷把一支金色的筆推到你桌上。' },
   { speaker: 'guanyu', text: '（小聲）給你。我看過你畫的閃電，超帥的。',
     effect: { courage: 5, kind: 1 } },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'qing', text: '放學前，你看見小晴坐在位子上，很專心地翻著恐龍百科。' },
 
   // 晚上
   { bg: 'home', chars: [{ id: 'azhe', x: 64, emo: 'neutral' }, { id: 'mom', x: 128, emo: 'happy' }],
@@ -221,6 +231,8 @@ const STORY = [
     { speaker: 'narrator', emo: 'happy', text: '你想起昨天晚上，媽媽抱著你的樣子。',
       effect: { courage: 5 } },
   ] },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'aming', text: '老師對全班說完那段話，你看見前面的阿明，慢慢把頭抬了起來。' },
   { time: 'dusk', bg: 'track', chars: [{ id: 'azhe', x: 52, emo: 'sad' }],
     speaker: 'narrator', text: '放學後，大家都走了。你一個人在操場收接力棒。' },
   { time: 'dusk', bg: 'track', chars: [{ id: 'azhe', x: 52, emo: 'surprised' }, { id: 'aming', x: 140, emo: 'neutral' }],
@@ -265,6 +277,8 @@ const ENDING = [
   ] },
   { speaker: 'narrator', emo: 'happy', text: '你把接力棒交到下一個人手上。沒有犯規。',
     inner: '我做到了。' },
+  // 背景一瞥（不影響能量和分支）
+  { speaker: 'narrator', glimpse: 'pinyu', text: '第六棒的品妤從阿凱手中接過棒子，一路往前衝。' },
   { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'happy' }],
     speaker: 'teacher', text: '阿哲，下禮拜一午休，要不要來找老師聊聊？可以帶你的畫冊來。',
     inner: '這個禮拜很難。可是我不是一個人。' },
@@ -276,4 +290,8 @@ export default {
   blurb: '愛畫畫，坐不住。常常忘東忘西。',
   story: STORY,
   ending: ENDING,
+  // 結尾的對照頁「同一天，在別人眼中」：上面是自己週二看到的一瞥，下面是對方那天的真相
+  contrast: { who: 'xiaoyu', day: '週二', seen: '練跑休息時，你看見小雨一個人站在終點線旁，一直抓著外套拉鍊。',
+    truth: '前一天，有人笑這件外套的袖口起毛球。那天晚上，外套的照片被傳到班級群組，24 個人已讀，沒有人說「不要這樣」。',
+    lead: '低著頭不說話的人，心裡可能正下著一場很安靜的雨。' },
 };
