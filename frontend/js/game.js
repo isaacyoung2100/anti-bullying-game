@@ -393,7 +393,7 @@ function stepDiary() {
     : [t('diaryPrompts')[n % t('diaryPrompts').length]];
   const entry = { day: state.day, quad: null, word: '', prompts, answers: [] };
   const dateTag = `<span class="diary-date">${t('diaryKicker', esc(tr(state.day)))}</span>`;
-  const axisFor = (q) => `${q === 'red' || q === 'yellow' ? ax.high : ax.low}, ${q === 'red' || q === 'blue' ? ax.bad : ax.good}`;
+  const axisFor = (q) => [q === 'red' || q === 'yellow' ? ax.high : ax.low, q === 'red' || q === 'blue' ? ax.bad : ax.good].join(t('listSep'));
 
   const pickMood = () => {
     const card = showPanel(`
@@ -523,6 +523,9 @@ function weatherOf(energy) {
   return { cls, icon, word: t('weather')[cls] };
 }
 
+// 天氣格子很窄：英文的星期用縮寫（Wednesday 放不下）
+const shortDay = (day) => (getLang() === 'en' ? tr(day).slice(0, 3) : tr(day));
+
 function stepReflect() {
   state.view.bg = 'track';
   state.view.chars = [{ id: state.story.id, x: 96, emo: 'neutral' }];
@@ -532,7 +535,7 @@ function stepReflect() {
     <div class="wx-day">
       <span class="wx" aria-hidden="true">${w.icon}</span>
       <span class="wx-word">${w.word}</span>
-      <span class="wx-label">${esc(tr(d.day))}</span>
+      <span class="wx-label">${esc(shortDay(d.day))}</span>
     </div>`;
   }).join('');
   showPanel(`

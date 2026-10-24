@@ -20,7 +20,7 @@ const STORY = [
     speaker: 'narrator', text: '你叫品妤，五年三班。你喜歡和佳佳、欣儀一起聊偶像和文具。' },
   { speaker: 'narrator', text: '你覺得自己很普通。成績普通，個性也普通。' },
   { bg: 'classroom', chars: [{ id: 'pinyu', x: 52, emo: 'neutral' }, { id: 'zhihao', x: 140, emo: 'happy' }],
-    speaker: 'narrator', text: '下課的走廊上，志豪又對著阿明大喊：「外星阿明！」' },
+    speaker: 'narrator', text: '下課的走廊上，志豪又對著阿明說：「外星阿明。」' },
   { speaker: 'class', text: '（旁邊的人都在笑。阿明的臉漲得紅紅的。）' },
   { speaker: 'pinyu', emo: 'angry', text: '志豪，亂取綽號很幼稚耶，一點都不好笑。' },
   { speaker: 'narrator', text: '志豪翻了一個白眼，走開了。' },
@@ -204,7 +204,7 @@ const STORY = [
       effect: { courage: 10 },
       then: [
         { speaker: 'pinyu', emo: 'neutral', text: '阿明，你這幾天還好嗎？' },
-        { speaker: 'aming', emo: 'neutral', text: '好多了！老師有處理，小雨也來找我說話。' },
+        { speaker: 'aming', emo: 'neutral', text: '好多了！老師有處理，冠宇也有來問我春捲的事。' },
         { speaker: 'aming', emo: 'happy', text: '明天運動會，我們一起大聲喊加油！' },
       ] },
     { text: '收下糖果，用力點點頭。',

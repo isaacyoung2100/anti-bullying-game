@@ -21,7 +21,7 @@ const STORY = [
       { text: '下課告訴老師，走廊上有人在叫綽號', result: '老師說：「謝謝你告訴我，老師會處理。」' },
     ] },
   { bg: 'classroom', chars: [{ id: 'aming', x: 52, emo: 'happy' }, { id: 'teacher', x: 140, emo: 'happy' }],
-    speaker: 'narrator', text: '你叫阿明，五年三班。你數學很好。\n媽媽來自越南，在家裡你們會說越南話。每次你考完試，媽媽都會說「Cố lên」，意思是「加油」。' },
+    speaker: 'narrator', text: '你叫阿明，五年三班。你數學很好。\n媽媽來自越南，在家裡你們會說越南話。\n每次你考完試，媽媽都會說「Cố lên」，意思是「加油」。' },
   { speaker: 'teacher', text: '我們來練運動會的加油口號！每個人輪流帶喊一句。下一個，阿明！' },
   { speaker: 'aming', emo: 'neutral', text: '五年三班——Cố lên！' },
   { speaker: 'narrator', emo: 'surprised', text: '你一喊完就愣住了。太習慣了，越南話就這樣跑出來了。' },
@@ -61,7 +61,7 @@ const STORY = [
       { text: '下課告訴老師午餐的事', result: '老師說：「謝謝你，老師會跟全班談談。」' },
     ] },
   { bg: 'classroom', chars: [{ id: 'aming', x: 52, emo: 'happy' }],
-    speaker: 'narrator', text: '午餐時間。今天媽媽幫你做了越南春捲，用米紙包著生菜和薄荷葉，還放了一小盒沾醬。是你最喜歡的。' },
+    speaker: 'narrator', text: '午餐時間。今天媽媽幫你做了越南春捲，用米紙包著生菜和薄荷葉，還放了一小盒沾醬。\n是你最喜歡的。' },
   { bg: 'classroom', chars: WITH_ZHIHAO('surprised', 'angry'),
     speaker: 'zhihao', text: '噁，什麼東西好臭喔！是誰的便當？' },
   { speaker: 'narrator', emo: 'sad', text: '有兩個同學把桌子往旁邊拉開。\n有人捏著鼻子看你。',
@@ -161,11 +161,11 @@ const STORY = [
   ] },
 
   // ---------------- 週五 ----------------
-  { k: 'day', day: '週五', title: '收接力棒', bg: 'classroom',
+  { k: 'day', day: '週五', title: '收角錐', bg: 'classroom',
     diary: ['小雨問你那句越南話時，你心裡的烏雲有沒有散開一點？'],
-    recap: '放學後，大家都走了，阿明一個人留在操場收接力棒。',
+    recap: '放學後，阿明一個人在器材室門口，把跑道上的角錐收進箱子。',
     help: [
-      { text: '留下來幫他收接力棒', result: '收完的時候，他說：「謝謝你。我以為大家都走了。」' },
+      { text: '留下來幫他收角錐', result: '收完的時候，他說：「謝謝你。我以為大家都走了。」' },
       { text: '問一句：「你還好嗎？」', result: '他想了一下，說：「現在好一點了。」' },
       { text: '約他明天一起喊「Cố lên！」', result: '他說：「好。你要喊大聲一點喔。」' },
       { text: '陪他一起走到校門口', result: '他媽媽在校門口等他，對你揮了揮手。' },
@@ -178,14 +178,14 @@ const STORY = [
   ] },
   { speaker: 'teacher', emo: 'neutral', text: '這不是你的錯。老師會跟全班說清楚，也不會讓大家知道是你說的。',
     effect: { courage: 10, kind: 1 } },
-  { speaker: 'teacher', emo: 'happy', text: '還有……如果你願意，運動會可以教大家用越南話喊加油。不想也完全沒關係，你自己決定。' },
-  { speaker: 'narrator', text: '第一節課，老師沒有點任何人的名字，只對全班說：\n「從今天開始，不可以叫任何人的綽號。笑別人說的語言、笑別人家裡的食物，都是霸凌。」' },
+  { speaker: 'teacher', emo: 'happy', text: '還有……如果你願意，運動會可以教大家用越南話喊加油。\n不想也完全沒關係，你自己決定。' },
+  { speaker: 'narrator', text: '第一節課，老師沒有點任何人的名字，只對全班說：\n「從今天開始，不可以叫任何人的綽號。\n笑別人說的語言、笑別人家裡的食物，都是霸凌。」' },
   { k: 'if', flag: 'toldMom', then: [
     { speaker: 'narrator', emo: 'happy', text: '你想起昨天晚上，媽媽摸摸你的頭說：「超能力。」',
       effect: { courage: 5 } },
   ] },
   { bg: 'track', chars: [{ id: 'aming', x: 52, emo: 'sad' }],
-    speaker: 'narrator', text: '放學後，大家都走了。你一個人在操場收接力棒。' },
+    speaker: 'narrator', text: '放學後，你一個人在器材室門口，把跑道上的角錐收進箱子。' },
   { bg: 'track', chars: [{ id: 'aming', x: 52, emo: 'surprised' }, { id: 'xiaoyu', x: 140, emo: 'neutral' }],
     speaker: 'xiaoyu', text: '……阿明。你那天喊的那句越南話，是什麼意思？' },
   { speaker: 'aming', emo: 'neutral', text: '……是「加油」。' },
@@ -204,7 +204,7 @@ const STORY = [
         { speaker: 'xiaoyu', emo: 'happy', text: '明天，可以教我用越南話說加油嗎？' },
       ] },
     { text: '什麼都沒說，點點頭。',
-      then: [{ speaker: 'narrator', emo: 'neutral', text: '小雨也沒再說什麼，陪你把接力棒收完。', inner: '有人陪著，好像沒那麼難過了。' }] },
+      then: [{ speaker: 'narrator', emo: 'neutral', text: '小雨也沒再說什麼，陪你把角錐收完。', inner: '有人陪著，好像沒那麼難過了。' }] },
   ] },
 ];
 
@@ -215,7 +215,7 @@ const ENDING = [
   { bg: 'sportsday', chars: [{ id: 'aming', x: 52, emo: 'neutral' }, { id: 'xiaoyu', x: 140, emo: 'happy' }],
     speaker: 'narrator', text: '比賽前，你、小雨、阿哲，還有幾個同學圍在一起。你深吸一口氣。' },
   { speaker: 'aming', emo: 'happy', text: 'Cố lên！五年三班！' },
-  { speaker: 'class', text: '「Cố lên！五年三班！」\n（幾個人跟著你喊，發音都怪怪的，大家都笑了。志豪沒有跟著喊，但這一次，他也沒有笑你。）' },
+  { speaker: 'class', text: '「Cố lên！五年三班！」\n（幾個人跟著你喊，發音都怪怪的，大家都笑了。\n志豪沒有跟著喊，但這一次，他也沒有笑你。）' },
   { k: 'if', flag: 'askedMomAway', then: [
     { bg: 'sportsday', chars: [{ id: 'aming', x: 52, emo: 'surprised' }, { id: 'momM', x: 140, emo: 'neutral' }],
       speaker: 'narrator', text: '你看向觀眾席。最後面，有一個戴著帽子的人。是媽媽。她還是來了。' },

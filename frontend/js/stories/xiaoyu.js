@@ -170,7 +170,7 @@ const STORY = [
   { k: 'if', flag: 'toldMom', then: [
     { speaker: 'teacher', text: '媽媽昨天也打電話給老師了。謝謝你願意告訴媽媽。' },
   ] },
-  { speaker: 'teacher', emo: 'neutral', text: '還有，學校有補助，班服你不用擔心，這本來就是你可以用的。老師已經幫你登記了，不會有別人知道。',
+  { speaker: 'teacher', emo: 'neutral', text: '還有，學校有補助，班服你不用擔心，這本來就是你可以用的。\n老師已經幫你登記了，不會有別人知道。',
     effect: { courage: 10, kind: 1 } },
   { speaker: 'teacher', text: '這不是你的錯。群組的事，老師會處理。' },
   { speaker: 'narrator', text: '第一節課，老師沒有點任何人的名字，只對全班說：\n「把別人的照片貼到群組裡開玩笑，也是霸凌。」\n那張照片不見了。' },

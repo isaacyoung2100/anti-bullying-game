@@ -426,6 +426,17 @@ button { cursor: pointer; }
 .btn:active { transform: translate(0.4cqw, 0.6cqw); box-shadow: 0.2cqw 0.3cqw 0 var(--ink); }
 .btn.secondary { background: #ffffff; }
 
+/* 還不能按（例如日記還沒選情緒詞）：看起來像鉛筆畫的空框 */
+.btn:disabled {
+  cursor: not-allowed;
+  color: var(--ink-soft);
+  background: transparent;
+  border-style: dashed;
+  border-color: #b9aeb5;
+  box-shadow: none;
+  transform: none;
+}
+
 .btn-row {
   display: flex;
   gap: 3cqw;

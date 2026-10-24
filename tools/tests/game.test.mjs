@@ -18,7 +18,8 @@ const ALWAYS_LOCKED_OK = new Set([
   'kai|週一|2',
 ]);
 
-const FORBIDDEN = ['外籍新娘'];
+// 歧視用語與性別貶抑的綽號：需要呈現侮辱時，用綽號或嘲笑的行為呈現，不教孩子新的罵人字眼
+const FORBIDDEN = ['外籍新娘', '娘娘腔', '娘炮', '被笑娘', '女生國', '正義魔人', '智障'];
 
 function walkSteps(list, fn) {
   for (const s of list) {
@@ -179,4 +180,49 @@ test('路徑統計與快照相同', () => {
   if (process.env.UPDATE_SNAPSHOT) writeFileSync(file, `${JSON.stringify(now, null, 2)}\n`);
   const saved = JSON.parse(readFileSync(file, 'utf8'));
   assert.deepEqual(now, saved);
+});
+
+test('台詞一句 40 字以內（多行台詞每一行分開算）', () => {
+  for (const { st } of ALL) {
+    const visit = (s) => {
+      for (const t of [s.text, s.inner, s.fear].filter(Boolean)) {
+        for (const seg of t.split('\n')) assert.ok(seg.length <= 40, `${st.id}：${seg.length} 字「${seg}」`);
+      }
+    };
+    walkSteps([...st.story, ...st.ending], (s) => {
+      visit(s);
+      if (s.k === 'choice') s.options.forEach(visit);
+    });
+  }
+});
+
+test('每一天都有日記引導問題、四個旁觀同學的小行動', () => {
+  for (const { st } of ALL) {
+    for (const d of st.story.filter((s) => s.k === 'day')) {
+      assert.ok(d.diary?.length >= 1 && d.diary.length <= 2, `${st.id} ${d.day} 要有一到兩個日記問題`);
+      assert.equal(d.help?.length, 4, `${st.id} ${d.day} 要有四個小行動`);
+    }
+  }
+});
+
+test('每個故事都有普通同學冠宇的小善意（不只弱勢角色互相幫忙）', () => {
+  for (const { st, paths } of ALL) {
+    for (const p of paths) {
+      assert.ok(p.lines.some((l) => l.speaker === 'guanyu' || l.text.includes('冠宇')), `${st.id} 有路徑沒有遇到冠宇`);
+    }
+  }
+});
+
+test('劇情一致：接力棒次在每個故事裡都一樣', () => {
+  // 小雨第三、小晴第四、阿凱第五、品妤第六、冠宇第七
+  const ORDER = { 第三棒: '小雨', 第四棒: '小晴', 第五棒: '阿凱', 第六棒: '品妤', 第七棒: '冠宇' };
+  for (const { st } of ALL) {
+    walkSteps([...st.story, ...st.ending], (s) => {
+      for (const [leg, name] of Object.entries(ORDER)) {
+        if (!s.text?.includes(leg)) continue;
+        const who = st.id === { 小雨: 'xiaoyu', 小晴: 'qing', 阿凱: 'kai', 品妤: 'pinyu' }[name] ? '你' : name;
+        assert.ok(s.text.includes(who) || s.text.includes(`${leg}的${name}`) || s.text.includes('你跑'), `${st.id}：「${s.text}」的${leg}應該是${name}`);
+      }
+    });
+  }
 });
