@@ -25,6 +25,7 @@ const state = {
   dayStep: null,      // 今天的標題卡（日記用它的引導問題）
   diary: [],          // 每天的日記 [{ day, quad, word, prompts, answers }]
   thinkFirst: null,   // 「換你想一想」第一次的選擇，給「聽完分享，再想一次」對照
+  thinkAgain: null,   // 「聽完分享，再想一次」的選擇（分享圖用最後一次的選擇）
   history: [],        // 看過的台詞（和當時的畫面），給「上一句」重看
   back: null,         // 正在重看：{ index, from: 'line' | 'panel' }
   view: { bg: 'title', chars: [], speaker: null },
@@ -670,6 +671,7 @@ function stepThink(step = {}) {
 
   const showResult = (day, action) => {
     if (again && first) {
+      state.thinkAgain = { day, action };
       const label = (d, a) => `${t('dayTitle', esc(tr(d.day)), esc(tr(d.title)))}<br>${esc(tr(a.text))}`;
       showPanel(`
         <div class="kicker">${kicker(3)}</div>
@@ -698,6 +700,157 @@ function stepThink(step = {}) {
   pickDay();
 }
 
+// ---------- 分享給朋友 ----------
+// 玩完可以把「我玩了這個遊戲」做成一張圖分享出去，讓朋友也來玩
+// 只放角色、心裡的天氣和「換你想一想」選的小事；日記內容是自己的，不放進去；什麼都不上傳
+
+const GAME_URL = 'https://isaacyoung2100.github.io/anti-bullying-game/';
+const shareUrl = () => (getLang() === 'en' ? `${GAME_URL}?lang=en` : GAME_URL);
+
+// 文字換行：中文一個字一個字斷，英文一個詞一個詞斷
+function wrapText(g, text, maxWidth) {
+  const tokens = text.match(/[\u3000-\u9fff\uff00-\uffef]|[^\s\u3000-\u9fff\uff00-\uffef]+\s*|\s+/g) || [];
+  const lines = [];
+  let cur = '';
+  for (const tok of tokens) {
+    if (cur && g.measureText(cur + tok).width > maxWidth) {
+      lines.push(cur.trimEnd());
+      cur = tok.trimStart();
+    } else {
+      cur += tok;
+    }
+  }
+  if (cur.trim()) lines.push(cur.trimEnd());
+  return lines;
+}
+
+function shareCard() {
+  const cv = document.createElement('canvas');
+  cv.width = 1080; cv.height = 1350;
+  const g = cv.getContext('2d');
+  const font = getComputedStyle(document.body).fontFamily;
+  const ink = '#3a3140';
+  const set = (size, weight = 700, color = ink) => { g.font = `${weight} ${size}px ${font}`; g.fillStyle = color; };
+
+  // 日記本的一頁：橫線、紅色邊線、裝訂孔
+  g.fillStyle = '#fbf7ee';
+  g.fillRect(0, 0, cv.width, cv.height);
+  g.strokeStyle = '#d3e0ec';
+  g.lineWidth = 2;
+  for (let y = 120; y < cv.height; y += 72) { g.beginPath(); g.moveTo(0, y); g.lineTo(cv.width, y); g.stroke(); }
+  g.fillStyle = '#eba3a3';
+  g.fillRect(96, 0, 4, cv.height);
+  g.fillStyle = '#2b2420';
+  for (let y = 70; y < cv.height; y += 130) { g.beginPath(); g.arc(46, y, 15, 0, Math.PI * 2); g.fill(); }
+
+  const left = 150;
+  const width = cv.width - left - 80;
+  set(40, 700, '#d0463c');
+  g.fillText(t('shareKicker'), left, 110);
+  // 標題畫上螢光筆
+  set(84);
+  const title = t('gameTitle');
+  g.fillStyle = 'rgba(255, 226, 122, 0.85)';
+  g.fillRect(left - 8, 150, Math.min(g.measureText(title).width + 16, width), 44);
+  set(84);
+  g.fillText(title, left, 200);
+
+  // 角色頭像（圓形貼紙）
+  const pc = document.createElement('canvas');
+  pc.width = 240; pc.height = 240;
+  drawPortrait(pc, state.story.id, 'happy');
+  g.save();
+  g.fillStyle = '#ffffff';
+  g.beginPath(); g.arc(left + 120, 380, 132, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#fff3d6';
+  g.beginPath(); g.arc(left + 120, 380, 118, 0, Math.PI * 2); g.fill();
+  g.beginPath(); g.arc(left + 120, 380, 118, 0, Math.PI * 2); g.clip();
+  g.drawImage(pc, left, 260, 240, 240);
+  g.restore();
+  set(46);
+  wrapText(g, t('shareWho', tr(state.story.name)), width - 290).forEach((l, i) => g.fillText(l, left + 290, 350 + i * 64));
+
+  // 心裡的天氣
+  set(36, 700, '#d0463c');
+  g.fillText(t('shareWeather'), left, 600);
+  const tile = Math.min(130, (width - 5 * 14) / 6);
+  state.days.slice(0, 6).forEach((d, i) => {
+    const x = left + i * (tile + 14);
+    const w = weatherOf(d.courage);
+    g.fillStyle = '#ffffff';
+    g.strokeStyle = ink;
+    g.lineWidth = 3;
+    g.beginPath(); g.roundRect(x, 630, tile, 170, 14); g.fill(); g.stroke();
+    g.font = `64px ${font}`;
+    g.textAlign = 'center';
+    g.fillText(w.icon, x + tile / 2, 715);
+    set(30);
+    g.textAlign = 'center';
+    g.fillText(w.word, x + tile / 2, 758);
+    set(26, 400, '#6f6578');
+    g.textAlign = 'center';
+    g.fillText(shortDay(d.day), x + tile / 2, 790);
+    g.textAlign = 'left';
+  });
+
+  // 換你想一想選的小事（最後一次的選擇）
+  const pick = state.thinkAgain || state.thinkFirst;
+  if (pick) {
+    set(40);
+    const lines = wrapText(g, t('shareAct', tr(pick.day.day), tr(pick.action.text)), width - 60);
+    const h = 44 + lines.length * 58;
+    g.fillStyle = '#ffffff';
+    g.strokeStyle = ink;
+    g.lineWidth = 4;
+    g.beginPath(); g.roundRect(left, 850, width, h, 18); g.fill(); g.stroke();
+    set(40);
+    lines.forEach((l, i) => g.fillText(l, left + 30, 910 + i * 58));
+  }
+
+  set(40);
+  g.fillText(t('shareInvite'), left, 1200);
+  set(34, 700, '#3b6fb6');
+  g.fillText(shareUrl().replace('https://', ''), left, 1255);
+  return cv;
+}
+
+function stepShare() {
+  const cv = shareCard();
+  const png = cv.toDataURL('image/png');
+  const text = t('shareText', tr(state.story.name));
+  const card = showPanel(`
+    <div class="kicker">${t('shareKicker2')}</div>
+    <h2>${t('shareTitle')}</h2>
+    <img class="share-img" src="${png}" alt="${esc(t('shareAlt', tr(state.story.name)))}">
+    <p class="diary-hint">${t('shareHold')}</p>
+    <div class="share-btns">
+      ${navigator.share ? `<button class="btn" type="button" id="doShare">${t('shareBtn')}</button>` : ''}
+      <a class="btn secondary" id="download" href="${png}" download="${esc(t('gameTitle'))}.png">${t('shareDownload')}</a>
+      <button class="btn secondary" type="button" id="copy">${t('shareCopy')}</button>
+    </div>
+    <p class="share-note" id="shareNote" aria-live="polite"></p>
+    <div class="btn-row"><button class="btn secondary" type="button" id="go">${t('shareBack')}</button></div>
+  `, 'share-card', { page: true });
+  const note = card.querySelector('#shareNote');
+  card.querySelector('#doShare')?.addEventListener('click', async () => {
+    try {
+      const blob = await new Promise((r) => cv.toBlob(r, 'image/png'));
+      const file = new File([blob], `${t('gameTitle')}.png`, { type: 'image/png' });
+      if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], text, url: shareUrl() });
+      else await navigator.share({ title: t('gameTitle'), text, url: shareUrl() });
+    } catch { /* 使用者取消分享，或瀏覽器不允許 */ }
+  });
+  card.querySelector('#copy').onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(`${text} ${shareUrl()}`);
+      note.textContent = t('shareCopied');
+    } catch {
+      note.textContent = `${text} ${shareUrl()}`;
+    }
+  };
+  card.querySelector('#go').onclick = stepClosing;
+}
+
 function stepClosing() {
   setHudVisible(false);
   const card = showPanel(`
@@ -711,6 +864,7 @@ function stepClosing() {
       ${HELP_LINES.map((h) => `<p><b>${esc(tr(h.name))}　${esc(h.number)}</b><br><span>${esc(tr(h.note))}</span></p>`).join('')}
     </div>
     <p>${t('bystanderTip')}</p>
+    ${state.story ? `<button class="btn share-btn" type="button" id="share">${t('shareOpen')}</button>` : ''}
     <div class="btn-row">
       ${state.thinkFirst ? `<button class="btn" type="button" id="rethink">${t('againBtn')}</button>` : ''}
       ${state.story ? `<button class="btn secondary" type="button" id="again">${t('playAgain')}</button>` : ''}
@@ -722,6 +876,7 @@ function stepClosing() {
     insertAfterCurrent([{ k: 'think', again: true }, { k: 'closing' }]);
     next();
   });
+  card.querySelector('#share')?.addEventListener('click', stepShare);
   card.querySelector('#again')?.addEventListener('click', () => startStory(state.story.id));
   card.querySelector('#home').onclick = goHome;
 }
@@ -827,6 +982,7 @@ function resetProgress() {
   state.dayStep = null;
   state.diary = [];
   state.thinkFirst = null;
+  state.thinkAgain = null;
   state.history = [];
   state.back = null;
 }

@@ -747,6 +747,24 @@ button { cursor: pointer; }
   background: linear-gradient(transparent 60%, rgba(255, 226, 122, 0.8) 60%, rgba(255, 226, 122, 0.8) 92%, transparent 92%);
 }
 
+/* 分享給朋友 */
+.share-btn { width: 100%; margin: 1cqw 0 2cqw; }
+
+.share-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 2cqw 0;
+  border: 0.8cqw solid #ffffff;
+  box-shadow: 0.6cqw 1.2cqw 2.4cqw rgba(58, 49, 64, 0.25);
+  user-select: auto;
+  -webkit-touch-callout: default;
+}
+
+.share-btns { display: flex; flex-wrap: wrap; gap: 2.4cqw; margin-top: 2cqw; }
+.share-btns .btn { text-decoration: none; }
+.share-note { margin-top: 2cqw; font-size: 4cqw; color: var(--good); word-break: break-all; }
+
 /* 暫停選單 */
 .pause-card { text-align: center; }
 
