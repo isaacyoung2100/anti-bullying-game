@@ -28,6 +28,8 @@ body {
 .stage { height: 100%; max-width: calc((100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) * 9 / 16); }
 .hud { padding-top: 2.4cqw; }
 .panel { padding-top: 15cqw; }
+/* Artifacts 不允許頁面下載檔案：分享圖改用長按存圖或複製連結 */
+#download { display: none; }
 """
 
 
