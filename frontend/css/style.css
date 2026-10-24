@@ -433,7 +433,7 @@ button { cursor: pointer; }
 }
 
 /* 卡片頂端的紙膠帶（卡片內容會捲動，所以畫在卡片裡面的最上方） */
-.panel:not(.page) > .card::before {
+.panel:not(.full) > .card::before {
   content: "";
   display: block;
   width: 20cqw;
@@ -444,7 +444,7 @@ button { cursor: pointer; }
 }
 
 /* 整頁模式：長內容佔滿畫面，像翻到日記本的新一頁，往下滑 */
-.panel.page {
+.panel.full {
   z-index: 5;
   align-items: flex-start;
   padding: calc(8cqw + env(safe-area-inset-top)) 6cqw 0 11cqw;
@@ -456,7 +456,7 @@ button { cursor: pointer; }
   backdrop-filter: none;
 }
 
-.panel.page .card {
+.panel.full .card {
   max-height: none;
   overflow: visible;
   padding: 0;
@@ -474,7 +474,7 @@ button { cursor: pointer; }
   background: linear-gradient(transparent, var(--card) 35%);
 }
 
-.panel.page .card > .btn-row:last-child {
+.panel.full .card > .btn-row:last-child {
   padding-bottom: calc(6cqw + env(safe-area-inset-bottom));
   background: linear-gradient(transparent, var(--paper) 35%);
 }
@@ -1089,7 +1089,7 @@ button:focus-visible {
   /* 右頁沒有上方的能量條 */
   .dialog { margin-top: 0; padding-top: 6cqw; }
   .panel { padding: 6cqw 5cqw; }
-  .panel.page { padding: 6cqw 6cqw 0 11cqw; }
+  .panel.full { padding: 6cqw 6cqw 0 11cqw; }
 
   /* 暫停：選單在右頁；用陰影把左頁也一起蓋暗（陰影不會被捲動區域裁掉） */
   .pause-layer {

@@ -336,7 +336,7 @@ function clearDialog() {
 function showPanel(html, cls = '', { page = false } = {}) {
   clearDialog();
   const panel = $('panel');
-  panel.classList.toggle('page', page);
+  panel.classList.toggle('full', page);
   panel.innerHTML = `<div class="card paper-card ${cls}">${html}</div>`;
   panel.hidden = false;
   panel.scrollTop = 0;
