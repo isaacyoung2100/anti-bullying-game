@@ -307,3 +307,17 @@ test('背景一瞥的小回應：每則三個，剛好一個「沒做」，每�
     }
   }
 });
+
+test('對照頁的第二件：揭曉另一則一瞥，上面那張和那天的一瞥一模一樣', () => {
+  for (const { st } of ALL) {
+    const c = st.contrast2;
+    assert.ok(c && c.seen && c.truth && c.lead, `${st.id} 缺對照頁的第二件`);
+    const list = glimpsesByDay(st);
+    const g = list.find((x) => x.day === c.day);
+    assert.ok(g, `${st.id} 的${c.day}沒有一瞥`);
+    assert.equal(g.glimpse, c.who, `${st.id} 第二件的人和${c.day}的一瞥不同`);
+    assert.equal(g.text, c.seen, `${st.id} 第二件上面那張要和${c.day}的一瞥一模一樣`);
+    // 兩件剛好就是這個角色的兩則一瞥
+    assert.deepEqual(new Set([st.contrast.seen, c.seen]), new Set(list.map((x) => x.text)), `${st.id} 的對照頁沒有揭曉全部的一瞥`);
+  }
+});

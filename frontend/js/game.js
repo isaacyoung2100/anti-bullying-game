@@ -856,16 +856,19 @@ function stepZhihao() {
 
 // 同一天，在別人眼中：上面是這個禮拜自己看到的一瞥，下面是對方那天真正經歷的事
 // 進班時每組玩不同角色，六個角色的對照頁串成一圈，剛好可以互相對照
+// 這個禮拜注意到的兩件事都揭曉（照日期排）；contrast 是串成一圈的那一件，contrast2 是另一件
+const WEEK = ['週一', '週二', '週三', '週四', '週五', '週六'];
 function stepContrast() {
-  const c = state.story.contrast;
-  const name = nameOf(c.who);
-  state.view.chars = [{ id: state.story.id, x: 60, emo: 'neutral' }, { id: c.who, x: 132, emo: 'neutral' }];
+  const ring = state.story.contrast;
+  const pairs = [ring, state.story.contrast2].filter(Boolean)
+    .sort((a, b) => WEEK.indexOf(a.day) - WEEK.indexOf(b.day));
+  state.view.chars = [{ id: state.story.id, x: 60, emo: 'neutral' }, { id: ring.who, x: 132, emo: 'neutral' }];
   state.view.speaker = null;
-  const card = showPanel(`
-    <div class="kicker">${t('contrastKicker')}</div>
-    <h2>${t('contrastTitle')}</h2>
+  const pair = (c) => {
+    const name = nameOf(c.who);
+    return `
     <div class="cmp cmp-seen">
-      <canvas class="cmp-face" width="96" height="96" aria-hidden="true"></canvas>
+      <canvas class="cmp-face" width="96" height="96" data-who="${c.who}" aria-hidden="true"></canvas>
       <div>
         <b>${esc(t('contrastSeen', name, tr(c.day)))}</b>
         <p>${esc(tr(c.seen))}</p>
@@ -875,11 +878,17 @@ function stepContrast() {
       <b>${esc(t('contrastTruth', name))}</b>
       <p>${esc(tr(c.truth))}</p>
     </div>
-    <p class="cmp-lead">${esc(tr(c.lead))}</p>
-    <p class="cmp-try">${esc(t('contrastTry', name))}</p>
+    <p class="cmp-lead">${esc(tr(c.lead))}</p>`;
+  };
+  const names = pairs.map((c) => nameOf(c.who));
+  const card = showPanel(`
+    <div class="kicker">${t('contrastKicker')}</div>
+    <h2>${t('contrastTitle')}</h2>
+    ${pairs.map(pair).join('<hr class="cmp-sep">')}
+    <p class="cmp-try">${esc(t('contrastTry', names))}</p>
     <div class="btn-row"><button class="btn" type="button" id="go">${t('cont')}</button></div>
   `, 'contrast-card');
-  drawPortrait(card.querySelector('canvas'), c.who, 'neutral');
+  card.querySelectorAll('.cmp-face').forEach((cv) => drawPortrait(cv, cv.dataset.who, 'neutral'));
   card.querySelector('#go').onclick = next;
 }
 

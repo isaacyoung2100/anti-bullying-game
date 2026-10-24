@@ -755,6 +755,7 @@ button { cursor: pointer; }
 }
 .cmp-truth b { color: #b0582e; }
 .cmp-lead { font-weight: 700; }
+.cmp-sep { margin: calc(4 * var(--u)) 0; border: 0; border-top: 1px dashed #c9bfa8; }
 .cmp-try { font-size: max(12px, calc(3.8 * var(--u))); color: var(--ink-soft); }
 
 /* 一週回顧：心裡的天氣（天氣貼紙） */

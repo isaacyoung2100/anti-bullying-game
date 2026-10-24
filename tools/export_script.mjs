@@ -102,13 +102,16 @@ for (const st of STORIES) {
   doc.push(...steps(st.story, st.id));
   doc.push(...steps(st.ending, st.id));
   if (st.contrast) {
-    const c = st.contrast;
-    const name = CHARACTERS[c.who]?.name || c.who;
-    doc.push('', '### 結尾的對照頁：同一天，在別人眼中', '',
-      `- **你看見的${name}（${c.day}）**：${c.seen}`,
-      `- **同一天，在${name}身上的事**：${c.truth}`,
-      `- **引導語**：${c.lead}`,
-      `- 小字：想知道${name}的這一個禮拜嗎？下次可以選${name}玩玩看。`);
+    doc.push('', '### 結尾的對照頁：同一天，在別人眼中（這個禮拜注意到的兩件事，照日期排）', '');
+    const week = ['週一', '週二', '週三', '週四', '週五', '週六'];
+    const pairs = [st.contrast, st.contrast2].filter(Boolean).sort((a, b) => week.indexOf(a.day) - week.indexOf(b.day));
+    for (const c of pairs) {
+      const name = CHARACTERS[c.who]?.name || c.who;
+      doc.push(`- **你看見的${name}（${c.day}）**：${c.seen}${c === st.contrast ? '　（串成一圈的那一件）' : ''}`,
+        `  - **同一天，在${name}身上的事**：${c.truth}`,
+        `  - **引導語**：${c.lead}`);
+    }
+    doc.push(`- 小字：想知道${pairs.map((c) => CHARACTERS[c.who]?.name).join('、')}的這一個禮拜嗎？下次可以選他們玩玩看。`);
   }
   doc.push('');
 }
