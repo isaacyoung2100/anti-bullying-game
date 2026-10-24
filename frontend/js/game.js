@@ -323,6 +323,7 @@ function goForward() {
 }
 
 function stepTitle() {
+  $('sceneCaption').textContent = '';
   state.view.bg = 'title';
   state.view.chars = [
     { id: 'xiaoyu', x: 40, emo: 'neutral' },
@@ -393,6 +394,7 @@ function stepDay(step) {
   }
   state.day = step.day;
   state.dayStep = step;
+  $('sceneCaption').textContent = t('dayTitle', tr(step.day), tr(step.title));
   state.view.bg = step.bg;
   state.view.chars = [];
   state.view.speaker = null;

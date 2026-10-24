@@ -12,6 +12,8 @@
 </head>
 <body>
   <main class="stage" id="stage">
+    <!-- 手機和直拿的平板：兩頁疊成一欄；橫拿的平板和電腦：攤開成左右兩頁 -->
+    <div class="page page-left">
     <header class="hud off" id="hud">
       <div class="courage">
         <span class="courage-label">心靈能量</span>
@@ -25,8 +27,11 @@
     <div class="scene">
       <canvas id="screen" width="1536" height="864" role="img" aria-label="遊戲畫面"></canvas>
     </div>
+    <p class="scene-caption" id="sceneCaption" aria-hidden="true"></p>
+    </div>
 
     <p class="sr-only" id="srLine" aria-live="polite"></p>
+    <div class="page page-right">
     <section class="dialog idle" id="dialog">
       <div class="dialog-head">
         <canvas class="portrait" id="portrait" width="96" height="96" aria-hidden="true"></canvas>
@@ -39,6 +44,7 @@
     </section>
 
     <div class="panel" id="panel" hidden></div>
+    </div>
     <div class="panel pause-layer" id="pause" hidden></div>
   </main>
 

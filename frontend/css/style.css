@@ -956,3 +956,71 @@ button:focus-visible {
   outline: 0.8cqw solid var(--blue-pen);
   outline-offset: 0.6cqw;
 }
+
+/* ---------- 平板橫拿、電腦：攤開的日記本（左頁場景、右頁對話） ---------- */
+
+/* 手機和直拿的平板：兩頁疊成一欄，和原本一樣 */
+.page { display: contents; }
+.scene-caption { display: none; }
+
+@media (min-width: 900px) and (min-aspect-ratio: 5/4) {
+  .stage {
+    flex-direction: row;
+    width: min(100%, calc(100dvh * 1.5), 1400px);
+    max-width: none;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  /* 每一頁自己當作量尺：字的大小跟著一頁的寬度，不會因為螢幕變寬而變很大 */
+  .page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
+    container-type: inline-size;
+    background:
+      linear-gradient(90deg, transparent 7cqw, var(--margin) 7cqw, var(--margin) 7.3cqw, transparent 7.3cqw),
+      var(--paper);
+  }
+
+  /* 中間的書溝 */
+  .page-left { border-radius: 1.2cqw 0 0 1.2cqw; box-shadow: inset -2.4cqw 0 3cqw -2.4cqw rgba(58, 49, 64, 0.3), -1cqw 0 4cqw rgba(0, 0, 0, 0.4); }
+  .page-right { border-radius: 0 1.2cqw 1.2cqw 0; box-shadow: inset 2.4cqw 0 3cqw -2.4cqw rgba(58, 49, 64, 0.3), 1cqw 0 4cqw rgba(0, 0, 0, 0.4); }
+
+  /* 裝訂孔移到中間 */
+  .stage::before {
+    left: 50%;
+    width: 28px;
+    transform: translateX(-50%);
+    background: radial-gradient(circle at 50% 50%, var(--desk) 0 9px, transparent 10px) 0 40px / 28px 90px repeat-y;
+    z-index: 6;
+  }
+
+  /* 左頁：照片放在頁面中間，下面手寫今天的標題 */
+  .page-left .scene { margin-top: auto; }
+  .scene-caption {
+    display: block;
+    margin: 5cqw 4cqw auto 10cqw;
+    font-size: 5.4cqw;
+    font-weight: 700;
+    text-align: center;
+    color: var(--ink-soft);
+    transform: rotate(-1.5deg);
+  }
+
+  /* 右頁沒有上方的能量條 */
+  .dialog { margin-top: 0; padding-top: 6cqw; }
+  .panel { padding: 6cqw 5cqw; }
+  .panel.page { padding: 6cqw 6cqw 0 11cqw; }
+
+  /* 暫停：選單在右頁；用陰影把左頁也一起蓋暗（陰影不會被捲動區域裁掉） */
+  .pause-layer {
+    left: 50%;
+    container-type: inline-size;
+    padding: 6cqw 8cqw;
+    box-shadow: -50cqw 0 0 0 rgba(43, 36, 32, 0.55);
+  }
+}
