@@ -227,6 +227,81 @@ button { cursor: pointer; }
   object-fit: cover;
 }
 
+/* 手機畫面：群組和私訊，放在照片右邊 */
+.phone {
+  position: absolute;
+  right: 2.5%;
+  bottom: 4%;
+  width: 46%;
+  height: 92%;
+  padding: 1.4cqw;
+  background: #2b2420;
+  border-radius: 3.4cqw;
+  box-shadow: 0.6cqw 1.2cqw 2cqw rgba(0, 0, 0, 0.35);
+  transform: rotate(2.5deg);
+  z-index: 1;
+}
+
+.phone.rise { animation: phone-rise 0.35s ease-out; }
+@keyframes phone-rise { from { transform: translateY(30%) rotate(2.5deg); opacity: 0; } }
+
+.phone .screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: #eef1f5;
+  border-radius: 2.4cqw;
+  font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans TC', sans-serif;
+}
+
+.phone .screen.off { background: #111; }
+
+.phone .bar {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2cqw;
+  padding: 1.4cqw 2cqw;
+  color: #ffffff;
+  background: #5b6b8c;
+  font-size: 3cqw;
+}
+
+.phone .bar small { opacity: 0.75; font-size: 2.4cqw; }
+
+.phone .chat {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1.2cqw;
+  padding: 1.4cqw;
+  font-size: 2.6cqw;
+  line-height: 1.35;
+}
+
+.phone .msg { display: flex; align-items: flex-end; gap: 0.8cqw; }
+.phone .msg.me { justify-content: flex-end; }
+.phone .avatar { flex: none; width: 3.6cqw; height: 3.6cqw; border-radius: 50%; background: #c7ccd8; align-self: flex-start; }
+.phone .col { display: flex; flex-direction: column; gap: 0.3cqw; min-width: 0; }
+.phone .from { font-size: 2.1cqw; color: #6f7480; }
+.phone .bubble { padding: 0.8cqw 1.4cqw; background: #ffffff; border-radius: 1.6cqw; word-break: break-word; }
+.phone .me .bubble { background: #ffe27a; }
+.phone .sticker { font-size: 6cqw; line-height: 1; }
+.phone .meta { flex: none; font-size: 1.9cqw; color: #8a8f99; }
+.phone .photo { position: relative; display: block; width: 18cqw; height: 14cqw; background: #c8cfd8; border-radius: 1.2cqw; overflow: hidden; }
+.phone .photo-pic { position: absolute; inset: 0; display: grid; place-items: center; font-size: 9cqw; }
+.phone .photo-cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 0.4cqw; font-size: 2.2cqw; font-weight: 700; text-align: center; color: #fff; background: rgba(208, 70, 60, 0.85); }
+.phone .sys, .phone .toast { margin: 0; align-self: center; padding: 0.4cqw 1.4cqw; font-size: 2.1cqw; color: #ffffff; background: rgba(60, 64, 76, 0.55); border-radius: 2cqw; }
+.phone .toast { background: rgba(90, 168, 79, 0.85); }
+.phone .new { animation: msg-pop 0.35s ease-out; }
+@keyframes msg-pop { from { transform: translateY(1.6cqw); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .phone.rise, .phone .new { animation: none; }
+}
+
 /* ---------- 對話：直接寫在本子的橫線上 ---------- */
 
 /* 對話區只畫橫線、底色透明：紅色邊線和裝訂孔來自同一張紙；橫線跟著文字捲動，文字才會剛好寫在線上 */

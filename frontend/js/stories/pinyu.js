@@ -5,6 +5,14 @@
 // 家人是常加班的爸媽和讀國二的姊姊（雙薪家庭）
 // 週一走廊這一幕也出現在阿明的故事裡
 
+// 週二晚上的小群組（手機畫面）：問了問題，已讀 4，然後被移出群組
+const ASK = { me: true, text: '大隊接力要綁什麼顏色的髮圈？' };
+const SPARKLE = (...more) => ({ title: '閃亮五人組', sub: '5 人', msgs: [
+  { from: '欣儀', text: '明天見～' },
+  { from: '佳佳', sticker: '💖' },
+  ...more,
+] });
+
 const STORY = [
   // ---------------- 週一 ----------------
   { k: 'day', day: '週一', title: '開口之後', bg: 'classroom',
@@ -58,30 +66,31 @@ const STORY = [
       { text: '把踢人的畫面截圖給老師看', result: '隔天，輔導老師找了相關的同學聊一聊。' },
       { text: '隔天早上在校門口等她一起進教室', result: '看到你在等她，她的腳步變輕快了。' },
     ] },
-  { bg: 'home', chars: [{ id: 'pinyu', x: 96, emo: 'neutral' }],
-    speaker: 'narrator', text: '晚上八點。平常響個不停的「閃亮五人組」群組，突然好安靜。' },
-  { speaker: 'narrator', text: '你在群組問：「大隊接力要綁什麼顏色的髮圈？」' },
-  { speaker: 'narrator', emo: 'sad', text: '「已讀 4」。過了十分鐘，沒有人回。然後跳出一行字：' },
-  { speaker: 'narrator', emo: 'cry', anim: 'shake', text: '「欣儀 已將 品妤 移出群組。」',
+  { bg: 'home', chars: [{ id: 'pinyu', x: 48, emo: 'neutral' }],
+    phone: SPARKLE(), speaker: 'narrator', text: '晚上八點。平常響個不停的「閃亮五人組」群組，突然好安靜。' },
+  { speaker: 'narrator', phone: SPARKLE(ASK), text: '你在群組問：「大隊接力要綁什麼顏色的髮圈？」' },
+  { speaker: 'narrator', emo: 'sad', phone: SPARKLE({ ...ASK, seen: 4 }), text: '「已讀 4」。過了十分鐘，沒有人回。然後跳出一行字：' },
+  { speaker: 'narrator', emo: 'cry', anim: 'shake', phone: SPARKLE({ ...ASK, seen: 4 }, { system: '欣儀 已將 品妤 移出群組' }), text: '「欣儀 已將 品妤 移出群組。」',
     effect: { courage: -15, witness: 4 } },
   { speaker: 'narrator', emo: 'sad', text: '房間裡，只剩下時鐘的滴答聲。你的手心好冰。' },
   { k: 'choice', prompt: '你會怎麼做？', options: [
     { text: '私訊佳佳：「為什麼要把我踢掉？」',
       effect: { courage: -5 },
-      then: [{ speaker: 'narrator', emo: 'sad', text: '訊息顯示已讀，可是佳佳一整晚都沒有回。', inner: '連佳佳都不敢替我說話。' }] },
+      then: [{ speaker: 'narrator', emo: 'sad', phone: { title: '佳佳', msgs: [{ me: true, text: '為什麼要把我踢掉？', seen: true }] }, text: '訊息顯示已讀，可是佳佳一整晚都沒有回。', inner: '連佳佳都不敢替我說話。' }] },
     { text: '把手機關機，用棉被蒙住頭。',
       effect: { courage: -5 },
-      then: [{ speaker: 'narrator', emo: 'cry', text: '你把手機丟在桌上，縮進被子裡。', inner: '我只是說了一句對的話。為什麼這麼難受？' }] },
+      then: [{ speaker: 'narrator', emo: 'cry', phone: { off: true }, text: '你把手機丟在桌上，縮進被子裡。', inner: '我只是說了一句對的話。為什麼這麼難受？' }] },
     { text: '把被移出群組的畫面截圖存起來。', need: 40,
       fear: '截圖存起來，會不會顯得我很愛計較？',
       effect: { courage: 5 },
       then: [
-        { speaker: 'narrator', text: '你按下截圖，把時間和畫面都存了下來。' },
+        { speaker: 'narrator', phone: SPARKLE({ ...ASK, seen: 4 }, { system: '欣儀 已將 品妤 移出群組' }, { toast: '截圖已儲存' }), text: '你按下截圖，把時間和畫面都存了下來。' },
         { speaker: 'narrator', text: '（被排擠時把畫面存下來，之後找大人幫忙會比較清楚。）',
           inner: '排擠人是她們的問題，不是我變差了。' },
       ] },
   ] },
-  { bg: 'home', chars: [{ id: 'pinyu', x: 96, emo: 'surprised' }],
+  { bg: 'home', chars: [{ id: 'pinyu', x: 48, emo: 'surprised' }],
+    phone: { title: '五年三班', sub: '32 人', msgs: [{ from: '冠宇', text: '品妤，明天小考的重點，可以借我對一下筆記嗎？' }] },
     speaker: 'narrator', text: '手機震了一下。是冠宇在班級大群組問你：\n「品妤，明天小考的重點，可以借我對一下筆記嗎？」',
     effect: { courage: 5, kind: 1 } },
   { speaker: 'narrator', emo: 'happy', text: '只是一句普通的話。可是你覺得暖暖的。' },

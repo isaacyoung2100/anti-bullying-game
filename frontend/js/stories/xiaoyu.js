@@ -8,6 +8,15 @@ const WITH_ZHIHAO = (you = 'neutral', zh = 'neutral') => [
   { id: 'zhihao', x: 140, emo: zh },
 ];
 
+// 週二晚上的班級群組（手機畫面）：照片先跳出來，接著是一堆大笑貼圖
+const CLASS_GROUP = { title: '五年三班', sub: '32 人', msgs: [
+  { from: '某位同學', photo: true, text: '復古風女王', seen: 24 },
+  { from: '同學 A', sticker: '😂' },
+  { from: '同學 B', sticker: '🤣' },
+  { from: '同學 C', sticker: '😂' },
+] };
+const withMsg = (chat, ...more) => ({ ...chat, msgs: [...chat.msgs, ...more] });
+
 const STORY = [
   // ---------------- 週一 ----------------
   { k: 'day', day: '週一', title: '班服', bg: 'classroom',
@@ -54,30 +63,30 @@ const STORY = [
       { text: '把群組截圖給爸媽或老師看', result: '隔天，老師說：「謝謝你，這件事老師會處理。」' },
       { text: '不按讚、不傳貼圖', result: '那天晚上，已讀的人裡面，有一個沒有笑。' },
     ] },
-  { bg: 'home', chars: [{ id: 'xiaoyu', x: 96, emo: 'neutral' }],
+  { bg: 'home', chars: [{ id: 'xiaoyu', x: 48, emo: 'neutral' }],
     speaker: 'narrator', text: '晚上九點。媽媽還在上班，弟弟已經睡了。你一個人在餐桌寫功課。' },
-  { speaker: 'narrator', emo: 'surprised', text: '手機震了一下。是班級群組。\n有人傳了一張照片：你那件起毛球的外套，旁邊加了一行字——「復古風女王」。' },
-  { speaker: 'narrator', emo: 'cry', text: '底下有好幾個「哈哈哈」的貼圖。\n照片旁邊寫著：已讀 24。',
+  { speaker: 'narrator', emo: 'surprised', phone: { ...CLASS_GROUP, upto: 1 }, text: '手機震了一下。是班級群組。\n有人傳了一張照片：你那件起毛球的外套，旁邊加了一行字——「復古風女王」。' },
+  { speaker: 'narrator', emo: 'cry', phone: CLASS_GROUP, text: '底下有好幾個「哈哈哈」的貼圖。\n照片旁邊寫著：已讀 24。',
     effect: { courage: -15, witness: 24 } },
   { speaker: 'narrator', text: '24 個人看到了。群組裡，沒有一個人說「不要這樣」。',
     inner: '佳佳也看到了吧。' },
   { k: 'choice', prompt: '你會怎麼做？', options: [
     { text: '傳一個「哈哈」貼圖，假裝不在意。',
       effect: { courage: -10 },
-      then: [{ speaker: 'narrator', emo: 'happy', text: '你傳了一個大笑的貼圖。', inner: '我在笑。為什麼我在笑？' }] },
+      then: [{ speaker: 'narrator', emo: 'happy', phone: withMsg(CLASS_GROUP, { me: true, sticker: '😂' }), text: '你傳了一個大笑的貼圖。', inner: '我在笑。為什麼我在笑？' }] },
     { text: '把手機蓋起來，退出群組。',
       effect: { courage: -5 },
-      then: [{ speaker: 'narrator', emo: 'sad', text: '你退出了群組。房間突然變得好安靜。', inner: '明天他們會不會說我玻璃心？' }] },
+      then: [{ speaker: 'narrator', emo: 'sad', phone: withMsg(CLASS_GROUP, { system: '你已退出群組' }), text: '你退出了群組。房間突然變得好安靜。', inner: '明天他們會不會說我玻璃心？' }] },
     { text: '把照片截圖下來，等媽媽回家給她看。', need: 40, flag: 'savedProof',
       fear: '截圖了又怎樣？大人會不會說只是開玩笑？',
       effect: { courage: 5 },
       then: [
-        { speaker: 'narrator', emo: 'neutral', text: '你把照片、是誰傳的、傳的時間，都截圖存了下來。' },
+        { speaker: 'narrator', emo: 'neutral', phone: withMsg(CLASS_GROUP, { toast: '截圖已儲存' }), text: '你把照片、是誰傳的、傳的時間，都截圖存了下來。' },
         { speaker: 'narrator', text: '（遇到網路上的欺負，把畫面完整截圖保存，是保護自己的證據。）',
           inner: '我要讓大人知道。' },
       ] },
   ] },
-  { speaker: 'narrator', emo: 'surprised', text: '過了一會兒，你收到一則私訊。是同班的冠宇：\n「那張照片很過分，我沒有笑。」',
+  { speaker: 'narrator', emo: 'surprised', phone: { title: '冠宇', msgs: [{ from: '冠宇', text: '那張照片很過分，我沒有笑。' }] }, text: '過了一會兒，你收到一則私訊。是同班的冠宇：\n「那張照片很過分，我沒有笑。」',
     effect: { courage: 5, kind: 1 } },
   { speaker: 'narrator', text: '只有一句話。可是你看了好多次。' },
 

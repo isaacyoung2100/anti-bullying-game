@@ -29,7 +29,7 @@ const state = {
   history: [],        // 看過的台詞（和當時的畫面），給「上一句」重看
   back: null,         // 正在重看：{ index, from: 'line' | 'panel' }
   anim: null,         // 場景動作：{ type: 'run' | 'shake' | 'jump' | 'cheer', who, t0 }
-  view: { bg: 'title', chars: [], speaker: null },
+  view: { bg: 'title', chars: [], speaker: null, phone: null },
   typing: null,
   paused: false,
 };
@@ -188,6 +188,52 @@ function nameOf(id) {
   return tr((CHARACTERS[id] || CHARACTERS.narrator).name);
 }
 
+// ---------- 手機畫面（群組、私訊） ----------
+// 台詞可以帶 phone：{ title, sub, msgs, upto, off }，畫面右邊出現一支手機
+// msgs 的每一則：{ from, text }、{ from, sticker }、{ from, photo: true, text }（照片和照片上的字）、
+// { me: true, text | sticker, seen }、{ system }（群組的系統訊息）、{ toast }（例如截圖已儲存）
+// upto：這一句只顯示到第幾則，讓訊息跟著劇情一則一則跳出來
+
+function renderPhone() {
+  const el = $('phone');
+  const p = state.view.phone;
+  if (!p) {
+    el.hidden = true;
+    el.innerHTML = '';
+    el.dataset.title = '';
+    return;
+  }
+  const msgs = p.off ? [] : p.msgs.slice(0, p.upto ?? p.msgs.length);
+  // 同一個聊天室，新多出來的訊息才有跳出來的動畫
+  const same = el.dataset.title === (p.title || '') && !el.hidden;
+  const shown = same ? Number(el.dataset.count || 0) : 0;
+  const seen = (m) => (m.seen ? `<span class="meta">${m.seen === true ? t('seenDm') : t('seen', m.seen)}</span>` : '');
+  const body = (m) => {
+    if (m.sticker) return `<span class="sticker" aria-hidden="true">${m.sticker}</span>`;
+    if (m.photo) return `<span class="photo"><span class="photo-pic" aria-hidden="true">🧥</span><span class="photo-cap">${esc(tr(m.text))}</span></span>`;
+    return `<span class="bubble">${esc(tr(m.text))}</span>`;
+  };
+  const html = msgs.map((m, i) => {
+    const cls = i >= shown ? ' new' : '';
+    if (m.system) return `<p class="sys${cls}">${esc(tr(m.system))}</p>`;
+    if (m.toast) return `<p class="toast${cls}">${esc(tr(m.toast))}</p>`;
+    if (m.me) return `<div class="msg me${cls}">${seen(m)}${body(m)}</div>`;
+    return `<div class="msg${cls}"><span class="avatar" aria-hidden="true"></span><span class="col"><span class="from">${esc(tr(m.from))}</span>${body(m)}</span>${seen(m)}</div>`;
+  }).join('');
+  el.innerHTML = p.off
+    ? '<div class="screen off"></div>'
+    : `<div class="screen">
+        <div class="bar"><span aria-hidden="true">‹</span><b>${esc(tr(p.title))}</b>${p.sub ? `<small>${esc(tr(p.sub))}</small>` : ''}</div>
+        <div class="chat">${html}</div>
+      </div>`;
+  el.classList.toggle('rise', !same);
+  el.hidden = false;
+  el.dataset.title = p.title || '';
+  el.dataset.count = String(msgs.length);
+  const chat = el.querySelector('.chat');
+  if (chat) chat.scrollTop = chat.scrollHeight;
+}
+
 function showLine(step) {
   const { speaker } = step;
   const text = tr(step.text);
@@ -207,6 +253,7 @@ function showLine(step) {
   $('srLine').textContent = [nameOf(speaker), text, inner ? `${t('innerPrefix')}${inner}` : '']
     .filter(Boolean).join(' ');
   describeScene();
+  renderPhone();
   const canBack = state.back ? state.back.index > 0 : state.history.length > 1;
   $('btnBack').hidden = !canBack;
   $('dialog').classList.toggle('past', !!state.back);
@@ -326,6 +373,8 @@ function stepLine(step) {
       });
     }
   }
+  if (step.bg) state.view.phone = null;
+  if ('phone' in step) state.view.phone = step.phone;
   // 劇情裡加上的裝扮，例如戴上耳罩
   if (step.wear) {
     for (const [id, items] of Object.entries(step.wear)) {
@@ -354,7 +403,7 @@ function stepLine(step) {
     applyEffect(step.effect);
     step.applied = true;
   }
-  state.history.push({ step, bg: state.view.bg, chars: state.view.chars.map(({ enter, ...c }) => ({ ...c })) });
+  state.history.push({ step, bg: state.view.bg, phone: state.view.phone, chars: state.view.chars.map(({ enter, ...c }) => ({ ...c })) });
   showLine(step);
 }
 
@@ -364,6 +413,7 @@ function stepLine(step) {
 function showPast() {
   const e = state.history[state.back.index];
   state.view.bg = e.bg;
+  state.view.phone = e.phone;
   state.view.chars = e.chars.map((c) => ({ ...c }));
   showLine(e.step);
   finishTyping();
@@ -396,6 +446,7 @@ function goForward() {
     state.back = null;
     const e = state.history[last];
     state.view.bg = e.bg;
+    state.view.phone = e.phone;
     state.view.chars = e.chars.map((c) => ({ ...c }));
     showLine(e.step);
     finishTyping();
@@ -410,6 +461,8 @@ function goForward() {
 }
 
 function stepTitle() {
+  state.view.phone = null;
+  renderPhone();
   $('sceneCaption').textContent = '';
   state.view.bg = 'title';
   state.view.chars = [
@@ -481,6 +534,8 @@ function stepDay(step) {
   }
   state.day = step.day;
   state.dayStep = step;
+  state.view.phone = null;
+  renderPhone();
   $('sceneCaption').textContent = t('dayTitle', tr(step.day), tr(step.title));
   state.view.bg = step.bg;
   state.view.chars = [];
@@ -648,6 +703,8 @@ function stepEnding() {
 }
 
 function stepZhihao() {
+  state.view.phone = null;
+  renderPhone();
   state.days.push({ day: state.day, courage: state.courage });
   state.view.bg = 'classroom';
   state.view.chars = [{ id: 'zhihao', x: 96, emo: 'sad' }];

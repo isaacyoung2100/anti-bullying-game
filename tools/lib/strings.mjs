@@ -10,6 +10,10 @@ export function storyStrings() {
       add(s.text); add(s.inner); add(s.prompt); add(s.day); add(s.title); add(s.recap);
       (s.help || []).forEach((h) => { add(h.text); add(h.result); });
       (s.diary || []).forEach(add);
+      if (s.phone) {
+        add(s.phone.title); add(s.phone.sub);
+        (s.phone.msgs || []).forEach((m) => { add(m.from); add(m.text); add(m.system); add(m.toast); });
+      }
       if (s.k === 'choice') s.options.forEach((o) => { add(o.text); add(o.fear); walk(o.then); });
       if (s.k === 'if') walk(s.then);
     }
