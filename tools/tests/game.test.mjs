@@ -245,8 +245,8 @@ test('最多連續兩天被欺負：連續兩天之後的那一天，整天都�
 });
 
 // 背景一瞥：用旁觀同學的眼睛看到另一個角色（多視角交織）
+// 每個角色一週只注意到兩次，不然會模糊主角自己的故事；
 // 只放在主線（不在選項或條件裡），每個玩家都會看到；不加減能量
-const DAYS = ['週一', '週二', '週三', '週四', '週五', '週六'];
 function glimpsesByDay(st) {
   const out = [];
   let day = '週一';
@@ -258,10 +258,12 @@ function glimpsesByDay(st) {
   return out;
 }
 
-test('背景一瞥：每個角色每天剛好一則，都在主線上，不影響能量', () => {
+test('背景一瞥：每個角色一週兩則，在不同天、看到不同的人，都在主線上，不影響能量', () => {
   for (const { st } of ALL) {
     const list = glimpsesByDay(st);
-    assert.deepEqual(list.map((g) => g.day), DAYS, `${st.id} 的背景一瞥：${list.map((g) => g.day).join('、')}`);
+    assert.equal(list.length, 2, `${st.id} 有 ${list.length} 則背景一瞥`);
+    assert.notEqual(list[0].day, list[1].day, `${st.id} 的兩則一瞥在同一天`);
+    assert.notEqual(list[0].glimpse, list[1].glimpse, `${st.id} 的兩則一瞥看到同一個人`);
     for (const g of list) {
       assert.ok(g.glimpse in CHARACTERS && g.glimpse !== st.id, `${st.id}：看到的人 ${g.glimpse} 不對`);
       assert.ok(!g.effect, `${st.id} ${g.day} 的背景一瞥不能加減能量`);
@@ -271,8 +273,6 @@ test('背景一瞥：每個角色每天剛好一則，都在主線上，不影�
       if (s.k === 'choice') s.options.forEach((o) => walkSteps(o.then, (x) => assert.ok(!x.glimpse, `${st.id}：一瞥放進了選項裡`)));
       if (s.k === 'if') walkSteps(s.then, (x) => assert.ok(!x.glimpse, `${st.id}：一瞥放進了條件裡`));
     }
-    // 看到的角色要分散：六天至少看到四個不同的人
-    assert.ok(new Set(list.map((g) => g.glimpse)).size >= 4, `${st.id} 的一瞥都在看同一兩個人`);
   }
 });
 

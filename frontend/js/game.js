@@ -641,7 +641,7 @@ function stepChoice(step) {
 }
 
 // 背景一瞥的小回應：主角自己也在難受，可是還是可以做一點小事（一個眼神、一句小聲的話）
-// 「什麼都沒做」也是正常的選項：不劃掉、不扣能量，回顧時只說「注意到幾次、做了幾次」
+// 「什麼都沒做」也是正常的選項：不劃掉、不扣能量，回顧時只說「注意到幾次、做了幾次」（每個角色一週兩次）
 function stepReact(step) {
   state.view.speaker = null;
   const card = showPanel(`

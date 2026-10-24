@@ -46,14 +46,6 @@ const STORY = [
         { speaker: 'narrator', emo: 'sad', text: '他聳聳肩走開了。', inner: '我說出來了。就算他沒有道歉，我也說出來了。' },
       ] },
   ] },
-  // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'pinyu', text: '下課時，你看見欣儀和佳佳手牽手走出教室，把品妤留在後面。',
-    inner: '她們吵架了嗎？',
-    react: [
-      { text: '對品妤揮揮手。', result: '品妤看了你一眼，也輕輕揮了一下手。' },
-      { text: '經過她旁邊時，扮一個好笑的鬼臉。', result: '品妤愣了一下，嘴角好像動了一點點。' },
-      { text: '抓抓頭，走回自己的座位。', result: '你剛剛才被大家笑，心裡還亂糟糟的。', none: true },
-    ] },
 
   // ---------------- 週二 ----------------
   { k: 'day', day: '週二', title: '起跑線', bg: 'track',
@@ -134,13 +126,6 @@ const STORY = [
         { speaker: 'guanyu', emo: 'happy', text: '哪有，比我好一百倍。', inner: '真的嗎？' },
       ] },
   ] },
-  // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'kai', text: '下午彩排進場舞，阿凱站在最前面帶大家跳，跳完大家都拍手了。',
-    react: [
-      { text: '跟大家一起用力拍手。', result: '掌聲好大，阿凱笑得有點不好意思。' },
-      { text: '大聲喊：「阿凱，帥喔！」', result: '阿凱轉頭看過來，笑得好開心。' },
-      { text: '跟著拍子，默默踏步。', result: '今天不用躲誰，你覺得踏步也很好玩。', none: true },
-    ] },
   { speaker: 'narrator', emo: 'happy', text: '今天，沒有人笑你。', inner: '如果每天都像今天就好了。' },
 
   // ---------------- 週四（白天在學校，晚上和家人）----------------
@@ -186,13 +171,6 @@ const STORY = [
     speaker: 'narrator', props: ['goldpen'], text: '下課前，隔壁組的冠宇偷偷把一支金色的筆推到你桌上。' },
   { speaker: 'guanyu', text: '（小聲）給你。我看過你畫的閃電，超帥的。',
     effect: { courage: 5, kind: 1 } },
-  // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'qing', text: '放學前，你看見小晴坐在位子上，很專心地翻著恐龍百科。',
-    react: [
-      { text: '經過她旁邊時，把腳步放輕。', result: '小晴沒有被吵到，又翻了一頁。' },
-      { text: '在她看得到的地方，比一個讚。', result: '小晴看了你的手一眼，又低頭看書。' },
-      { text: '抱著書包，快步走過去。', result: '你心裡還想著那張不能畫的海報。', none: true },
-    ] },
 
   // 晚上
   { bg: 'home', chars: [{ id: 'azhe', x: 64, emo: 'neutral' }, { id: 'mom', x: 128, emo: 'happy' }],
@@ -302,13 +280,6 @@ const ENDING = [
   ] },
   { speaker: 'narrator', emo: 'happy', text: '你把接力棒交到下一個人手上。沒有犯規。',
     inner: '我做到了。' },
-  // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'pinyu', text: '第六棒的品妤從阿凱手中接過棒子，一路往前衝。',
-    react: [
-      { text: '大聲喊：「品妤，衝啊！」', result: '你的聲音混在加油聲裡，品妤跑得好快。' },
-      { text: '跟著大家一起拍手。', result: '掌聲好大，你覺得自己也是隊伍的一份子。' },
-      { text: '坐下來喘氣，看著跑道。', result: '你剛跑完第一棒，腿還在抖，心裡卻好輕。', none: true },
-    ] },
   { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'happy' }],
     speaker: 'teacher', text: '阿哲，下禮拜一午休，要不要來找老師聊聊？可以帶你的畫冊來。',
     inner: '這個禮拜很難。可是我不是一個人。' },

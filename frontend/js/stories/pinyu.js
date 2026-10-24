@@ -73,14 +73,6 @@ const STORY = [
       { text: '把踢人的畫面截圖給老師看', result: '隔天，輔導老師找了相關的同學聊一聊。' },
       { text: '隔天早上在校門口等她一起進教室', result: '看到你在等她，她的腳步變輕快了。' },
     ] },
-  // 背景一瞥（不影響能量和分支）
-  { bg: 'track', chars: [{ id: 'pinyu', x: 52, emo: 'neutral' }],
-    speaker: 'narrator', glimpse: 'kai', text: '白天體育課，男生們猜拳分隊，你看見阿凱一個人站在旁邊。',
-    react: [
-      { text: '遠遠地對阿凱揮揮手。', result: '阿凱看到了，愣了一下。' },
-      { text: '跟旁邊的女生說：「阿凱跑得滿快的。」', result: '旁邊的女生點點頭，往阿凱那邊看了一眼。' },
-      { text: '抱著球，站在女生隊伍後面。', result: '昨天被丟下的事還在心裡，你沒力氣管別人。', none: true },
-    ] },
   { bg: 'home', chars: [{ id: 'pinyu', x: 48, emo: 'neutral' }],
     phone: SPARKLE(), speaker: 'narrator', text: '晚上八點。平常響個不停的「閃亮五人組」群組，突然好安靜。' },
   { speaker: 'narrator', phone: SPARKLE(ASK), text: '你在群組問：「大隊接力要綁什麼顏色的髮圈？」' },
@@ -148,13 +140,6 @@ const STORY = [
         { speaker: 'narrator', text: '小雨有點不好意思，把外套拉鍊拉下來一點點。' },
       ] },
   ] },
-  // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'azhe', text: '午休時，你看見冠宇趴在阿哲的桌邊，看他畫閃電。',
-    react: [
-      { text: '走過去看一眼，說：「這隻閃電好帥。」', result: '阿哲抬起頭，笑得好開心。' },
-      { text: '對阿哲比一個讚。', result: '阿哲看到了，有點不好意思。' },
-      { text: '趴在桌上午休。', result: '群組的那一晚讓你好累，你閉上眼睛。', none: true },
-    ] },
   { speaker: 'narrator', emo: 'happy', text: '今天，你不用想辦法躲開誰。', inner: '如果每天都像今天就好了。' },
 
   // ---------------- 週四（白天在學校，晚上和家人）----------------
@@ -258,13 +243,6 @@ const STORY = [
     { speaker: 'narrator', emo: 'happy', text: '你想起昨天晚上，姊姊遞給你的那瓶牛奶。',
       effect: { courage: 5 } },
   ] },
-  // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'qing', text: '第一節課前，你看見小晴從圖書角回來，把鉛筆排得整整齊齊。',
-    react: [
-      { text: '跟她說：「排得好整齊。」', result: '小晴說：「十二色，從深到淺。」' },
-      { text: '經過時，把她歪掉的椅子推正。', result: '小晴看了看椅子，點了一下頭。' },
-      { text: '回到座位，想著老師剛剛說的話。', result: '老師說這不是你的錯，你心裡輕了一點。', none: true },
-    ] },
   { time: 'dusk', bg: 'classroom', chars: [{ id: 'pinyu', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '放學打掃完，大家都在收書包。' },
   { time: 'dusk', bg: 'classroom', chars: [{ id: 'pinyu', x: 52, emo: 'surprised' }, { id: 'aming', x: 140, emo: 'happy' }],
@@ -302,13 +280,6 @@ const ENDING = [
     { bg: 'sportsday', chars: [{ id: 'pinyu', x: 52, emo: 'happy' }, { id: 'sister', x: 140, emo: 'happy' }],
       speaker: 'sister', anim: 'cheer', text: '品妤，衝啊！' },
   ] },
-  // 背景一瞥（不影響能量和分支）
-  { speaker: 'narrator', glimpse: 'kai', text: '開幕進場時，阿凱走在最前面帶舞，胸前的金色花環亮晶晶的。',
-    react: [
-      { text: '跟著他的拍子，大聲數：「一、二、三、四！」', result: '全班的腳步，跟著你的聲音一起動。' },
-      { text: '跳完跟阿凱說：「謝謝你教我踏步。」', result: '阿凱笑著說：「你跳得很好！」' },
-      { text: '挺直背，專心踩好每一步。', result: '看著前面的花環，你覺得自己也是隊伍的一份子。', none: true },
-    ] },
   { bg: 'sportsday', chars: [{ id: 'pinyu', x: 52, emo: 'happy' }, { id: 'aming', x: 140, emo: 'happy' }],
     speaker: 'narrator', anim: 'run', text: '「砰！」\n你是第六棒。從阿凱手中接過棒子，一路往前衝。' },
   { speaker: 'aming', anim: 'cheer', text: '品妤——超帥的！' },
