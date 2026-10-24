@@ -28,6 +28,7 @@ const state = {
   thinkAgain: null,   // 「聽完分享，再想一次」的選擇（分享圖用最後一次的選擇）
   history: [],        // 看過的台詞（和當時的畫面），給「上一句」重看
   back: null,         // 正在重看：{ index, from: 'line' | 'panel' }
+  anim: null,         // 場景動作：{ type: 'run' | 'shake' | 'jump' | 'cheer', who, t0 }
   view: { bg: 'title', chars: [], speaker: null },
   typing: null,
   paused: false,
@@ -51,22 +52,74 @@ function backdrop(bg, boil) {
   return backdrops.get(key);
 }
 
+// 場景動作的長度（毫秒）和跑步的距離
+const ANIM_MS = { run: 1300, shake: 500, jump: 1400, cheer: 1200 };
+const RUN_DIST = 70;
+
+// 跑步要跑多遠：不跑出照片（直向畫面只看得到 x 約 24–168）；
+// 終點有人就停在他旁邊，太近的話從他前面跑過去
+const RUN_MAX = 158;
+function runDistance(id) {
+  const me = state.view.chars.find((c) => c.id === id);
+  if (!me) return 0;
+  let target = Math.min(me.x + RUN_DIST, RUN_MAX);
+  const block = state.view.chars.find((c) => c.id !== id && Math.abs(c.x - target) < 22);
+  if (block) {
+    target = block.x - 24;
+    if (target - me.x < 20) target = Math.min(block.x + 24, RUN_MAX);
+  }
+  return Math.max(0, target - me.x);
+}
+const ease = (p) => 1 - (1 - p) * (1 - p);
+
 function render(time) {
   // 系統設定「減少動態效果」時，線條和角色都不動
   const still = reducedMotion.matches;
   const boil = still ? 0 : Math.floor(time / 380) % 3;
   const k = screen.width / W;
+  const anim = still ? null : state.anim;
+  const ap = anim ? Math.min(1, (time - anim.t0) / ANIM_MS[anim.type]) : 1;
+  // 搖晃：很大的聲音時，整個畫面晃一下
+  const shake = anim?.type === 'shake' ? (1 - ap) * 2.4 * Math.sin(time / 22) : 0;
   g.setTransform(1, 0, 0, 1, 0, 0);
-  g.drawImage(backdrop(state.view.bg, boil), 0, 0);
-  g.setTransform(k, 0, 0, k, 0, 0);
+  g.fillStyle = '#fbf7ee';
+  g.fillRect(0, 0, screen.width, screen.height);
+  g.drawImage(backdrop(state.view.bg, boil), shake * k, 0);
+  g.setTransform(k, 0, 0, k, shake * k, 0);
   const speaking = state.view.speaker;
   const anySpeaker = speaking && state.view.chars.some((c) => c.id === speaking);
-  state.view.chars.forEach((c, n) => {
+  const sports = state.view.bg === 'sportsday';
+  const order = anim?.type === 'run'
+    ? [...state.view.chars].sort((a, b) => anim.who.includes(a.id) - anim.who.includes(b.id))
+    : state.view.chars;
+  order.forEach((c, n) => {
     const talking = c.id === speaking;
-    const bob = still ? 0
-      : talking ? (Math.floor(time / 260) % 2) : (Math.floor((time + n * 400) / 900) % 2);
-    drawChar(g, c.id, c.x, FLOOR_Y, c.emo, { bob: -bob * 0.8, dim: anySpeaker && !talking, boil });
+    let bob = still ? 0
+      : -0.8 * (talking ? (Math.floor(time / 260) % 2) : (Math.floor((time + n * 400) / 900) % 2));
+    let { x } = c;
+    let stride = 0;
+    // 走進來：同一個場景有人加入時，從旁邊走進畫面
+    if (c.enter && !still) {
+      const p = Math.min(1, (time - c.enter.t0) / 500);
+      x += c.enter.dx * (1 - ease(p));
+      if (p < 1) stride = Math.sin(time / 60);
+      else delete c.enter;
+    }
+    const mine = anim && anim.who.includes(c.id);
+    if (mine && anim.type === 'run') {
+      x += anim.dist * ease(ap);
+      if (ap < 1) { stride = Math.sin(time / 45); bob = -Math.abs(Math.sin(time / 45)) * 1.6; }
+    }
+    if (mine && (anim.type === 'jump' || anim.type === 'cheer')) {
+      bob = -Math.abs(Math.sin((time - anim.t0) / 120)) * 5 * (1 - ap);
+    }
+    drawChar(g, c.id, x, FLOOR_Y, c.emo, { bob, dim: anySpeaker && !talking, boil, stride, sports, outfit: c.outfit || [] });
   });
+  // 動作做完：跑完的人停在終點
+  if (anim && ap >= 1) {
+    if (anim.type === 'run') state.view.chars.forEach((c) => { if (anim.who.includes(c.id)) c.x += anim.dist; });
+    state.anim = null;
+  }
   drawForeground(g, state.view.bg, boil);
   for (const label of sceneLabels(state.view.bg)) {
     g.font = `700 ${label.size}px ${getComputedStyle(document.body).fontFamily}`;
@@ -129,9 +182,9 @@ function applyEffect(effect) {
 
 // ---------- 對話 ----------
 
-// 玩家扮演的角色顯示為「你」
+// 名字框顯示角色的名字（玩家扮演的角色也一樣，例如「小雨」）；旁白仍用「你」
 function nameOf(id) {
-  if (id === state.story?.id) return t('you');
+  if (id === state.story?.id) return tr(state.story.name);
   return tr((CHARACTERS[id] || CHARACTERS.narrator).name);
 }
 
@@ -144,8 +197,9 @@ function showLine(step) {
   $('speaker').textContent = nameOf(speaker);
   state.view.speaker = speaker;
   const portrait = $('portrait');
-  const emo = state.view.chars.find((c) => c.id === speaker)?.emo || 'neutral';
-  portrait.classList.toggle('empty', !drawPortrait(portrait, speaker, emo));
+  const who = state.view.chars.find((c) => c.id === speaker);
+  const look = { sports: state.view.bg === 'sportsday', outfit: who?.outfit || [] };
+  portrait.classList.toggle('empty', !drawPortrait(portrait, speaker, who?.emo || 'neutral', look));
   const innerEl = $('inner');
   innerEl.textContent = inner ? `${t('innerPrefix')}${inner}` : '';
   innerEl.hidden = true;
@@ -253,9 +307,42 @@ function run() {
 }
 
 function stepLine(step) {
+  if (state.anim?.type === 'run') {
+    // 上一句的跑步還沒跑完就點下一句：直接停在終點
+    state.view.chars.forEach((c) => { if (state.anim.who.includes(c.id)) c.x += state.anim.dist; });
+  }
+  state.anim = null;
   if (step.bg) {
+    const before = state.view.bg === step.bg ? new Set(state.view.chars.map((c) => c.id)) : null;
+    const outfits = Object.fromEntries(state.view.chars.map((c) => [c.id, c.outfit]));
     state.view.bg = step.bg;
-    state.view.chars = (step.chars || []).map((c) => ({ ...c }));
+    // 裝扮只在同一個場景裡留著（換場景就換回原本的衣服）
+    state.view.chars = (step.chars || []).map((c) => ({ ...c, outfit: before ? outfits[c.id] : undefined }));
+    // 同一個場景有新的人加入：讓他從旁邊走進來
+    if (before) {
+      const now = performance.now();
+      state.view.chars.forEach((c) => {
+        if (!before.has(c.id)) c.enter = { t0: now, dx: c.x < W / 2 ? -50 : 50 };
+      });
+    }
+  }
+  // 劇情裡加上的裝扮，例如戴上耳罩
+  if (step.wear) {
+    for (const [id, items] of Object.entries(step.wear)) {
+      const c = state.view.chars.find((x) => x.id === id);
+      if (c) c.outfit = [...(c.outfit || []), ...items];
+    }
+  }
+  if (step.anim) {
+    const me = state.story.id;
+    const others = state.view.chars.map((c) => c.id).filter((id) => id !== me);
+    const who = {
+      run: [me],
+      shake: [],
+      jump: state.view.chars.map((c) => c.id),
+      cheer: step.speaker !== 'narrator' && step.speaker !== me && others.includes(step.speaker) ? [step.speaker] : others,
+    }[step.anim];
+    state.anim = { type: step.anim, who, t0: performance.now(), dist: step.anim === 'run' ? runDistance(me) : 0 };
   }
   if (step.emo) {
     // 旁白或全班說話時，表情套用在「你」身上
@@ -267,7 +354,7 @@ function stepLine(step) {
     applyEffect(step.effect);
     step.applied = true;
   }
-  state.history.push({ step, bg: state.view.bg, chars: state.view.chars.map((c) => ({ ...c })) });
+  state.history.push({ step, bg: state.view.bg, chars: state.view.chars.map(({ enter, ...c }) => ({ ...c })) });
   showLine(step);
 }
 
@@ -987,6 +1074,7 @@ function resetProgress() {
   state.thinkAgain = null;
   state.history = [];
   state.back = null;
+  state.anim = null;
 }
 
 // 回主畫面：標題 → 選角色

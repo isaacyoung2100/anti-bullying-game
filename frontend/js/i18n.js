@@ -9,7 +9,6 @@ const UI = {
   zh: {
     htmlLang: 'zh-Hant',
     gameTitle: '五年三班大隊接力',
-    you: '你',
     energy: '心靈能量',
     energyText: (n) => `${n}（滿分 100）`,
     pause: '❚❚ 暫停',
@@ -132,7 +131,6 @@ const UI = {
   en: {
     htmlLang: 'en',
     gameTitle: 'Class 5-3 Relay',
-    you: 'You',
     energy: 'Heart Energy',
     energyText: (n) => `${n} out of 100`,
     pause: '❚❚ Pause',

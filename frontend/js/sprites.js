@@ -227,7 +227,11 @@ function dimLayer(target) {
 }
 
 // 畫角色：x 為中心，y 為腳底（約 48 單位高）
-export function drawChar(g, id, x, y, emo = 'neutral', { bob = 0, dim = false, boil = 0, shadow = true } = {}) {
+// 運動會的號碼布：大隊接力的棒次
+const BIB = { azhe: 1, zhihao: 2, xiaoyu: 3, qing: 4, kai: 5, pinyu: 6, guanyu: 7, aming: 8, jiajia: 9, xinyi: 10 };
+
+// 裝扮：stride 是跑步、走路時手腳擺動（-1 到 1）；sports 是運動會那天；outfit 是劇情裡加上的東西
+export function drawChar(g, id, x, y, emo = 'neutral', { bob = 0, dim = false, boil = 0, shadow = true, stride = 0, sports = false, outfit = [] } = {}) {
   const pal = PALETTES[id];
   if (!pal) return;
   // 沒在說話的人畫淡一點：先畫在另一層再整層變淡，
@@ -238,7 +242,7 @@ export function drawChar(g, id, x, y, emo = 'neutral', { bob = 0, dim = false, b
     lg.setTransform(1, 0, 0, 1, 0, 0);
     lg.clearRect(0, 0, layer.width, layer.height);
     lg.setTransform(g.getTransform());
-    drawChar(lg, id, x, y, emo, { bob, boil, shadow });
+    drawChar(lg, id, x, y, emo, { bob, boil, shadow, stride, sports, outfit });
     // 蓋一層紙的顏色：看起來褪色，但不會透出後面的桌子
     lg.setTransform(1, 0, 0, 1, 0, 0);
     lg.globalCompositeOperation = 'source-atop';
@@ -260,30 +264,63 @@ export function drawChar(g, id, x, y, emo = 'neutral', { bob = 0, dim = false, b
     g.fillStyle = 'rgba(58, 49, 64, 0.12)';
     g.beginPath(); g.ellipse(x, y - bob, 9, 1.6, 0, 0, Math.PI * 2); g.fill();
   }
-  // 腳和鞋子
-  box(g, x - 5, y - 14, 4, 12, { fill: pal.P, shade: '#00000040' });
-  box(g, x + 1, y - 14, 4, 12, { fill: pal.P, shade: '#00000040' });
-  oval(g, x - 3.6, y - 1.4, 3, 1.5, { fill: '#ffffff', width: 0.45 });
-  oval(g, x + 3.6, y - 1.4, 3, 1.5, { fill: '#ffffff', width: 0.45 });
-  // 手臂（在身體後面）
+  // 運動會那天，同學都穿一樣的班服
+  const kid = !pal.adult;
+  const shirt = sports && kid ? { C: '#7fc8e8', D: '#4f9fc4' } : { C: pal.C, D: pal.D };
+  // 腳和鞋子：跑步時一前一後
+  const lift = Math.abs(stride) * 2;
+  box(g, x - 5 + stride * 2.5, y - 14, 4, 12 - (stride > 0 ? lift : 0), { fill: pal.P, shade: '#00000040' });
+  box(g, x + 1 - stride * 2.5, y - 14, 4, 12 - (stride < 0 ? lift : 0), { fill: pal.P, shade: '#00000040' });
+  oval(g, x - 3.6 + stride * 2.5, y - 1.4 - (stride > 0 ? lift : 0), 3, 1.5, { fill: '#ffffff', width: 0.45 });
+  oval(g, x + 3.6 - stride * 2.5, y - 1.4 - (stride < 0 ? lift : 0), 3, 1.5, { fill: '#ffffff', width: 0.45 });
+  // 手臂（在身體後面）：跑步時前後擺
   for (const s of [-1, 1]) {
-    line(g, [[x + s * 6, y - 25], [x + s * 9.5, y - 15.5]], pal.C, 2.8);
-    line(g, [[x + s * 6, y - 25], [x + s * 9.5, y - 15.5]], INK, 0.35);
-    oval(g, x + s * 9.7, y - 14.6, 1.5, 1.5, { fill: pal.S, width: 0.4 });
+    const hand = [x + s * 9.5 - s * stride * 3.5, y - 15.5 - Math.abs(stride) * 2];
+    line(g, [[x + s * 6, y - 25], hand], shirt.C, 2.8);
+    line(g, [[x + s * 6, y - 25], hand], INK, 0.35);
+    oval(g, hand[0] + s * 0.2, hand[1] + 0.9, 1.5, 1.5, { fill: pal.S, width: 0.4 });
   }
   // 上衣
-  shape(g, [[x - 7, y - 27], [x + 7, y - 27], [x + 8.5, y - 13], [x - 8.5, y - 13]], { fill: pal.C, shade: pal.D });
+  shape(g, [[x - 7, y - 27], [x + 7, y - 27], [x + 8.5, y - 13], [x - 8.5, y - 13]], { fill: shirt.C, shade: shirt.D });
+  // 號碼布：小雨的上面是阿哲畫的金色閃電
+  if (sports && kid && BIB[id]) {
+    box(g, x - 4, y - 24, 8, 7, { fill: '#ffffff', width: 0.4 });
+    if (id === 'xiaoyu') {
+      shape(g, [[x + 0.8, y - 23.4], [x - 1.8, y - 20.2], [x + 0.2, y - 20.2], [x - 1, y - 17.6], [x + 2.2, y - 21.2], [x + 0.2, y - 21.2], [x + 1.6, y - 23.4]], { fill: '#ffd166', stroke: '#c99a30', width: 0.3 });
+    } else {
+      g.fillStyle = INK;
+      g.font = '700 5px sans-serif';
+      g.textAlign = 'center';
+      g.textBaseline = 'middle';
+      g.fillText(String(BIB[id]), x, y - 20.3);
+    }
+  }
+  // 阿凱：阿嬤用金線縫的花環
+  if (sports && id === 'kai') {
+    oval(g, x, y - 27.5, 6.5, 2.2, { stroke: '#e8b23c', width: 1.2 });
+    for (const dx of [-5, -1.5, 2, 5.5]) oval(g, x + dx, y - 26.8, 0.9, 0.9, { fill: '#ff8fab', stroke: null });
+  }
   // 頭
   const hx = x, hy = y - 36.5;
   hairBack(g, pal, hx, hy);
   oval(g, hx, hy, 8.6, 9, { fill: pal.S, shade: '#e9a98033' });
   face(g, emo, hx, hy, pal.glasses);
   fringe(g, pal, hx, hy);
+  // 小晴的耳罩
+  if (outfit.includes('earmuffs')) {
+    line(g, ellipsePts(hx, hy - 1, 10.2, 11, 10, Math.PI * 1.05, Math.PI * 1.95), '#e070a0', 1.1);
+    for (const s of [-1, 1]) oval(g, hx + s * 9.6, hy + 1, 2.4, 3.2, { fill: '#ff9fc8', shade: '#e070a0' });
+  }
+  // 帽子（阿明的媽媽戴著帽子站在最後面）
+  if (outfit.includes('hat')) {
+    oval(g, hx, hy - 6.5, 13, 2.6, { fill: '#e8d9b5', shade: '#c9b282' });
+    shape(g, [...ellipsePts(hx, hy - 7, 8.5, 6.5, 10, Math.PI, Math.PI * 2)], { fill: '#e8d9b5', shade: '#c9b282' });
+  }
   g.restore();
 }
 
 // 頭像（對話框、選角色用）：畫到肩膀為止，畫布底色由 CSS 決定
-export function drawPortrait(canvas, id, emo) {
+export function drawPortrait(canvas, id, emo, look = {}) {
   const g = canvas.getContext('2d');
   g.setTransform(1, 0, 0, 1, 0, 0);
   g.clearRect(0, 0, canvas.width, canvas.height);
@@ -291,7 +328,7 @@ export function drawPortrait(canvas, id, emo) {
   const s = canvas.width / 26;
   g.setTransform(s, 0, 0, s, 0, 0);
   // 大人畫得比較高，腳底往下移，頭才會在頭像中間
-  drawChar(g, id, 13, PALETTES[id].adult ? 55.5 : 51, emo, { shadow: false });
+  drawChar(g, id, 13, PALETTES[id].adult ? 55.5 : 51, emo, { shadow: false, ...look });
   g.setTransform(1, 0, 0, 1, 0, 0);
   return true;
 }

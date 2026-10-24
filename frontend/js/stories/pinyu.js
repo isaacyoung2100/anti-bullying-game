@@ -62,7 +62,7 @@ const STORY = [
     speaker: 'narrator', text: '晚上八點。平常響個不停的「閃亮五人組」群組，突然好安靜。' },
   { speaker: 'narrator', text: '你在群組問：「大隊接力要綁什麼顏色的髮圈？」' },
   { speaker: 'narrator', emo: 'sad', text: '「已讀 4」。過了十分鐘，沒有人回。然後跳出一行字：' },
-  { speaker: 'narrator', emo: 'cry', text: '「欣儀 已將 品妤 移出群組。」',
+  { speaker: 'narrator', emo: 'cry', anim: 'shake', text: '「欣儀 已將 品妤 移出群組。」',
     effect: { courage: -15, witness: 4 } },
   { speaker: 'narrator', emo: 'sad', text: '房間裡，只剩下時鐘的滴答聲。你的手心好冰。' },
   { k: 'choice', prompt: '你會怎麼做？', options: [
@@ -109,7 +109,7 @@ const STORY = [
     { text: '照著做，再跑一次。',
       effect: { courage: 5 },
       then: [
-        { speaker: 'narrator', emo: 'happy', text: '你蹲低，「砰」一響就衝出去。快了一秒！' },
+        { speaker: 'narrator', emo: 'happy', anim: 'run', text: '你蹲低，「砰」一響就衝出去。快了一秒！' },
         { speaker: 'xiaoyu', emo: 'happy', text: '你看，快很多吧！', inner: '換一群人在一起，原來也可以這麼開心。' },
       ] },
     { text: '「明天可以再跟我一起練嗎？」',
@@ -255,11 +255,11 @@ const ENDING = [
   { speaker: 'narrator', text: '你看著佳佳，點了點頭。' },
   { k: 'if', flag: 'toldMom', then: [
     { bg: 'sportsday', chars: [{ id: 'pinyu', x: 52, emo: 'happy' }, { id: 'sister', x: 140, emo: 'happy' }],
-      speaker: 'sister', text: '品妤，衝啊！' },
+      speaker: 'sister', anim: 'cheer', text: '品妤，衝啊！' },
   ] },
   { bg: 'sportsday', chars: [{ id: 'pinyu', x: 52, emo: 'happy' }, { id: 'aming', x: 140, emo: 'happy' }],
-    speaker: 'narrator', text: '「砰！」\n你是第六棒。從阿凱手中接過棒子，一路往前衝。' },
-  { speaker: 'aming', text: '品妤——超帥的！' },
+    speaker: 'narrator', anim: 'run', text: '「砰！」\n你是第六棒。從阿凱手中接過棒子，一路往前衝。' },
+  { speaker: 'aming', anim: 'cheer', text: '品妤——超帥的！' },
   { k: 'if', flag: 'friend', then: [
     { speaker: 'aming', text: '椰子糖的力量！衝啊！' },
   ] },

@@ -30,7 +30,7 @@ const STORY = [
     speaker: 'zhihao', text: '哎呀手滑！排那麼齊，是要拜拜喔？',
     effect: { courage: -10, witness: 6 } },
   { speaker: 'class', text: '（後面有人說：「她去資源班的啦，規矩很多。」）' },
-  { speaker: 'narrator', emo: 'cry', text: '鉛筆掉了一地，順序全亂了。你的心跳變快，耳朵嗡嗡作響。' },
+  { speaker: 'narrator', emo: 'cry', anim: 'shake', text: '鉛筆掉了一地，順序全亂了。你的心跳變快，耳朵嗡嗡作響。' },
   { k: 'choice', prompt: '你會怎麼做？', options: [
     { text: '蹲下來，雙手抱住頭，閉上眼睛。',
       effect: { courage: -5 },
@@ -63,7 +63,7 @@ const STORY = [
   { bg: 'classroom', chars: [{ id: 'qing', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '下午打掃時間，教室裡都是拖椅子的聲音。你的耳朵有點痛。' },
   { speaker: 'narrator', text: '志豪拿著一張鐵椅子，走到你後面，用力往地上一摔！' },
-  { speaker: 'narrator', emo: 'surprised', text: '「碰——！」\n巨大的聲音在你的耳朵裡炸開。' },
+  { speaker: 'narrator', emo: 'surprised', anim: 'shake', text: '「碰——！」\n巨大的聲音在你的耳朵裡炸開。' },
   { bg: 'classroom', chars: CLASS_CHARS('cry', 'happy'),
     speaker: 'zhihao', text: '哇，耳朵那麼靈喔？測試一下而已啦！',
     effect: { courage: -15, witness: 8 } },
@@ -82,7 +82,7 @@ const STORY = [
       fear: '戴上大耳罩，會不會被大家指指點點？',
       effect: { courage: 5 },
       then: [
-        { speaker: 'narrator', text: '你戴上耳罩，世界一下子變安靜了。' },
+        { speaker: 'narrator', wear: { qing: ['earmuffs'] }, text: '你戴上耳罩，世界一下子變安靜了。' },
         { speaker: 'narrator', text: '你在筆記本寫下：「週二，故意摔椅子。」', inner: '耳罩幫我擋住了怪獸的吼叫。' },
       ] },
   ] },
@@ -121,7 +121,7 @@ const STORY = [
   { speaker: 'kai', emo: 'happy', text: '小晴，你的拍子最準。可以幫我數拍子嗎？',
     effect: { courage: 5, kind: 1 } },
   { speaker: 'qing', text: '好。一、二、三、四。每一拍都一樣長。' },
-  { speaker: 'narrator', emo: 'happy', text: '第二次，全班跳得整整齊齊。大家都拍手了。', inner: '我的耳朵，也可以幫上忙。' },
+  { speaker: 'narrator', emo: 'happy', anim: 'jump', text: '第二次，全班跳得整整齊齊。大家都拍手了。', inner: '我的耳朵，也可以幫上忙。' },
   { speaker: 'narrator', emo: 'happy', text: '今天，沒有人故意嚇你。', inner: '如果每天都像今天就好了。' },
 
   // ---------------- 週四（白天在學校，晚上和家人）----------------
@@ -258,13 +258,13 @@ const ENDING = [
     inner: '大隊接力，全班每個人都要跑。我也是。' },
   { k: 'if', flag: 'toldMom', then: [
     { bg: 'sportsday', chars: [{ id: 'qing', x: 52, emo: 'surprised' }, { id: 'dadQ', x: 140, emo: 'happy' }],
-      speaker: 'narrator', text: '你看到爸爸站在圍欄邊，對你比了一個「三角龍衝鋒」。' },
+      speaker: 'narrator', anim: 'cheer', text: '你看到爸爸站在圍欄邊，對你比了一個「三角龍衝鋒」。' },
   ] },
   { bg: 'sportsday', chars: [{ id: 'qing', x: 52, emo: 'neutral' }, { id: 'xiaoyu', x: 140, emo: 'happy' }],
     speaker: 'narrator', text: '第三棒的小雨衝過來了。你在心裡數著步伐。' },
   { bg: 'sportsday', chars: [{ id: 'qing', x: 52, emo: 'happy' }, { id: 'azhe', x: 140, emo: 'happy' }],
-    speaker: 'narrator', text: '啪！接力棒穩穩落進你的手心。你照著固定的步伐，直直往前衝。' },
-  { speaker: 'azhe', text: '小晴，直線加速！好棒！' },
+    speaker: 'narrator', anim: 'run', text: '啪！接力棒穩穩落進你的手心。你照著固定的步伐，直直往前衝。' },
+  { speaker: 'azhe', anim: 'cheer', text: '小晴，直線加速！好棒！' },
   { k: 'if', flag: 'friend', then: [
     { speaker: 'azhe', text: '只看前面就好！我說的沒錯吧！' },
   ] },
