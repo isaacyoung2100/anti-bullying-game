@@ -30,7 +30,7 @@ const STORY = [
   { bg: 'classroom', chars: [{ id: 'azhe', x: 52, emo: 'sad' }, { id: 'teacher', x: 140, emo: 'angry' }],
     speaker: 'teacher', text: '志豪，用這種話說同學是不對的。上課專心。' },
   { speaker: 'class', text: '（教室安靜下來。可是後面還是有人在偷笑。）' },
-  { speaker: 'narrator', text: '你感覺到大家都在看你。' },
+  { speaker: 'narrator', zoom: true, text: '你感覺到大家都在看你。' },
   { k: 'choice', prompt: '你會怎麼做？', options: [
     { text: '跟著笑：「對啊，我就是很笨。」',
       effect: { courage: -5 },
@@ -188,7 +188,7 @@ const STORY = [
     { text: '把這幾天發生的事告訴媽媽。', need: 30, flag: 'toldMom',
       fear: '說出來，媽媽會不會覺得是我的問題？',
       then: [
-        { speaker: 'azhe', emo: 'cry', text: '媽媽……大家都說跟我同一隊很倒楣。他們不讓我畫畫。' },
+        { speaker: 'azhe', emo: 'cry', zoom: true, text: '媽媽……大家都說跟我同一隊很倒楣。他們不讓我畫畫。' },
         { speaker: 'mom', emo: 'sad', text: '……謝謝你告訴我。這不是你的錯。' },
         { speaker: 'mom', emo: 'neutral', text: '明天媽媽會跟老師聯絡。你不用一個人面對。',
           effect: { courage: 15, kind: 1 } },

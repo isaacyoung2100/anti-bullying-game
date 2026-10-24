@@ -31,7 +31,7 @@ const STORY = [
   { bg: 'classroom', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }, { id: 'jiajia', x: 140, emo: 'happy' }],
     speaker: 'narrator', text: '你叫小雨，五年三班。你跑步很快，話不多。\n家裡有你、媽媽和讀幼兒園的弟弟。每天放學，都是你去接弟弟。' },
   { speaker: 'jiajia', text: '老師說運動會要穿一樣的班服，一件 350 元，要訂的人禮拜五前跟我登記喔！' },
-  { speaker: 'narrator', emo: 'sad', text: '350 元。你想起媽媽上個月在廚房算帳，算了好久。' },
+  { speaker: 'narrator', emo: 'sad', zoom: true, text: '350 元。你想起媽媽上個月在廚房算帳，算了好久。' },
   { speaker: 'xiaoyu', emo: 'sad', text: '那個……我可以不要訂嗎？' },
   { bg: 'classroom', chars: WITH_ZHIHAO('sad', 'happy'),
     speaker: 'zhihao', text: '不訂？那你要穿那件喔？袖口都起毛球了耶，笑死。',
@@ -186,7 +186,7 @@ const STORY = [
     { text: '把群組的截圖拿給媽媽看，告訴她這幾天的事。', need: 30, flag: 'toldMom',
       fear: '媽媽已經這麼累了，我還要讓她擔心嗎？',
       then: [
-        { speaker: 'xiaoyu', emo: 'cry', text: '媽媽……他們在群組笑我的外套。佳佳的生日也沒有邀我。' },
+        { speaker: 'xiaoyu', emo: 'cry', zoom: true, text: '媽媽……他們在群組笑我的外套。佳佳的生日也沒有邀我。' },
         { speaker: 'momX', emo: 'sad', text: '……謝謝你告訴我。這不是你的錯，一點都不是。' },
         { speaker: 'momX', emo: 'neutral', text: '明天媽媽會打電話給老師。你不用一個人面對。',
           effect: { courage: 15, kind: 1 } },

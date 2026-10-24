@@ -1,7 +1,7 @@
 import {
   STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, ZHIHAO_INNER, HELP_LINES,
 } from './story.js?v=dev';
-import { W, drawScene, drawForeground, drawProps, drawLight, drawChar, drawPortrait, sceneLabels } from './sprites.js?v=dev';
+import { W, H, drawScene, drawForeground, drawProps, drawLight, drawChar, drawPortrait, sceneLabels } from './sprites.js?v=dev';
 import { t, tr, getLang, setLang } from './i18n.js?v=dev';
 
 const $ = (id) => document.getElementById(id);
@@ -72,6 +72,33 @@ function runDistance(id) {
 }
 const ease = (p) => 1 - (1 - p) * (1 - p);
 
+// 鏡頭：台詞帶 zoom（true 是主角，或寫角色的 id）時，慢慢拉近到那個人的臉；
+// 下一句沒有 zoom 就慢慢拉回來。換場景時直接回到全景
+const ZOOM_K = 1.7;
+const cam = { x: W / 2, y: H / 2, k: 1, bg: null, t: 0 };
+function updateCamera(time, still) {
+  const id = state.view.zoom === true ? state.story?.id : state.view.zoom;
+  const c = id && state.view.chars.find((x) => x.id === id);
+  const target = c ? { x: c.x, y: FLOOR_Y - 34, k: ZOOM_K } : { x: W / 2, y: H / 2, k: 1 };
+  const dt = Math.min(100, time - cam.t);
+  cam.t = time;
+  if (still || cam.bg !== state.view.bg) {
+    Object.assign(cam, target, { bg: state.view.bg });
+  } else {
+    const a = 1 - Math.exp(-dt / 260);
+    cam.x += (target.x - cam.x) * a;
+    cam.y += (target.y - cam.y) * a;
+    cam.k += (target.k - cam.k) * a;
+  }
+  // 不要拉到照片外面去
+  const hw = W / 2 / cam.k, hh = H / 2 / cam.k;
+  return {
+    k: cam.k,
+    x: Math.min(W - hw, Math.max(hw, cam.x)),
+    y: Math.min(H - hh, Math.max(hh, cam.y)),
+  };
+}
+
 function render(time) {
   // 系統設定「減少動態效果」時，線條和角色都不動
   const still = reducedMotion.matches;
@@ -81,11 +108,15 @@ function render(time) {
   const ap = anim ? Math.min(1, (time - anim.t0) / ANIM_MS[anim.type]) : 1;
   // 搖晃：很大的聲音時，整個畫面晃一下
   const shake = anim?.type === 'shake' ? (1 - ap) * 2.4 * Math.sin(time / 22) : 0;
+  const view = updateCamera(time, still);
+  const z = view.k;
+  const ox = (W / 2 - view.x * z + shake) * k, oy = (H / 2 - view.y * z) * k;
   g.setTransform(1, 0, 0, 1, 0, 0);
   g.fillStyle = '#fbf7ee';
   g.fillRect(0, 0, screen.width, screen.height);
-  g.drawImage(backdrop(state.view.bg, boil), shake * k, 0);
-  g.setTransform(k, 0, 0, k, shake * k, 0);
+  g.setTransform(z, 0, 0, z, ox, oy);
+  g.drawImage(backdrop(state.view.bg, boil), 0, 0);
+  g.setTransform(k * z, 0, 0, k * z, ox, oy);
   const speaking = state.view.speaker;
   const anySpeaker = speaking && state.view.chars.some((c) => c.id === speaking);
   const sports = state.view.bg === 'sportsday';
@@ -244,6 +275,7 @@ function showLine(step) {
   $('dialog').classList.remove('idle');
   $('speaker').textContent = nameOf(speaker);
   state.view.speaker = speaker;
+  state.view.zoom = step.zoom ?? null;
   const portrait = $('portrait');
   const who = state.view.chars.find((c) => c.id === speaker);
   const look = { sports: state.view.bg === 'sportsday', outfit: who?.outfit || [] };
@@ -472,6 +504,7 @@ function stepTitle() {
   $('sceneCaption').textContent = '';
   state.view.bg = 'title';
   state.view.props = [];
+  state.view.zoom = null;
   state.view.chars = [
     { id: 'xiaoyu', x: 40, emo: 'neutral' },
     { id: 'jiajia', x: 68, emo: 'happy' },
@@ -547,6 +580,7 @@ function stepDay(step) {
   state.view.bg = step.bg;
   state.view.chars = [];
   state.view.props = [];
+  state.view.zoom = null;
   state.view.speaker = null;
   updateHud();
   showPanel(`
@@ -716,6 +750,7 @@ function stepZhihao() {
   state.days.push({ day: state.day, courage: state.courage });
   state.view.bg = 'classroom';
   state.view.props = [];
+  state.view.zoom = null;
   state.view.chars = [{ id: 'zhihao', x: 96, emo: 'sad' }];
   state.view.speaker = null;
   const card = showPanel(`
@@ -744,6 +779,7 @@ const shortDay = (day) => (getLang() === 'en' ? tr(day).slice(0, 3) : tr(day));
 function stepReflect() {
   state.view.bg = 'track';
   state.view.props = [];
+  state.view.zoom = null;
   state.view.chars = [{ id: state.story.id, x: 96, emo: 'neutral' }];
   const tiles = state.days.map((d) => {
     const w = weatherOf(d.courage);

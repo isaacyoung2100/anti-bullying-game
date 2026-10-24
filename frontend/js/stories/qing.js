@@ -68,7 +68,7 @@ const STORY = [
     speaker: 'zhihao', text: '哇，耳朵那麼靈喔？測試一下而已啦！',
     effect: { courage: -15, witness: 8 } },
   { speaker: 'class', text: '（有人嚇了一跳，然後看著你摀住耳朵，偷偷笑了。）' },
-  { speaker: 'narrator', emo: 'cry', text: '尖尖的聲音一直在腦袋裡轉。你全身僵硬，雙手摀住耳朵。' },
+  { speaker: 'narrator', emo: 'cry', zoom: true, text: '尖尖的聲音一直在腦袋裡轉。你全身僵硬，雙手摀住耳朵。' },
   { k: 'choice', prompt: '你會怎麼做？', options: [
     { text: '趴在桌上，用外套把頭整個包起來。',
       effect: { courage: -5 },
@@ -189,7 +189,7 @@ const STORY = [
     { text: '把筆記本上的事，一條一條唸給爸爸聽。', need: 30, flag: 'toldMom',
       fear: '唸出來，那些事會不會變得更可怕？',
       then: [
-        { speaker: 'qing', emo: 'sad', text: '週一，鉛筆被弄亂。週二，故意摔椅子。今天，說不真實的話。' },
+        { speaker: 'qing', emo: 'sad', zoom: true, text: '週一，鉛筆被弄亂。週二，故意摔椅子。今天，說不真實的話。' },
         { speaker: 'dadQ', emo: 'sad', text: '……謝謝你寫得這麼清楚。欺負人是不對的，不是你的錯。' },
         { speaker: 'dadQ', emo: 'neutral', text: '明天爸爸先去學校跟林老師談。你不用一個人面對。',
           effect: { courage: 15, kind: 1 } },

@@ -30,7 +30,7 @@ const STORY = [
     speaker: 'zhihao', text: '（捏著嗓子扭腰）哎唷～男生跳什麼舞啦，大家快來看！',
     effect: { courage: -10, witness: 6 } },
   { speaker: 'class', emo: 'sad', text: '（幾個男生圍過來，跟著甩手怪笑。）' },
-  { speaker: 'narrator', emo: 'sad', text: '你想把手收進口袋，可是身體好像僵住了。' },
+  { speaker: 'narrator', emo: 'sad', zoom: true, text: '你想把手收進口袋，可是身體好像僵住了。' },
   { k: 'choice', prompt: '你會怎麼做？', options: [
     { text: '馬上停下來，低頭走回教室。',
       effect: { courage: -5 },
@@ -198,7 +198,7 @@ const STORY = [
     { text: '把學校發生的事都告訴阿嬤。', need: 30, flag: 'toldMom',
       fear: '阿嬤要是去學校找老師，大家會不會更排擠我？',
       then: [
-        { speaker: 'kai', emo: 'cry', text: '阿嬤……同學一直學我的動作，分組也故意不要我。' },
+        { speaker: 'kai', emo: 'cry', zoom: true, text: '阿嬤……同學一直學我的動作，分組也故意不要我。' },
         { speaker: 'grandma', emo: 'sad', text: '……謝謝你告訴阿嬤。這不是你的錯。' },
         { speaker: 'grandma', emo: 'neutral', text: '明天阿嬤寫聯絡簿給林老師。你不用一個人面對。',
           effect: { courage: 15, kind: 1 } },

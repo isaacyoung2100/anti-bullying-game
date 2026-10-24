@@ -36,7 +36,7 @@ const STORY = [
     speaker: 'narrator', text: '你轉身想找欣儀和佳佳去廁所，她們卻收起了笑容。' },
   { speaker: 'xinyi', text: '（小聲）幹嘛那麼愛出風頭啊，很掃興耶。',
     effect: { courage: -10, witness: 5 } },
-  { speaker: 'narrator', emo: 'sad', text: '她們手牽手走出教室，沒有等你。' },
+  { speaker: 'narrator', emo: 'sad', zoom: true, text: '她們手牽手走出教室，沒有等你。' },
   { k: 'choice', prompt: '你會怎麼做？', options: [
     { text: '追上去說：「好啦，我剛剛隨便講講的。」',
       effect: { courage: -10 },
@@ -195,7 +195,7 @@ const STORY = [
     { text: '把這個禮拜的事，全部告訴姊姊。', need: 30, flag: 'toldMom',
       fear: '承認被排擠，家人會不會覺得我很沒用？',
       then: [
-        { speaker: 'pinyu', emo: 'cry', text: '我替阿明說話，欣儀就把大家拉走，還把我踢出群組……' },
+        { speaker: 'pinyu', emo: 'cry', zoom: true, text: '我替阿明說話，欣儀就把大家拉走，還把我踢出群組……' },
         { speaker: 'sister', emo: 'sad', text: '……謝謝你告訴我。這不是你的錯。' },
         { speaker: 'sister', emo: 'neutral', text: '我們跟爸媽說，在聯絡簿寫給老師。這要讓大人知道。',
           effect: { courage: 15, kind: 1 } },

@@ -24,7 +24,7 @@ const STORY = [
     speaker: 'narrator', text: '你叫阿明，五年三班。你數學很好。\n媽媽來自越南，在家裡你們會說越南話。\n每次你考完試，媽媽都會說「Cố lên」，意思是「加油」。' },
   { speaker: 'teacher', text: '我們來練運動會的加油口號！每個人輪流帶喊一句。下一個，阿明！' },
   { speaker: 'aming', emo: 'neutral', text: '五年三班——Cố lên！' },
-  { speaker: 'narrator', emo: 'surprised', text: '你一喊完就愣住了。太習慣了，越南話就這樣跑出來了。' },
+  { speaker: 'narrator', emo: 'surprised', zoom: true, text: '你一喊完就愣住了。太習慣了，越南話就這樣跑出來了。' },
   { bg: 'classroom', chars: WITH_ZHIHAO('surprised', 'happy'),
     speaker: 'zhihao', text: '「勾雷」？哈哈哈，那是什麼外星話啦！以後就叫你「外星阿明」！',
     effect: { courage: -10, witness: 8 } },
@@ -178,7 +178,7 @@ const STORY = [
     { text: '告訴媽媽：大家在學你講話，還笑你的便當。', need: 30, flag: 'toldMom',
       fear: '媽媽知道大家笑她做的菜，會不會很難過？',
       then: [
-        { speaker: 'aming', emo: 'cry', text: '媽媽……我不小心說了越南話，大家就叫我外星阿明。他們還說你做的春捲很臭。' },
+        { speaker: 'aming', emo: 'cry', zoom: true, text: '媽媽……我不小心說了越南話，大家就叫我外星阿明。他們還說你做的春捲很臭。' },
         { speaker: 'momM', emo: 'sad', text: '……謝謝你告訴媽媽。這不是你的錯，也不是媽媽的錯。' },
         { speaker: 'momM', emo: 'neutral', text: '會說兩種話，是你的超能力喔。明天媽媽會去找老師談。',
           effect: { courage: 15, kind: 1 } },
