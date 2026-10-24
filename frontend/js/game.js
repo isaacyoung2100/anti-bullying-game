@@ -25,6 +25,8 @@ const state = {
   dayStep: null,      // 今天的標題卡（日記用它的引導問題）
   diary: [],          // 每天的日記 [{ day, quad, word, prompts, answers }]
   thinkFirst: null,   // 「換你想一想」第一次的選擇，給「聽完分享，再想一次」對照
+  history: [],        // 看過的台詞（和當時的畫面），給「上一句」重看
+  back: null,         // 正在重看：{ index, from: 'line' | 'panel' }
   view: { bg: 'title', chars: [], speaker: null },
   typing: null,
   paused: false,
@@ -150,6 +152,10 @@ function showLine(step) {
   $('srLine').textContent = [nameOf(speaker), text, inner ? `${t('innerPrefix')}${inner}` : '']
     .filter(Boolean).join(' ');
   describeScene();
+  const canBack = state.back ? state.back.index > 0 : state.history.length > 1;
+  $('btnBack').hidden = !canBack;
+  $('dialog').classList.toggle('past', !!state.back);
+  $('nextHint').textContent = state.back ? t('backHint') : t('nextHint');
   typeText(text, !!inner);
 }
 
@@ -260,7 +266,59 @@ function stepLine(step) {
     applyEffect(step.effect);
     step.applied = true;
   }
+  state.history.push({ step, bg: state.view.bg, chars: state.view.chars.map((c) => ({ ...c })) });
   showLine(step);
+}
+
+// ---------- 上一句：重看剛剛的台詞 ----------
+// 只是重看文字，不會再改變心靈能量，也不能重選；看完往前點，就回到原本的地方
+
+function showPast() {
+  const e = state.history[state.back.index];
+  state.view.bg = e.bg;
+  state.view.chars = e.chars.map((c) => ({ ...c }));
+  showLine(e.step);
+  finishTyping();
+}
+
+function goBack() {
+  if (state.paused || !state.story) return;
+  if (!state.back) {
+    // 在選擇題這類卡片上，最後一句就是剛剛的台詞；在台詞上，要看的是前一句
+    const k = state.steps[state.i]?.k;
+    // 卡片裡只有選擇題可以回去看（標題卡、日記重跑一次會重複加能量或清掉內容）
+    if (k && k !== 'choice') return;
+    const onPanel = k === 'choice';
+    const index = state.history.length - (onPanel ? 1 : 2);
+    if (index < 0) return;
+    finishTyping();
+    state.back = { index, from: onPanel ? 'panel' : 'line' };
+  } else {
+    if (state.back.index === 0) return;
+    state.back.index -= 1;
+  }
+  showPast();
+}
+
+// 重看時往前：看完最後一句就回到原本的台詞或卡片
+function goForward() {
+  const last = state.history.length - 1;
+  state.back.index += 1;
+  if (state.back.from === 'line' && state.back.index >= last) {
+    state.back = null;
+    const e = state.history[last];
+    state.view.bg = e.bg;
+    state.view.chars = e.chars.map((c) => ({ ...c }));
+    showLine(e.step);
+    finishTyping();
+    return;
+  }
+  if (state.back.from === 'panel' && state.back.index > last) {
+    state.back = null;
+    run();
+    return;
+  }
+  showPast();
 }
 
 function stepTitle() {
@@ -300,6 +358,8 @@ function applyLang() {
   $('btnPause').textContent = t('pause');
   $('btnPause').setAttribute('aria-label', t('pauseLabel'));
   $('nextHint').textContent = t('nextHint');
+  $('btnBack').textContent = t('back');
+  $('btnBack').setAttribute('aria-label', t('backLabel'));
 }
 
 function stepSelect() {
@@ -363,7 +423,9 @@ function stepChoice(step) {
           : `<button class="choice" type="button" data-n="${n}">${esc(tr(o.text))}</button>`;
       }).join('')}
     </div>
+    ${state.history.length ? `<button class="text-btn" type="button" id="review">${t('reviewBtn')}</button>` : ''}
   `, 'choice-card');
+  card.querySelector('#review')?.addEventListener('click', goBack);
   card.querySelectorAll('.choice:not(.locked)').forEach((btn) => {
     btn.onclick = () => {
       const o = step.options[Number(btn.dataset.n)];
@@ -483,7 +545,7 @@ function diaryWeekHtml() {
         ${e.skipped ? '' : `<span class="picked-feel ${e.quad}">${quads[e.quad].face} ${esc(e.word)}</span>`}
       </div>
       ${e.skipped ? `<p class="q">${t('diaryEmpty')}</p>`
-        : e.prompts.map((p, i) => (e.answers[i] ? `<p class="q">${esc(p)}</p><p>${esc(e.answers[i])}</p>` : '')).join('')}
+        : e.prompts.map((p, i) => `<p class="q">${esc(p)}</p>${e.answers[i] ? `<p>${esc(e.answers[i])}</p>` : `<p class="blank">${t('diaryNoAnswer')}</p>`}`).join('')}
     </div>`).join('');
 }
 
@@ -715,6 +777,11 @@ function advance() {
   if (state.paused) return;
   const step = state.steps[state.i];
   if (!step) return;
+  // 正在重看剛剛的台詞：往前看下一句（從選擇題回來看的也一樣）
+  if (state.back) {
+    if (!finishTyping()) goForward();
+    return;
+  }
   // 卡片上的「繼續」也可以用空白鍵按；選擇題要自己點
   if (step.k) {
     // 只按看得到的「繼續」：還沒選完的卡片，空白鍵不能跳過
@@ -727,9 +794,11 @@ function advance() {
 }
 
 $('stage').addEventListener('click', (e) => {
-  if (e.target.closest('#panel, #pause, #hud')) return;
+  if (e.target.closest('#panel, #pause, #hud, #btnBack')) return;
   advance();
 });
+
+$('btnBack').onclick = (e) => { e.stopPropagation(); goBack(); };
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
@@ -742,6 +811,7 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     advance();
   }
+  if (e.key === 'ArrowLeft' && !e.target.closest?.('input, textarea')) goBack();
 });
 
 $('btnPause').onclick = pause;
@@ -757,6 +827,8 @@ function resetProgress() {
   state.dayStep = null;
   state.diary = [];
   state.thinkFirst = null;
+  state.history = [];
+  state.back = null;
 }
 
 // 回主畫面：標題 → 選角色

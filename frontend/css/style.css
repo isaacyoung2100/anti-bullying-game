@@ -301,6 +301,26 @@ button { cursor: pointer; }
 
 .next-hint.hide { visibility: hidden; }
 
+/* 上一句：手速太快沒看到時，可以回去重看 */
+.back-btn {
+  position: absolute;
+  left: 10cqw;
+  bottom: 1cqw;
+  min-height: 44px;
+  padding: 0 1cqw;
+  font-size: 3.6cqw;
+  color: var(--blue-pen);
+  background: none;
+  border: 0;
+}
+
+/* 重看中：文字變成鉛筆色，提醒這是剛剛的台詞 */
+.dialog.past .line { color: var(--ink-soft); }
+.dialog.past .next-hint { color: var(--blue-pen); }
+
+/* 一週回顧裡沒有寫的問題 */
+.diary-entry .blank { color: var(--ink-soft); }
+
 @keyframes blink { 50% { opacity: 0.25; } }
 
 /* ---------- 面板（標題、選角色、每天的標題卡、選擇、內心話、日記、回顧） ---------- */
