@@ -16,8 +16,6 @@
  * 兩份表單都不收集姓名和 email。
  */
 
-const SCALE_5 = ['1 非常不同意', '2 不同意', '3 普通', '4 同意', '5 非常同意'];
-
 const CHARACTERS = [
   '阿哲（愛畫畫，坐不住，常常忘東忘西）',
   '小雨（跑步很快，話不多，每天放學去接弟弟）',
@@ -60,13 +58,53 @@ function addConsent(form, title, helpText) {
   ]);
 }
 
+// 一組題目：先放一個小標題，再一題一題的 1–5 量尺
+// （不用「選擇題格」：表格左邊的題目欄寬度固定，題目一長就擠成一直條，手機上也難按）
 function addLikertGrid(form, title, helpText, rows) {
-  form.addGridItem()
+  form.addSectionHeaderItem().setTitle(title).setHelpText(helpText || '');
+  rows.forEach((row) => addScale(form, row));
+}
+
+function addScale(form, title) {
+  return form.addScaleItem()
     .setTitle(title)
-    .setHelpText(helpText || '')
-    .setRows(rows)
-    .setColumns(SCALE_5)
+    .setBounds(1, 5)
+    .setLabels('非常不同意', '非常同意')
     .setRequired(true);
+}
+
+/**
+ * 已經建好的成人版：把「選擇題格」原地換成一題一題的量尺
+ * 表單網址不變。用法：選函式 convertAdultGridsToScales，按「執行」
+ * 第一次會再要求一個「查看雲端硬碟檔案」的授權，用來依名稱找到表單
+ */
+function convertAdultGridsToScales() {
+  const files = DriveApp.getFilesByName('《五年三班大隊接力》試玩回饋問卷（成人版）');
+  let count = 0;
+  while (files.hasNext()) {
+    const form = FormApp.openById(files.next().getId());
+    const n = convertGrids(form);
+    Logger.log('已轉換：%s（%s 個表格）\n編輯網址：%s', form.getTitle(), n, form.getEditUrl());
+    count += 1;
+  }
+  if (!count) Logger.log('找不到成人版表單：請確認表單名稱沒有改過');
+}
+
+function convertGrids(form) {
+  const items = form.getItems();
+  let n = 0;
+  // 從後面往前換，前面題目的位置才不會跑掉
+  for (let i = items.length - 1; i >= 0; i--) {
+    if (items[i].getType() !== FormApp.ItemType.GRID) continue;
+    const grid = items[i].asGridItem();
+    const at = items[i].getIndex();
+    const created = [form.addSectionHeaderItem().setTitle(grid.getTitle()).setHelpText(grid.getHelpText())];
+    grid.getRows().forEach((row) => created.push(addScale(form, row)));
+    form.deleteItem(at);
+    created.forEach((item, k) => form.moveItem(item.getIndex(), at + k));
+    n += 1;
+  }
+  return n;
 }
 
 // ========== A. 成人版 ==========
