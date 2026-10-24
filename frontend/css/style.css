@@ -318,9 +318,6 @@ button { cursor: pointer; }
 .dialog.past .line { color: var(--ink-soft); }
 .dialog.past .next-hint { color: var(--blue-pen); }
 
-/* 一週回顧裡沒有寫的問題 */
-.diary-entry .blank { color: var(--ink-soft); }
-
 @keyframes blink { 50% { opacity: 0.25; } }
 
 /* ---------- 面板（標題、選角色、每天的標題卡、選擇、內心話、日記、回顧） ---------- */

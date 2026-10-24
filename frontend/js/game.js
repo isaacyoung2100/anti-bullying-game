@@ -545,7 +545,7 @@ function diaryWeekHtml() {
         ${e.skipped ? '' : `<span class="picked-feel ${e.quad}">${quads[e.quad].face} ${esc(e.word)}</span>`}
       </div>
       ${e.skipped ? `<p class="q">${t('diaryEmpty')}</p>`
-        : e.prompts.map((p, i) => `<p class="q">${esc(p)}</p>${e.answers[i] ? `<p>${esc(e.answers[i])}</p>` : `<p class="blank">${t('diaryNoAnswer')}</p>`}`).join('')}
+        : e.prompts.map((p, i) => `<p class="q">${esc(p)}</p>${e.answers[i] ? `<p>${esc(e.answers[i])}</p>` : ''}`).join('')}
     </div>`).join('');
 }
 
