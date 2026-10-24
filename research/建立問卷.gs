@@ -1,19 +1,25 @@
 /**
- * 《五年三班大隊接力》試玩問卷：自動建立兩份 Google 表單
+ * 《五年三班大隊接力》試玩問卷：自動建立三份 Google 表單
  *
- * 用法（只要做一次）：
+ * 用法：
  *   1. 打開 https://script.google.com ，按「新專案」
  *   2. 把這個檔案的內容全部貼上，取代原本的程式碼，按儲存
- *   3. 上方選單選函式 createAllForms，按「執行」
+ *   3. 上方選單選要執行的函式，按「執行」：
+ *        createAllForms     三份一起建立
+ *        createAdultOnly    只建一般成人版
+ *        createExpertOnly   只建教育專業版
+ *        createChildOnly    只建學童版
  *   4. 第一次會要求授權：選你的 Google 帳號 →「進階」→「前往（不安全）」→ 允許
  *      （這是你自己寫的程式，Google 才會這樣提醒）
- *   5. 執行完，下方「執行記錄」會列出兩份表單的填寫網址、編輯網址，以及收集回覆的試算表
+ *   5. 下方「執行記錄」會列出每份表單的填寫網址、編輯網址，以及收集回覆的試算表
  *
- * 會建立：
- *   A. 成人版：大學生、研究生、家長、老師（SUS 系統可用性 + 情意量表 + 開放題）
- *   B. 學童版：國小五、六年級（簡短量表 + 開放題 + 心情打勾，勾選需要幫忙的會看到求助說明）
+ * 三份表單：
+ *   A. 一般成人版：大學生、研究生、家長。以「玩家」身分回答遊玩感受
+ *   B. 教育專業版：國小教師、輔導教師、特教教師、師培生。以「專家」身分評估教育適切性與課堂可行性
+ *   C. 學童版：國小五、六年級。簡短量表 + 開放題 + 心情打勾（勾選需要幫忙的會看到求助說明）
  *
- * 兩份表單都不收集姓名和 email。
+ * 操作感受用 UMUX-Lite（2 題，7 點量尺），可以換算成 SUS 等級，見 research/問卷說明與分析.md
+ * 三份表單都不收集姓名和 email。
  */
 
 const CHARACTERS = [
@@ -32,14 +38,18 @@ const HELP_TEXT =
   '安心專線 1925（24 小時，心情很不好的時候）';
 
 function createAllForms() {
-  const adult = createAdultForm();
-  const child = createChildForm();
-  [adult, child].forEach((f) => {
-    Logger.log('====== %s ======', f.form.getTitle());
-    Logger.log('填寫網址（給受試者）：%s', f.form.getPublishedUrl());
-    Logger.log('編輯網址（給你）：%s', f.form.getEditUrl());
-    Logger.log('回覆試算表：%s', f.sheet.getUrl());
-  });
+  [createAdultForm(), createExpertForm(), createChildForm()].forEach(logForm);
+}
+
+function createAdultOnly() { logForm(createAdultForm()); }
+function createExpertOnly() { logForm(createExpertForm()); }
+function createChildOnly() { logForm(createChildForm()); }
+
+function logForm(f) {
+  Logger.log('====== %s ======', f.form.getTitle());
+  Logger.log('填寫網址（給受試者）：%s', f.form.getPublishedUrl());
+  Logger.log('編輯網址（給你）：%s', f.form.getEditUrl());
+  Logger.log('回覆試算表：%s', f.sheet.getUrl());
 }
 
 // 回覆自動寫進一份新的試算表
@@ -47,6 +57,14 @@ function linkSheet(form, name) {
   const sheet = SpreadsheetApp.create(name);
   form.setDestination(FormApp.DestinationType.SPREADSHEET, sheet.getId());
   return sheet;
+}
+
+function newForm(title, description) {
+  const form = FormApp.create(title);
+  form.setDescription(description);
+  form.setCollectEmail(false);
+  form.setProgressBar(true);
+  return form;
 }
 
 // 同意才繼續；不同意就直接結束
@@ -58,86 +76,63 @@ function addConsent(form, title, helpText) {
   ]);
 }
 
-// 一組題目：先放一個小標題，再一題一題的 1–5 量尺
-// （不用「選擇題格」：表格左邊的題目欄寬度固定，題目一長就擠成一直條，手機上也難按）
-function addLikertGrid(form, title, helpText, rows) {
-  form.addSectionHeaderItem().setTitle(title).setHelpText(helpText || '');
-  rows.forEach((row) => addScale(form, row));
-}
+const CONSENT_TEXT =
+  '．匿名：不收集姓名、email 或任何可以辨識你的資料。\n' +
+  '．用途：只用於學術研究統計，預計投稿第四屆情意教育國際研討會（ICAE4）。\n' +
+  '．自願：你可以隨時停止填寫，停止不會有任何影響。\n' +
+  '．遊戲和問卷都談到校園霸凌，如果回想起不舒服的經驗，請隨時停下來。\n' +
+  '研究聯絡人：（請填上你的姓名與聯絡方式）';
 
-function addScale(form, title) {
+function addScale(form, title, max = 5) {
   return form.addScaleItem()
     .setTitle(title)
-    .setBounds(1, 5)
+    .setBounds(1, max)
     .setLabels('非常不同意', '非常同意')
     .setRequired(true);
 }
 
-/**
- * 已經建好的成人版：把「選擇題格」原地換成一題一題的量尺
- * 表單網址不變。用法：選函式 convertAdultGridsToScales，按「執行」
- * 第一次會再要求一個「查看雲端硬碟檔案」的授權，用來依名稱找到表單
- */
-function convertAdultGridsToScales() {
-  const files = DriveApp.getFilesByName('《五年三班大隊接力》試玩回饋問卷（成人版）');
-  let count = 0;
-  while (files.hasNext()) {
-    const form = FormApp.openById(files.next().getId());
-    const n = convertGrids(form);
-    Logger.log('已轉換：%s（%s 個表格）\n編輯網址：%s', form.getTitle(), n, form.getEditUrl());
-    count += 1;
-  }
-  if (!count) Logger.log('找不到成人版表單：請確認表單名稱沒有改過');
+// 一組題目：先放一個小標題，再一題一題的量尺
+// （不用「選擇題格」：表格左邊的題目欄寬度固定，題目一長就擠成一直條，手機上也難按）
+function addGroup(form, title, helpText, rows) {
+  form.addSectionHeaderItem().setTitle(title).setHelpText(helpText || '');
+  rows.forEach((row) => addScale(form, row));
 }
 
-function convertGrids(form) {
-  const items = form.getItems();
-  let n = 0;
-  // 從後面往前換，前面題目的位置才不會跑掉
-  for (let i = items.length - 1; i >= 0; i--) {
-    if (items[i].getType() !== FormApp.ItemType.GRID) continue;
-    const grid = items[i].asGridItem();
-    const at = items[i].getIndex();
-    const created = [form.addSectionHeaderItem().setTitle(grid.getTitle()).setHelpText(grid.getHelpText())];
-    grid.getRows().forEach((row) => created.push(addScale(form, row)));
-    form.deleteItem(at);
-    created.forEach((item, k) => form.moveItem(item.getIndex(), at + k));
-    n += 1;
-  }
-  return n;
+// UMUX-Lite（Lewis, Utesch, & Maher, 2013）：兩題、7 點量尺
+function addUmuxLite(form) {
+  form.addPageBreakItem().setTitle('操作感受')
+    .setHelpText('請依照剛剛操作遊戲的感受作答（1 非常不同意，7 非常同意）。');
+  addScale(form, 'U1. 這個遊戲的功能符合我的需求。', 7);
+  addScale(form, 'U2. 這個遊戲很容易使用。', 7);
 }
 
-// ========== A. 成人版 ==========
+function addPlayedQuestions(form) {
+  form.addCheckboxItem().setTitle('你這次玩了哪些角色？（可複選）').setRequired(true)
+    .setChoiceValues(CHARACTERS);
+  form.addMultipleChoiceItem().setTitle('你有把至少一個角色的一週從頭玩到最後一頁嗎？').setRequired(true)
+    .setChoiceValues(['有，玩到最後一頁', '沒有，中途停下來']);
+}
+
+// ========== A. 一般成人版 ==========
 
 function createAdultForm() {
-  const form = FormApp.create('《五年三班大隊接力》試玩回饋問卷（成人版）');
-  form.setDescription(
+  const form = newForm('《五年三班大隊接力》試玩回饋問卷（一般成人版）',
     '感謝你試玩反霸凌情意體驗遊戲《五年三班大隊接力》。遊戲以國小高年級的校園生活為背景，' +
     '用第一人稱呈現被嘲笑、被排擠時的處境。\n\n' +
-    '這份問卷想了解你在遊玩時的操作感受、情感共鳴，以及對遊戲設計的看法，約需 8 分鐘。'
-  );
-  form.setCollectEmail(false);
-  form.setProgressBar(true);
+    '這份問卷想了解你玩的時候的感受，約需 6 分鐘。\n' +
+    '如果你是國小教師、輔導教師或師培生，請改填「教育專業版」。');
   form.setConfirmationMessage('謝謝你的回饋！\n\n' + HELP_TEXT);
 
-  addConsent(form, '研究說明與同意',
-    '．匿名：不收集姓名、email 或任何可以辨識你的資料。\n' +
-    '．用途：只用於學術研究統計，預計投稿第四屆情意教育國際研討會（ICAE4）。\n' +
-    '．自願：你可以隨時停止填寫，停止不會有任何影響。\n' +
-    '．遊戲和問卷都談到校園霸凌，如果回想起不舒服的經驗，請隨時停下來。\n' +
-    '研究聯絡人：（請填上你的姓名與聯絡方式）');
+  addConsent(form, '研究說明與同意', CONSENT_TEXT);
 
-  form.addPageBreakItem().setTitle('第一部分：基本資料');
+  form.addPageBreakItem().setTitle('基本資料');
   form.addMultipleChoiceItem().setTitle('你的年齡').setRequired(true)
     .setChoiceValues(['18–22 歲', '23–29 歲', '30–39 歲', '40–49 歲', '50 歲以上']);
   form.addMultipleChoiceItem().setTitle('你的性別').setRequired(true)
     .setChoiceValues(['男', '女', '其他／不想說']);
   form.addMultipleChoiceItem().setTitle('你的身分').setRequired(true)
-    .setChoiceValues(['大學生', '研究生', '國小教師或師培生', '家長', '其他']).showOtherOption(true);
-  form.addCheckboxItem().setTitle('你這次玩了哪些角色？（可複選）').setRequired(true)
-    .setChoiceValues(CHARACTERS);
-  form.addMultipleChoiceItem().setTitle('你有把至少一個角色的一週從頭玩到最後一頁嗎？').setRequired(true)
-    .setChoiceValues(['有，玩到最後一頁', '沒有，中途停下來']);
+    .setChoiceValues(['大學生', '研究生', '家長', '其他']).showOtherOption(true);
+  addPlayedQuestions(form);
   form.addMultipleChoiceItem()
     .setTitle('求學時期，你比較接近哪一種經驗？')
     .setHelpText('這一題可以選「不想回答」。')
@@ -149,71 +144,103 @@ function createAdultForm() {
       '不想回答',
     ]);
 
-  // SUS：維持標準題序與正反題交錯，計分方式才能和其他研究比較
-  form.addPageBreakItem().setTitle('第二部分：操作感受')
-    .setHelpText('請依照剛剛操作遊戲的真實感受作答。這部分是國際通用的「系統可用性量表（SUS）」。');
-  addLikertGrid(form, '操作感受', '', [
-    '1. 我想我會願意經常使用這個遊戲（例如在課堂上再次使用）。',
-    '2. 我覺得這個遊戲不必要地複雜。',
-    '3. 我覺得這個遊戲很容易使用。',
-    '4. 我覺得需要有人在旁邊協助，我才能使用這個遊戲。',
-    '5. 我覺得這個遊戲的各項功能（對話、選擇、日記）整合得很好。',
-    '6. 我覺得這個遊戲有太多不一致的地方。',
-    '7. 我想大部分的人都能很快學會使用這個遊戲。',
-    '8. 我覺得這個遊戲用起來很笨拙、很麻煩。',
-    '9. 使用這個遊戲時，我覺得很有信心。',
-    '10. 我需要先學很多東西，才能開始使用這個遊戲。',
-  ]);
+  addUmuxLite(form);
 
-  form.addPageBreakItem().setTitle('第三部分：遊玩時的感受')
-    .setHelpText('請評估你在遊玩過程中的感受與想法。');
-  addLikertGrid(form, '換位思考與同理', '', [
+  form.addPageBreakItem().setTitle('玩的時候的感受')
+    .setHelpText('請評估你在遊玩過程中的感受與想法（1 非常不同意，5 非常同意）。');
+  addGroup(form, '換位思考與同理', '', [
     'E1. 第一人稱「你」的視角，讓我覺得自己好像就在那間教室或操場。',
     'E2. 我能體會主角被嘲笑、被孤立時心裡的委屈、緊張與無力。',
-    'E3. 遊戲的情節讓我想起自己求學時期，或身邊同學類似的經歷。',
   ]);
-  addLikertGrid(form, '「說不出口」的設計', '心靈能量太低時，部分選項會被劃掉，並顯示主角心裡在怕什麼。', [
+  addGroup(form, '「說不出口」的設計', '心靈能量太低時，部分選項會被劃掉，並顯示主角心裡在怕什麼。', [
     'C1. 看到選項被劃掉、寫出主角在怕什麼，讓我更能理解被欺負的人為什麼沒有求助。',
     'C2. 我能理解主角有時候為什麼會低頭、跟著笑，或說「沒事」。',
     'C3. 這個設計讓我重新思考「被欺負的人只要勇敢說出來就好」這種想法。',
   ]);
-  addLikertGrid(form, '責任在誰', '', [
+  addGroup(form, '責任在誰', '', [
     'R1. 遊戲清楚傳達：被欺負是做出傷害行為的人的責任，不是被欺負的人的錯。',
-    'R2. 主角不管怎麼選，欺負的人和旁觀者都不會突然改變，這讓我覺得情境很真實。',
-    'R3. 週五老師主動介入，讓我感受到被欺負的人不需要一個人承擔。',
+    'R2. 週五老師主動介入，讓我感受到被欺負的人不需要一個人承擔。',
   ]);
-  addLikertGrid(form, '旁觀者可以做什麼', '', [
+  addGroup(form, '旁觀者可以做什麼', '', [
     'B1. 「換你想一想」讓我意識到，一句「你還好嗎？」或不跟著笑，也有很大的力量。',
     'B2. 普通同學冠宇的小善意（給一支筆、傳一句「我沒有笑」），讓我覺得旁觀者真的可以做點什麼。',
-    'B3. 玩完後，如果在現實中看到有人被孤立，我會更願意給他一點友善的關注。',
   ]);
-  addLikertGrid(form, '每天的日記', '每天結束時，選一格心情、替情緒取名字，再回答一個問題。', [
-    'D1. 寫日記讓我停下來，注意到角色當下的感受。',
-    'D2. 替情緒取名字（例如「委屈」「被冷落」）讓我更清楚角色的心情。',
+  addGroup(form, '每天的日記', '每天結束時，選一格心情、替情緒取名字，再回答一個問題。', [
+    'D1. 寫日記（選心情、替情緒取名字）讓我停下來，注意到角色當下的感受。',
   ]);
-  addLikertGrid(form, '玩的時候的心情', '這一題用來確認遊戲對玩家是否安全，請照實回答。', [
+  addGroup(form, '玩的時候的心情', '這一題用來確認遊戲對玩家是否安全，請照實回答。', [
     'S1. 遊玩過程中，有讓我覺得難以承受的不舒服。',
   ]);
 
-  form.addPageBreakItem().setTitle('第四部分：你的想法（選填）');
+  form.addPageBreakItem().setTitle('你的想法（選填）');
   form.addParagraphTextItem().setTitle('哪一個場景、對話或心裡話讓你印象最深？為什麼？');
-  form.addParagraphTextItem().setTitle('你對「說不出口」（選項被劃掉、寫出主角在怕什麼）這個設計有什麼感受？');
-  form.addParagraphTextItem().setTitle('以成年人的眼光回頭看，這個遊戲有沒有真實反映校園人際的困難？有什麼可以改進的地方？');
+  form.addParagraphTextItem().setTitle('有什麼讓你覺得不真實、不舒服，或可以改進的地方？');
 
-  return { form, sheet: linkSheet(form, '《五年三班大隊接力》成人版回覆') };
+  return { form, sheet: linkSheet(form, '《五年三班大隊接力》一般成人版回覆') };
 }
 
-// ========== B. 學童版 ==========
+// ========== B. 教育專業版 ==========
+
+function createExpertForm() {
+  const form = newForm('《五年三班大隊接力》教育專業評估問卷',
+    '感謝你以教育專業的角度試玩《五年三班大隊接力》。這是一款給國小五、六年級的反霸凌情意體驗遊戲：' +
+    '學生以第一人稱度過一位被欺負同學運動會前的一週，每天結束時寫一篇情緒日記。\n\n' +
+    '這份問卷想請你評估遊戲是否適合給國小高年級學生使用，約需 8 分鐘。你的專業意見會直接用來修改遊戲。');
+  form.setConfirmationMessage('謝謝你的專業回饋！');
+
+  addConsent(form, '研究說明與同意', CONSENT_TEXT);
+
+  form.addPageBreakItem().setTitle('基本資料');
+  form.addMultipleChoiceItem().setTitle('你的身分').setRequired(true)
+    .setChoiceValues(['國小教師（導師或科任）', '輔導教師', '特殊教育教師', '師資培育生', '其他']).showOtherOption(true);
+  form.addMultipleChoiceItem().setTitle('你在國小現場的年資（師培生請選「未滿 1 年」）').setRequired(true)
+    .setChoiceValues(['未滿 1 年', '1–5 年', '6–10 年', '11–20 年', '20 年以上']);
+  form.addMultipleChoiceItem().setTitle('你是否處理過校園霸凌或學生人際衝突的事件？').setRequired(true)
+    .setChoiceValues(['有，多次', '有，一兩次', '沒有']);
+  addPlayedQuestions(form);
+
+  addUmuxLite(form);
+
+  form.addPageBreakItem().setTitle('教育適切性評估')
+    .setHelpText('請以國小五、六年級學生為對象來評估（1 非常不同意，5 非常同意）。');
+  addGroup(form, '情境與語言', '', [
+    'P1. 故事中的霸凌情境（取綽號、排擠、班級群組、模仿嘲笑）符合台灣國小高年級的實際狀況。',
+    'P2. 角色的台詞符合五、六年級學生的說話方式。',
+  ]);
+  addGroup(form, '角色描寫', '角色涵蓋 ADHD 特質、單親經濟弱勢、新住民家庭、性別氣質、自閉症類群，以及替同學說話的普通學生。', [
+    'P3. 角色的描寫尊重差異，不會強化對這些學生的刻板印象。',
+    'P4. 每個角色都有自己的優點和力量，不只是被同情的對象。',
+  ]);
+  addGroup(form, '教育設計', '', [
+    'P5. 「說不出口」機制（選項被劃掉並顯示主角在怕什麼）能幫助學生理解受害者求助的困難。',
+    'P6. 故事中老師的處理方式（主動察覺、私下晤談、對全班不點名提醒）符合校園實務。',
+    'P7. 每天的日記（情緒象限、替情緒命名）適合讓學生練習自我覺察。',
+    'P8. 「換你想一想」能引導學生思考旁觀者可以做的小事。',
+  ]);
+  addGroup(form, '安全', '', [
+    'P9. 遊戲的安全設計（開場提醒、隨時暫停、求助專線、最多連續兩天被欺負）足以保護學生。',
+    'P10. 我擔心這個遊戲可能讓有被欺負經驗的學生感到二度傷害。',
+  ]);
+  addGroup(form, '課堂可行性', '', [
+    'P11. 學生可以在一節課（40 分鐘）內完成一個角色的一週並進行討論。',
+    'P12. 如果條件允許，我願意在課堂上使用這個遊戲。',
+  ]);
+
+  form.addPageBreakItem().setTitle('專業建議（選填，但非常寶貴）');
+  form.addParagraphTextItem().setTitle('劇情、台詞或角色描寫中，最需要修改的地方是什麼？');
+  form.addParagraphTextItem().setTitle('如果在課堂上使用，你會怎麼安排（前導活動、分組討論、綜合活動）？');
+  form.addParagraphTextItem().setTitle('有沒有需要特別注意的風險，或應該加上的安全措施？');
+
+  return { form, sheet: linkSheet(form, '《五年三班大隊接力》教育專業版回覆') };
+}
+
+// ========== C. 學童版 ==========
 
 function createChildForm() {
-  const form = FormApp.create('五年三班大隊接力：遊戲回饋單');
-  form.setDescription(
+  const form = newForm('五年三班大隊接力：遊戲回饋單',
     '辛苦你過完五年三班同學的一週！\n\n' +
     '這不是考試，沒有分數，也沒有標準答案。請照你剛剛玩遊戲時真實的想法回答。\n' +
-    '這份回饋單不寫名字，沒有人會知道是你寫的。'
-  );
-  form.setCollectEmail(false);
-  form.setProgressBar(true);
+    '這份回饋單不寫名字，沒有人會知道是你寫的。');
   form.setConfirmationMessage('謝謝你！\n\n' + HELP_TEXT);
 
   const willing = form.addMultipleChoiceItem().setTitle('你願意填這份回饋單嗎？').setRequired(true);
@@ -242,7 +269,6 @@ function createChildForm() {
     '我覺得這個故事很真實，像學校裡會發生的事。',
     '我會想推薦這個遊戲給其他同學玩。',
   ];
-  // 學童版用一題一題的量尺，手機上比表格好點
   childItems.forEach((text, n) => {
     form.addScaleItem()
       .setTitle(`${n + 1}. ${text}`)

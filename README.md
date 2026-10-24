@@ -74,6 +74,6 @@ docs/角色擴充簡報.md      給協作 AI：新角色與角色交織的構想
 docs/由來.md             遊戲由來與設計演變（手寫）
 docs/研究施測安全流程.md  研究或試玩時必須遵守的安全程序
 docs/測試報告.md         測試、審查與修正紀錄
-research/建立問卷.gs     自動建立兩份 Google 表單（成人版、學童版）的 Apps Script
+research/建立問卷.gs     自動建立三份 Google 表單（一般成人版、教育專業版、學童版）的 Apps Script
 research/問卷說明與分析.md 問卷的建立方式、修改理由與分析方法
 ```
