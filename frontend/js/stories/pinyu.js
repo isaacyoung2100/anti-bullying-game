@@ -86,15 +86,55 @@ const STORY = [
     effect: { courage: 5, kind: 1 } },
   { speaker: 'narrator', emo: 'happy', text: '只是一句普通的話。可是你覺得暖暖的。' },
 
-  // ---------------- 週三 ----------------
-  { k: 'day', day: '週三', title: '午餐的空位', bg: 'classroom',
-    recap: '午餐時，欣儀把外套放在品妤原本的位子上，說「這裡有人要坐了」。佳佳低著頭沒說話。',
-    diary: ['朋友把你的位子佔走時，你最想轉身去哪裡？'],
+  // ---------------- 週三（好的一天：連續兩天被欺負之後，這一天不會再被欺負）----------------
+  // 同一幕也出現在小雨的故事裡
+  { k: 'day', day: '週三', title: '跟小雨學起跑', bg: 'track',
+    diary: ['今天和新朋友在一起的時候，你心裡是什麼感覺？'],
+    recap: '體育課計時，品妤跑去請跑最快的小雨教她起跑。兩個人一起練了好久。',
+    help: [
+      { text: '也加入她們一起練起跑', result: '三個人一起數「預備——砰」，笑成一團。' },
+      { text: '跟她說：「你剛剛快了一秒耶！」', result: '她驚訝地看著你：「真的嗎？」' },
+      { text: '下課找她一起去喝水', result: '她跟你說，小雨其實很會講笑話。' },
+      { text: '幫她們在終點計時', result: '你大聲報出秒數，兩個人一起歡呼。' },
+    ] },
+  { bg: 'track', chars: [{ id: 'pinyu', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'happy' }],
+    speaker: 'narrator', text: '下午體育課計時。你跑完，喘著氣站在終點。' },
+  { speaker: 'teacher', text: '小雨，十四秒二，全班最快！' },
+  { speaker: 'narrator', text: '你想起來，你從來沒跟小雨說過話。', inner: '要不要過去問她？' },
+  { bg: 'track', chars: [{ id: 'pinyu', x: 52, emo: 'happy' }, { id: 'xiaoyu', x: 140, emo: 'neutral' }],
+    speaker: 'pinyu', text: '小雨，你怎麼跑那麼快！可以教我起跑嗎？' },
+  { speaker: 'xiaoyu', emo: 'happy', text: '好啊。你要先把重心放低，聽到「砰」再衝。',
+    effect: { courage: 5, kind: 1 } },
+  { k: 'choice', prompt: '你會怎麼做？', options: [
+    { text: '照著做，再跑一次。',
+      effect: { courage: 5 },
+      then: [
+        { speaker: 'narrator', emo: 'happy', text: '你蹲低，「砰」一響就衝出去。快了一秒！' },
+        { speaker: 'xiaoyu', emo: 'happy', text: '你看，快很多吧！', inner: '換一群人在一起，原來也可以這麼開心。' },
+      ] },
+    { text: '「明天可以再跟我一起練嗎？」',
+      effect: { courage: 5 },
+      then: [
+        { speaker: 'pinyu', emo: 'neutral', text: '明天可以再跟我一起練嗎？' },
+        { speaker: 'xiaoyu', emo: 'happy', text: '好啊，下課的時候。', inner: '我是不是交到新朋友了？' },
+      ] },
+    { text: '跟她說：「謝謝你，你人好好。」',
+      then: [
+        { speaker: 'pinyu', emo: 'happy', text: '謝謝你，你人好好。' },
+        { speaker: 'narrator', text: '小雨有點不好意思，把外套拉鍊拉下來一點點。' },
+      ] },
+  ] },
+  { speaker: 'narrator', emo: 'happy', text: '今天，你不用想辦法躲開誰。', inner: '如果每天都像今天就好了。' },
+
+  // ---------------- 週四（白天在學校，晚上和家人）----------------
+  { k: 'day', day: '週四', title: '午餐的空位', bg: 'classroom',
+    diary: ['朋友把你的位子佔走時，你最想轉身去哪裡？', '為了做對的事而覺得孤單時，誰的話能讓你重新站穩？'],
+    recap: '午餐時，欣儀把外套放在品妤原本的位子上，說「這裡有人要坐了」。佳佳低著頭沒說話。爸媽加班還沒回家。讀國二的姊姊看到品妤盯著手機發呆，拿了一瓶牛奶坐到她旁邊。',
     help: [
       { text: '端著便當坐到她對面：「這裡有人坐嗎？」', result: '她驚訝地抬起頭，你們聊起了便當的菜。' },
       { text: '跟佔位子的人說：「這桌本來就是四個人的。」', result: '那個女生有點不好意思，把外套拿開了。' },
-      { text: '分一塊水果給她', result: '一塊蘋果，讓她的眼睛有了一點笑意。' },
-      { text: '下課告訴老師，午餐時有人被故意排擠', result: '老師說：「謝謝你，老師會注意午餐的座位。」' },
+      { text: '傳訊息給她：「明天練接力，我幫你計時！」', result: '她回了一個笑臉和握拳。' },
+      { text: '決定明天早上主動跟她說早安', result: '隔天聽到你的早安，她笑得很開心。' },
     ] },
   { bg: 'classroom', chars: [{ id: 'pinyu', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '午餐時間。以前你都和佳佳、欣儀把桌子併在一起吃。' },
@@ -110,7 +150,7 @@ const STORY = [
     { text: '笑著說：「沒關係，我今天想一個人看書。」',
       effect: { courage: -5 },
       then: [{ speaker: 'pinyu', emo: 'happy', text: '沒差啊，我今天剛好想邊吃邊看小說。', inner: '說謊的時候，喉嚨為什麼這麼乾？' }] },
-    { text: '問阿明：「你旁邊有人坐嗎？」', need: 40, flag: 'satWithAming',
+    { text: '問阿明：「你旁邊有人坐嗎？」', need: 50, flag: 'satWithAming',
       fear: '坐過去，會不會連我也一起被笑？',
       effect: { courage: 5 },
       then: [
@@ -121,16 +161,7 @@ const STORY = [
       ] },
   ] },
 
-  // ---------------- 週四 ----------------
-  { k: 'day', day: '週四', title: '姊姊的牛奶', bg: 'home',
-    recap: '爸媽加班還沒回家。讀國二的姊姊看到品妤盯著手機發呆，拿了一瓶牛奶坐到她旁邊。',
-    diary: ['為了做對的事而覺得孤單時，誰的話能讓你重新站穩？'],
-    help: [
-      { text: '傳訊息給她：「明天練接力，我幫你計時！」', result: '她回了一個笑臉和握拳。' },
-      { text: '傳一張「真正的朋友不用討好」的圖給她', result: '她看了很久，按了一個愛心。' },
-      { text: '問爸媽：有人替別人說話後被排擠，可以怎麼幫她', result: '爸媽說：「她很勇敢。你可以先陪在她旁邊。」' },
-      { text: '決定明天早上主動跟她說早安', result: '隔天聽到你的早安，她笑得很開心。' },
-    ] },
+  // 晚上
   { bg: 'home', chars: [{ id: 'pinyu', x: 64, emo: 'sad' }, { id: 'sister', x: 128, emo: 'neutral' }],
     speaker: 'narrator', text: '晚上八點，爸媽還在公司加班。桌上留著便當錢。' },
   { speaker: 'narrator', text: '讀國二的姊姊洗完澡，看到你盯著手機發呆。她拿了牛奶坐過來。' },
@@ -179,7 +210,7 @@ const STORY = [
     { speaker: 'teacher', text: '姊姊和爸媽也在聯絡簿寫給老師了。謝謝你願意告訴家人。' },
   ] },
   { k: 'if', flag: 'satWithAming', then: [
-    { speaker: 'teacher', text: '禮拜三你坐到阿明旁邊，老師都看到了。' },
+    { speaker: 'teacher', text: '昨天你坐到阿明旁邊，老師都看到了。' },
   ] },
   { speaker: 'teacher', emo: 'happy', text: '替別人說話很不容易。這不是你的錯，老師會處理。',
     effect: { courage: 10, kind: 1 } },

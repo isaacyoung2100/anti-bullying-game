@@ -86,15 +86,49 @@ const STORY = [
       ] },
   ] },
 
-  // ---------------- 週三 ----------------
-  { k: 'day', day: '週三', title: '加油海報', bg: 'classroom',
-    diary: ['整節課只能遞彩色筆時，你在想什麼？', '那支金色的筆，對你來說代表什麼？'],
-    recap: '分組做加油海報，沒有人找阿哲一組。他明明最會畫畫，卻被叫去旁邊遞彩色筆。',
+  // ---------------- 週三（好的一天：連續兩天被欺負之後，這一天不會再被欺負）----------------
+  { k: 'day', day: '週三', title: '午休的筆記本', bg: 'classroom',
+    diary: ['今天有人喜歡你畫的東西時，你心裡是什麼感覺？'],
+    recap: '午休時，冠宇看到阿哲筆記本裡的閃電，請他教自己畫。兩個人畫了一整個午休。',
+    help: [
+      { text: '也湊過去看他畫畫', result: '他多畫了一隻閃電給你看，畫得超快。' },
+      { text: '跟他說：「你的筆記本可以借我看嗎？」', result: '他有點害羞，還是把筆記本推到你面前。' },
+      { text: '請他幫你們組的作業畫插圖', result: '那份作業，被老師拿起來給全班看。' },
+      { text: '跟他說：「下次也教我畫。」', result: '他說：「好啊，閃電要先畫鋸齒。」' },
+    ] },
+  { bg: 'classroom', chars: [{ id: 'azhe', x: 52, emo: 'neutral' }],
+    speaker: 'narrator', text: '午休的時候，你偷偷在筆記本上畫閃電。' },
+  { bg: 'classroom', chars: [{ id: 'azhe', x: 52, emo: 'surprised' }, { id: 'guanyu', x: 140, emo: 'happy' }],
+    speaker: 'guanyu', text: '哇，這是你畫的喔？好帥。可以教我嗎？',
+    effect: { courage: 5, kind: 1 } },
+  { speaker: 'narrator', emo: 'happy', text: '你愣了一下。好久沒有人這樣問你了。' },
+  { k: 'choice', prompt: '你會怎麼回答？', options: [
+    { text: '「好啊！閃電要先畫鋸齒。」',
+      effect: { courage: 5 },
+      then: [
+        { speaker: 'azhe', emo: 'happy', text: '好啊！閃電要先畫鋸齒，再畫亮亮的邊。' },
+        { speaker: 'narrator', emo: 'happy', text: '你們畫了一整個午休，連鐘響都沒聽到。', inner: '原來我也可以教別人。' },
+      ] },
+    { text: '把筆記本推過去，讓他自己翻。',
+      effect: { courage: 5 },
+      then: [{ speaker: 'narrator', emo: 'happy', text: '冠宇一頁一頁翻，一直說「好厲害」。', inner: '他看得好認真。' }] },
+    { text: '「我畫得不好啦……」',
+      then: [
+        { speaker: 'azhe', emo: 'neutral', text: '我畫得不好啦……' },
+        { speaker: 'guanyu', emo: 'happy', text: '哪有，比我好一百倍。', inner: '真的嗎？' },
+      ] },
+  ] },
+  { speaker: 'narrator', emo: 'happy', text: '今天，沒有人笑你。', inner: '如果每天都像今天就好了。' },
+
+  // ---------------- 週四（白天在學校，晚上和家人）----------------
+  { k: 'day', day: '週四', title: '加油海報', bg: 'classroom',
+    diary: ['整節課只能遞彩色筆時，你在想什麼？', '看著媽媽煮的飯，哪一句話最難說出口？'],
+    recap: '分組做加油海報，沒有人找阿哲一組。他明明最會畫畫，卻被叫去旁邊遞彩色筆。這個禮拜的事都還壓在阿哲心裡。晚上媽媽問他學校怎麼樣，他看著碗裡的飯，不知道該怎麼說。',
     help: [
       { text: '邀他來你們這一組', result: '他愣了一下，抱著筆記本跑過來。' },
       { text: '跟組員說：「讓阿哲畫閃電，他畫得超好。」', result: '那張海報的閃電，後來被貼在教室最前面。' },
-      { text: '把你的彩色筆分他一半', result: '他畫了一隻小閃電在你的鉛筆盒上。' },
-      { text: '下課告訴老師，分組時沒有人找他', result: '老師點點頭：「謝謝你，下次分組老師會注意。」' },
+      { text: '傳訊息給他：「明天要不要一起練起跑？」', result: '過了很久，他回了一個字：「好。」後面加了一個閃電。' },
+      { text: '決定明天早上在校門口等他', result: '隔天早上，他看到你的時候，愣了一下，然後笑了。' },
     ] },
   { bg: 'classroom', chars: [{ id: 'teacher', x: 96, emo: 'happy' }],
     speaker: 'teacher', text: '今天分組做運動會的加油海報！四個人一組，自己找組員。' },
@@ -110,7 +144,7 @@ const STORY = [
     { text: '默默把彩色筆遞給他們。',
       effect: { courage: -5 },
       then: [{ speaker: 'narrator', emo: 'sad', text: '你遞了一整節課的彩色筆。', inner: '算了，反正他們也不會想用我的畫。' }] },
-    { text: '小聲問：「我可以畫閃電嗎？」', need: 30,
+    { text: '小聲問：「我可以畫閃電嗎？」', need: 40,
       fear: '如果他們說不要，我會更丟臉。',
       then: [
         { speaker: 'azhe', emo: 'neutral', text: '我……我可以畫閃電嗎？' },
@@ -130,20 +164,11 @@ const STORY = [
   { speaker: 'guanyu', text: '（小聲）給你。我看過你畫的閃電，超帥的。',
     effect: { courage: 5, kind: 1 } },
 
-  // ---------------- 週四 ----------------
-  { k: 'day', day: '週四', title: '晚餐', bg: 'home',
-    diary: ['看著媽媽煮的飯，哪一句話最難說出口？'],
-    recap: '這個禮拜的事都還壓在阿哲心裡。晚上媽媽問他學校怎麼樣，他看著碗裡的飯，不知道該怎麼說。',
-    help: [
-      { text: '傳訊息給他：「明天要不要一起練起跑？」', result: '過了很久，他回了一個字：「好。」後面加了一個閃電。' },
-      { text: '傳一張閃電貼圖給他', result: '他回了三張閃電。' },
-      { text: '跟爸媽說班上的事，問他們該怎麼辦', result: '媽媽說：「你願意注意到，就已經很棒了。明天可以先去跟他打招呼。」' },
-      { text: '決定明天早上在校門口等他', result: '隔天早上，他看到你的時候，愣了一下，然後笑了。' },
-    ] },
+  // 晚上
   { bg: 'home', chars: [{ id: 'azhe', x: 64, emo: 'neutral' }, { id: 'mom', x: 128, emo: 'happy' }],
     speaker: 'mom', text: '今天在學校怎麼樣？運動會快到了吧？' },
   { speaker: 'narrator', text: '你看著碗裡的飯。',
-    inner: '星期一、星期二、星期三……' },
+    inner: '星期一、星期二、今天……' },
   { k: 'choice', prompt: '你會怎麼回答？', options: [
     { text: '「還好啊。」',
       effect: { courage: -5 },
@@ -187,7 +212,7 @@ const STORY = [
     { speaker: 'teacher', text: '媽媽昨天也打電話給老師了。謝謝你願意告訴媽媽。' },
   ] },
   { k: 'if', flag: 'toldTeacher', then: [
-    { speaker: 'teacher', text: '也謝謝你前天來找老師。' },
+    { speaker: 'teacher', text: '也謝謝你昨天來找老師。' },
   ] },
   { speaker: 'teacher', emo: 'neutral', text: '這不是你的錯。老師會處理，也不會讓大家知道是你說的。',
     effect: { courage: 10, kind: 1 } },

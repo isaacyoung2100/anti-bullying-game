@@ -81,15 +81,54 @@ const STORY = [
     effect: { courage: 5, kind: 1 } },
   { speaker: 'narrator', text: '只有一句話。可是你看了好多次。' },
 
-  // ---------------- 週三 ----------------
-  { k: 'day', day: '週三', title: '生日邀請卡', bg: 'classroom',
-    diary: ['佳佳走過你的座位時，那一秒你心裡是什麼感覺？'],
-    recap: '佳佳發生日派對的邀請卡，走過小雨的座位沒有停。旁邊的女生小聲說「她哪有錢買禮物」。',
+  // ---------------- 週三（好的一天：連續兩天被欺負之後，這一天不會再被欺負）----------------
+  // 同一幕也出現在品妤的故事裡（品妤請小雨教她起跑）
+  { k: 'day', day: '週三', title: '最快的第三棒', bg: 'track',
+    diary: ['今天有人說你跑得快的時候，你心裡有什麼感覺？'],
+    recap: '體育課計時，小雨跑出全班最快的成績。品妤跑過來，請她教自己怎麼起跑。',
+    help: [
+      { text: '在終點幫她大聲報秒數', result: '她聽到自己的秒數，眼睛亮了一下。' },
+      { text: '跟她說：「你跑超快，好厲害。」', result: '她小聲說「謝謝」，嘴角往上翹。' },
+      { text: '請她一起練交棒', result: '你們交了十次棒，一次都沒有掉。' },
+      { text: '下課找她一起去喝水', result: '她跟你說，弟弟也很愛跑步。' },
+    ] },
+  { bg: 'track', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'neutral' }],
+    speaker: 'teacher', text: '今天每個人都跑一次計時，看看我們班的實力！' },
+  { speaker: 'narrator', emo: 'happy', text: '「砰！」\n你一衝出去，風就從耳朵旁邊吹過。' },
+  { speaker: 'teacher', emo: 'happy', text: '小雨，十四秒二，全班最快！' },
+  { bg: 'track', chars: [{ id: 'xiaoyu', x: 52, emo: 'surprised' }, { id: 'pinyu', x: 140, emo: 'happy' }],
+    speaker: 'pinyu', text: '小雨，你怎麼跑那麼快！可以教我起跑嗎？',
+    effect: { courage: 5, kind: 1 } },
+  { k: 'choice', prompt: '你會怎麼回答？', options: [
+    { text: '「好啊，你要先把重心放低。」',
+      effect: { courage: 5 },
+      then: [
+        { speaker: 'xiaoyu', emo: 'happy', text: '好啊。你要先把重心放低，聽到「砰」再衝。' },
+        { speaker: 'narrator', emo: 'happy', text: '品妤照著做，第二次就快了一秒。', inner: '原來我會的東西，也可以教別人。' },
+      ] },
+    { text: '「我每天跑去接弟弟，就練快了。」',
+      effect: { courage: 5 },
+      then: [
+        { speaker: 'xiaoyu', emo: 'happy', text: '我每天跑去幼兒園接弟弟，就練快了。' },
+        { speaker: 'pinyu', emo: 'happy', text: '哇，那你弟弟一定覺得你超帥。', inner: '我從來沒想過，接弟弟也是一件很帥的事。' },
+      ] },
+    { text: '點點頭，在旁邊示範一次。',
+      then: [
+        { speaker: 'narrator', text: '你蹲下來，慢慢做一次起跑的動作。' },
+        { speaker: 'pinyu', emo: 'happy', text: '原來是這樣！謝謝你！' },
+      ] },
+  ] },
+  { speaker: 'narrator', emo: 'happy', text: '今天，沒有人笑你的外套。', inner: '如果每天都像今天就好了。' },
+
+  // ---------------- 週四（白天在學校，晚上和家人）----------------
+  { k: 'day', day: '週四', title: '生日邀請卡', bg: 'classroom',
+    diary: ['佳佳走過你的座位時，那一秒你心裡是什麼感覺？', '你為什麼會猶豫，要不要告訴媽媽？'],
+    recap: '佳佳發生日派對的邀請卡，走過小雨的座位沒有停。旁邊的女生小聲說「她哪有錢買禮物」。群組的照片還在。晚上媽媽八點半才下班，問小雨怎麼臉臭臭的。',
     help: [
       { text: '下課找她一起去福利社', result: '她愣了一下，說：「……好啊。」' },
       { text: '跟佳佳說：「也邀小雨吧。」', result: '佳佳想了一下，又拿出一張卡片。' },
-      { text: '約她禮拜天去公園，帶弟弟也可以', result: '她說：「弟弟很吵喔。」可是她在笑。' },
-      { text: '告訴老師，班上有人說她買不起禮物', result: '老師說：「謝謝你，老師會注意班上的說話方式。」' },
+      { text: '傳訊息給她：「明天練跑要不要一起？」', result: '她回：「好，我跑第三棒。」' },
+      { text: '決定明天早上主動跟她說早安', result: '隔天早上，她小聲回了一句：「早安。」' },
     ] },
   { bg: 'classroom', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }, { id: 'jiajia', x: 140, emo: 'happy' }],
     speaker: 'narrator', text: '下課時，佳佳拿著一疊粉紅色的卡片走過每個座位。是她禮拜天的生日派對邀請卡。' },
@@ -103,7 +142,7 @@ const STORY = [
       then: [{ speaker: 'narrator', emo: 'sad', text: '課本上的字一個都看不進去。', inner: '不要哭。在這裡哭就更丟臉了。' }] },
     { text: '說：「沒關係，我禮拜天也要照顧弟弟。」',
       then: [{ speaker: 'xiaoyu', emo: 'happy', text: '沒關係啊，我禮拜天也要照顧弟弟。', inner: '就算不用照顧弟弟，也沒有人會邀我。' }] },
-    { text: '問佳佳：「我也可以去嗎？」', need: 40,
+    { text: '問佳佳：「我也可以去嗎？」', need: 50,
       fear: '如果她說不行，我會更丟臉。',
       then: [
         { speaker: 'xiaoyu', emo: 'neutral', text: '佳佳……我也可以去嗎？' },
@@ -112,16 +151,7 @@ const STORY = [
       ] },
   ] },
 
-  // ---------------- 週四 ----------------
-  { k: 'day', day: '週四', title: '很晚的晚餐', bg: 'home',
-    diary: ['你為什麼會猶豫，要不要告訴媽媽？', '如果媽媽知道了，你最希望她對你說什麼？'],
-    recap: '群組的照片還在。晚上媽媽八點半才下班，問小雨怎麼臉臭臭的。',
-    help: [
-      { text: '傳訊息給她：「明天練跑要不要一起？」', result: '她回：「好，我跑第三棒。」' },
-      { text: '傳訊息給她：「你跑超快，明天第三棒靠你了。」', result: '她回了一個閃電貼圖。' },
-      { text: '跟爸媽說群組的事，問他們該怎麼辦', result: '爸爸說：「明天先告訴老師。你不用一個人處理。」' },
-      { text: '決定明天早上主動跟她說早安', result: '隔天早上，她小聲回了一句：「早安。」' },
-    ] },
+  // 晚上
   { bg: 'home', chars: [{ id: 'xiaoyu', x: 64, emo: 'neutral' }, { id: 'momX', x: 128, emo: 'happy' }],
     speaker: 'narrator', text: '媽媽八點半才下班，手上提著店裡多出來的玉米濃湯。' },
   { speaker: 'momX', emo: 'happy', text: '快，趁熱喝！弟弟今天在幼兒園把襪子穿在手上，老師笑到不行。' },

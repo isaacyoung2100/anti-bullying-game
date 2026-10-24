@@ -88,15 +88,49 @@ const STORY = [
   { speaker: 'guanyu', text: '那是越南春捲嗎？跟河粉店賣的一樣嗎？……看起來好像滿好吃的。',
     effect: { courage: 5, kind: 1 } },
 
-  // ---------------- 週三 ----------------
-  { k: 'day', day: '週三', title: '我的家鄉', bg: 'classroom',
-    diary: ['報告時，你最想讓大家知道媽媽家鄉的什麼？'],
-    recap: '社會課報告「我的家鄉」，志豪說阿明的媽媽「是外國人，講話都怪怪的」，後面有人在偷笑。',
+  // ---------------- 週三（好的一天：連續兩天被欺負之後，這一天不會再被欺負）----------------
+  { k: 'day', day: '週三', title: '數學小老師', bg: 'classroom',
+    diary: ['今天有人需要你幫忙的時候，你心裡是什麼感覺？'],
+    recap: '數學課有一題很難，班長佳佳請阿明教她。阿明講得很清楚，佳佳說「你好厲害」。',
+    help: [
+      { text: '也去問他那一題怎麼算', result: '他畫了一張圖，一下子就講懂了。' },
+      { text: '跟他說：「你講得比課本還清楚。」', result: '他笑了，又多教你一個小技巧。' },
+      { text: '請他當你們組的數學小老師', result: '你們組那次小考，每個人都進步了。' },
+      { text: '下課約他一起玩數獨', result: '他三分鐘就解完了，大家都看呆了。' },
+    ] },
+  { bg: 'classroom', chars: [{ id: 'aming', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'neutral' }],
+    speaker: 'teacher', text: '這一題比較難，大家先自己想想看。' },
+  { speaker: 'narrator', emo: 'happy', text: '你看了一下題目，馬上就知道要怎麼算了。' },
+  { bg: 'classroom', chars: [{ id: 'aming', x: 52, emo: 'surprised' }, { id: 'jiajia', x: 140, emo: 'neutral' }],
+    speaker: 'jiajia', text: '阿明，這題你會嗎？可以教我嗎？',
+    effect: { courage: 5, kind: 1 } },
+  { k: 'choice', prompt: '你會怎麼做？', options: [
+    { text: '畫一張圖，一步一步講給她聽。',
+      effect: { courage: 5 },
+      then: [
+        { speaker: 'narrator', text: '你畫了一張圖，一步一步講。' },
+        { speaker: 'jiajia', emo: 'happy', text: '原來是這樣！你講得比課本還清楚。', inner: '原來我會的東西，也可以幫到別人。' },
+      ] },
+    { text: '「我媽媽教我一個算法，很快喔。」',
+      effect: { courage: 5 },
+      then: [
+        { speaker: 'aming', emo: 'happy', text: '我媽媽教我一個算法，很快喔。' },
+        { speaker: 'jiajia', emo: 'happy', text: '哇，你媽媽好厲害！', inner: '有人說媽媽很厲害。' },
+      ] },
+    { text: '把你的算式借她看。',
+      then: [{ speaker: 'jiajia', emo: 'happy', text: '懂了！謝謝你！' }] },
+  ] },
+  { speaker: 'narrator', emo: 'happy', text: '今天，沒有人叫你的綽號。', inner: '如果每天都像今天就好了。' },
+
+  // ---------------- 週四（白天在學校，晚上和家人）----------------
+  { k: 'day', day: '週四', title: '我的家鄉', bg: 'classroom',
+    diary: ['報告時，你最想讓大家知道媽媽家鄉的什麼？', '媽媽說要來加油時，你心裡最害怕的是什麼？'],
+    recap: '社會課報告「我的家鄉」，志豪說阿明的媽媽「是外國人，講話都怪怪的」，後面有人在偷笑。晚上媽媽說運動會要去加油。阿明想到「外星阿明」，擔心大家也會笑媽媽的口音。',
     help: [
       { text: '舉手問：「芽莊的海真的很藍嗎？」', result: '他點點頭，說了好多海邊的事。有幾個同學也開始問。' },
       { text: '報告後跟他說：「你講得很好。」', result: '他小聲說：「真的嗎？」耳朵紅紅的。' },
-      { text: '不跟著偷笑', result: '後面的笑聲少了一個。' },
-      { text: '下課跟老師說，你很想聽芽莊的事', result: '老師說：「那下次社會課，我們請阿明再多說一點。」' },
+      { text: '傳訊息給他：「明天可以教我一句越南話嗎？」', result: '他回：「好啊！」然後傳來一串你看不懂的字。' },
+      { text: '決定明天早上主動跟他打招呼', result: '隔天早上，他說：「Chào！」是越南話的「你好」。' },
     ] },
   { bg: 'classroom', chars: [{ id: 'teacher', x: 96, emo: 'happy' }],
     speaker: 'teacher', text: '社會課的報告題目是「我的家鄉」。大家可以介紹爸爸媽媽長大的地方喔。' },
@@ -114,7 +148,7 @@ const STORY = [
     { text: '隨便講幾句，趕快坐下。',
       effect: { courage: -5 },
       then: [{ speaker: 'narrator', emo: 'sad', text: '你講了不到一分鐘，就回到座位上。', inner: '趕快結束就好。' }] },
-    { text: '介紹媽媽的家鄉：芽莊的海。', need: 35,
+    { text: '介紹媽媽的家鄉：芽莊的海。', need: 45,
       fear: '如果我講媽媽的家鄉，大家會不會更覺得我們很奇怪？',
       then: [
         { speaker: 'aming', emo: 'neutral', text: '我媽媽來自越南的芽莊。那裡的海是全世界最藍的，她小時候每天都去游泳。' },
@@ -122,16 +156,7 @@ const STORY = [
       ] },
   ] },
 
-  // ---------------- 週四 ----------------
-  { k: 'day', day: '週四', title: '晚餐', bg: 'home',
-    diary: ['媽媽說要來加油時，你心裡最害怕的是什麼？'],
-    recap: '晚上媽媽說運動會要去加油。阿明想到「外星阿明」，擔心大家也會笑媽媽的口音。',
-    help: [
-      { text: '傳訊息給他：「明天可以教我一句越南話嗎？」', result: '他回：「好啊！」然後傳來一串你看不懂的字。' },
-      { text: '傳訊息給他：「你媽媽做的春捲看起來超好吃。」', result: '他回：「我叫我媽多做一條給你。」' },
-      { text: '跟爸媽說班上的事，問他們該怎麼辦', result: '媽媽說：「明天先跟他打招呼，再告訴老師。」' },
-      { text: '決定明天早上主動跟他打招呼', result: '隔天早上，他說：「Chào！」是越南話的「你好」。' },
-    ] },
+  // 晚上
   { bg: 'home', chars: [{ id: 'aming', x: 64, emo: 'neutral' }, { id: 'momM', x: 128, emo: 'happy' }],
     speaker: 'momM', text: 'Ăn cơm đi！吃飯囉！禮拜六運動會，媽媽也會去幫你們加油喔！' },
   { speaker: 'narrator', text: '你想到媽媽在觀眾席大聲喊加油的樣子。\n想到大家會聽到她的口音。',

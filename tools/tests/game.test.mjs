@@ -8,7 +8,7 @@ import {
   STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, HELP_LINES, ZHIHAO_INNER,
 } from '../../frontend/js/story.js';
 import { enumeratePaths, lockRates } from '../lib/paths.mjs';
-import { dayMoods, longestWithoutGood } from '../lib/days.mjs';
+import { dayMoods, longestWithoutGood, breaksBadRun } from '../lib/days.mjs';
 
 const ALL = STORIES.map((st) => ({ st, paths: enumeratePaths(st, { start: START_COURAGE, overnight: OVERNIGHT }) }));
 
@@ -233,5 +233,13 @@ test('不會連續三天都沒有好事：最多連續兩天，就要有人主�
     const days = dayMoods(st);
     const run = longestWithoutGood(days);
     assert.ok(run <= 2, `${st.id} 有連續 ${run} 天沒有好事：${days.map((d) => `${d.day}${d.good ? '好' : ''}`).join(' ')}`);
+  }
+});
+
+test('最多連續兩天被欺負：連續兩天之後的那一天，整天都是好的', () => {
+  for (const { st } of ALL) {
+    const days = dayMoods(st);
+    const bad = breaksBadRun(days);
+    assert.equal(bad, null, `${st.id} 的${bad?.day}「${bad?.title}」接在連續兩天被欺負之後，卻${bad?.bad ? '又被欺負' : '沒有好事'}：${days.map((d) => `${d.day}${d.bad ? '壞' : ''}${d.good ? '好' : ''}`).join(' ')}`);
   }
 });

@@ -91,15 +91,54 @@ const STORY = [
       ] },
   ] },
 
-  // ---------------- 週三 ----------------
-  { k: 'day', day: '週三', title: '金色彩帶', bg: 'classroom',
-    recap: '做進場道具時，志豪拿走阿凱帶來的金色彩帶，綁在掃把上亂揮，說「男生拿彩帶很怪耶」。',
-    diary: ['有人拿你喜歡的事開玩笑時，你最想對他說什麼？'],
+  // ---------------- 週三（好的一天：連續兩天被欺負之後，這一天不會再被欺負）----------------
+  // 同一幕也出現在小晴的故事裡（小晴幫忙數拍子）
+  { k: 'day', day: '週三', title: '彩排', bg: 'track',
+    diary: ['今天大家跟著你跳的時候，你心裡是什麼感覺？'],
+    recap: '進場舞第一次全班彩排。阿凱帶大家跳，還請拍子最準的小晴幫忙數拍子。',
+    help: [
+      { text: '跟著他的動作認真跳', result: '你們這一排，是跳得最整齊的一排。' },
+      { text: '跟他說：「你教得好清楚！」', result: '他笑了：「那我們再來一次！」' },
+      { text: '幫他把音樂調大聲一點', result: '音樂一響，大家都跟著拍子動起來了。' },
+      { text: '下課請他再教你一個動作', result: '他放慢速度，一拍一拍教你。' },
+    ] },
+  { bg: 'track', chars: [{ id: 'kai', x: 52, emo: 'happy' }, { id: 'teacher', x: 140, emo: 'happy' }],
+    speaker: 'teacher', text: '今天全班第一次彩排進場舞！阿凱，交給你帶。' },
+  { speaker: 'narrator', text: '你站到隊伍前面，深吸一口氣。' },
+  { speaker: 'narrator', emo: 'happy', text: '音樂響起。你數著拍子，全班跟著你一起動。' },
+  { bg: 'track', chars: [{ id: 'kai', x: 52, emo: 'surprised' }, { id: 'qing', x: 140, emo: 'neutral' }],
+    speaker: 'qing', text: '第三小節慢了半拍。第五小節快了半拍。' },
+  { speaker: 'narrator', text: '你一聽就知道，她說的都對。' },
+  { k: 'choice', prompt: '你會怎麼做？', options: [
+    { text: '「小晴，你可以幫我數拍子嗎？」',
+      effect: { courage: 5 },
+      then: [
+        { speaker: 'kai', emo: 'happy', text: '小晴，你的拍子最準。可以幫我數嗎？' },
+        { speaker: 'qing', emo: 'neutral', text: '好。一、二、三、四。每一拍都一樣長。', inner: '兩個人一起，可以做得更好。' },
+      ] },
+    { text: '照她說的，把那兩小節再練一次。',
+      effect: { courage: 5 },
+      then: [{ speaker: 'narrator', emo: 'happy', text: '你們把那兩小節重練一次，真的整齊多了。', inner: '她聽得好仔細。' }] },
+    { text: '跟她說：「謝謝你，好厲害。」',
+      then: [
+        { speaker: 'kai', emo: 'happy', text: '謝謝你，你好厲害。' },
+        { speaker: 'qing', emo: 'neutral', text: '不客氣。我喜歡準確的東西。' },
+      ] },
+  ] },
+  { bg: 'track', chars: [{ id: 'kai', x: 52, emo: 'happy' }, { id: 'guanyu', x: 140, emo: 'happy' }],
+    speaker: 'class', text: '（跳完的時候，大家都拍手了。有人喊：「阿凱，帥喔！」）',
+    effect: { courage: 5, kind: 1 } },
+  { speaker: 'narrator', emo: 'happy', text: '今天，沒有人學你的動作。', inner: '如果每天都像今天就好了。' },
+
+  // ---------------- 週四（白天在學校，晚上和家人）----------------
+  { k: 'day', day: '週四', title: '金色彩帶', bg: 'classroom',
+    diary: ['有人拿你喜歡的事開玩笑時，你最想對他說什麼？', '看著疼你的家人，今天有哪一句話最難說出口？'],
+    recap: '做進場道具時，志豪拿走阿凱帶來的金色彩帶，綁在掃把上亂揮，說「男生拿彩帶很怪耶」。晚上，阿嬤夾了煎魚給阿凱，問他練舞順不順利。他看著阿嬤的手，不知道要不要說。',
     help: [
       { text: '幫他從材料箱找一卷新的金色彩帶', result: '阿凱看著你。你們一起把花環綁好了。' },
       { text: '跟志豪說：「那是全班表演要用的，還他。」', result: '志豪把彩帶丟回桌上，沒再多說。' },
-      { text: '下課幫他收剪刀和材料，順便聊天', result: '他跟你說了他最喜歡的一首舞曲。' },
-      { text: '悄悄告訴老師，有人拿走同學的道具', result: '老師提醒全班：材料要放回原位。彩帶找回來了。' },
+      { text: '傳訊息給他：「明天的進場走位，你排得超清楚！」', result: '他回了一個比讚的貼圖。' },
+      { text: '決定明天早上約他在校門口一起練舞', result: '隔天在校門口看到你，他開心地小跑步過來。' },
     ] },
   { bg: 'classroom', chars: [{ id: 'kai', x: 52, emo: 'neutral' }, { id: 'teacher', x: 140, emo: 'happy' }],
     speaker: 'teacher', text: '請大家把進場的舞圈綁上彩帶。老師去辦公室拿膠帶，馬上回來。' },
@@ -122,7 +161,7 @@ const STORY = [
         { speaker: 'teacher', emo: 'neutral', text: '謝謝你告訴老師。老師會處理，也不會說是你講的。' },
         { speaker: 'narrator', text: '下課前，彩帶回到了你的桌上。' },
       ] },
-    { text: '伸出手說：「請還給我，這是我阿嬤準備的。」', need: 45,
+    { text: '伸出手說：「請還給我，這是我阿嬤準備的。」', need: 55,
       fear: '如果他當著大家的面扯壞它，我該怎麼辦？',
       then: [
         { speaker: 'kai', emo: 'angry', text: '請你還給我。這是我阿嬤昨晚幫全班剪的。' },
@@ -135,16 +174,7 @@ const STORY = [
   { speaker: 'guanyu', text: '（小聲）這個很好黏。你做的花環很好看。',
     effect: { courage: 5, kind: 1 } },
 
-  // ---------------- 週四 ----------------
-  { k: 'day', day: '週四', title: '阿嬤的晚餐', bg: 'home',
-    recap: '晚上，阿嬤夾了煎魚給阿凱，問他練舞順不順利。他看著阿嬤的手，不知道要不要說。',
-    diary: ['看著疼你的家人，今天有哪一句話最難說出口？'],
-    help: [
-      { text: '傳訊息給他：「明天的進場走位，你排得超清楚！」', result: '他回了一個比讚的貼圖。' },
-      { text: '傳一張跳舞的柴犬貼圖給他', result: '他回了一張貓咪擊掌，心情好了一點。' },
-      { text: '問家人：同學一直被說不像男生，可以怎麼幫他？', result: '家人說：「明天早上，先邀他一起走進教室。」' },
-      { text: '決定明天早上約他在校門口一起練舞', result: '隔天在校門口看到你，他開心地小跑步過來。' },
-    ] },
+  // 晚上
   { bg: 'home', chars: [{ id: 'kai', x: 64, emo: 'neutral' }, { id: 'grandma', x: 128, emo: 'happy' }],
     speaker: 'narrator', text: '店裡的熨斗還在冒蒸氣。阿嬤把一塊煎魚夾進你的碗裡。' },
   { speaker: 'grandma', text: '阿凱，今天練舞順利嗎？怎麼一進門就在發呆？' },
@@ -192,7 +222,7 @@ const STORY = [
     { speaker: 'teacher', text: '阿嬤昨天也在聯絡簿寫給老師了。謝謝你願意告訴阿嬤。' },
   ] },
   { k: 'if', flag: 'toldTeacher', then: [
-    { speaker: 'teacher', text: '也謝謝你禮拜三來告訴老師彩帶的事。' },
+    { speaker: 'teacher', text: '也謝謝你昨天來告訴老師彩帶的事。' },
   ] },
   { speaker: 'teacher', text: '拿別人的性別特質取笑人，學校會很認真處理。' },
   { speaker: 'teacher', text: '老師今天會通報，學校的性平會也會一起幫忙。' },

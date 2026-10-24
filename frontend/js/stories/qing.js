@@ -87,15 +87,52 @@ const STORY = [
       ] },
   ] },
 
-  // ---------------- 週三 ----------------
-  { k: 'day', day: '週三', title: '假裝友善的玩笑', bg: 'classroom',
-    recap: '志豪笑瞇瞇地騙小晴：「沙坑挖到暴龍骨頭，叫你快去挖！」後面的人等著看她跑去。',
-    diary: ['別人笑著跟你說話、其實是在騙你的時候，你心裡是什麼感覺？'],
+  // ---------------- 週三（好的一天：連續兩天被欺負之後，這一天不會再被欺負）----------------
+  // 同一幕也出現在阿凱的故事裡
+  { k: 'day', day: '週三', title: '準確的拍子', bg: 'track',
+    diary: ['今天你幫上別人的時候，你心裡是什麼感覺？'],
+    recap: '進場舞彩排時，小晴聽出哪裡快了、哪裡慢了。阿凱請她幫忙數拍子。',
+    help: [
+      { text: '跟她說：「你的耳朵好厲害！」', result: '她點點頭：「我對聲音很敏感。」' },
+      { text: '彩排時站在她旁邊，讓她不會被擠到', result: '她跳完整首，都沒有摀耳朵。' },
+      { text: '問她：「你最喜歡哪一種恐龍？」', result: '她講了十分鐘的三角龍，你聽得好入迷。' },
+      { text: '請老師把音樂調小聲一點', result: '她的肩膀放鬆了，跟著拍子點頭。' },
+    ] },
+  { bg: 'track', chars: [{ id: 'qing', x: 52, emo: 'neutral' }, { id: 'kai', x: 140, emo: 'happy' }],
+    speaker: 'narrator', text: '今天全班第一次彩排進場舞。阿凱站在最前面帶大家跳。' },
+  { speaker: 'narrator', text: '音樂有點大聲，可是拍子很清楚。你在心裡數：一、二、三、四。' },
+  { speaker: 'narrator', text: '第三小節，大家慢了半拍。第五小節，又快了半拍。' },
+  { k: 'choice', prompt: '你會怎麼做？', options: [
+    { text: '說出你聽到的。',
+      effect: { courage: 5 },
+      then: [
+        { speaker: 'qing', emo: 'neutral', text: '第三小節慢了半拍。第五小節快了半拍。' },
+        { speaker: 'narrator', text: '阿凱愣了一下，然後眼睛亮了起來。' },
+      ] },
+    { text: '小聲跟旁邊的阿凱說。',
+      effect: { courage: 5 },
+      then: [
+        { speaker: 'qing', emo: 'neutral', text: '阿凱，第三小節慢了，第五小節快了。' },
+        { speaker: 'narrator', text: '阿凱聽完，馬上點點頭。' },
+      ] },
+    { text: '寫在筆記本上，等一下拿給他看。',
+      then: [{ speaker: 'narrator', text: '你寫下「第三小節慢、第五小節快」，拿給阿凱看。' }] },
+  ] },
+  { speaker: 'kai', emo: 'happy', text: '小晴，你的拍子最準。可以幫我數拍子嗎？',
+    effect: { courage: 5, kind: 1 } },
+  { speaker: 'qing', text: '好。一、二、三、四。每一拍都一樣長。' },
+  { speaker: 'narrator', emo: 'happy', text: '第二次，全班跳得整整齊齊。大家都拍手了。', inner: '我的耳朵，也可以幫上忙。' },
+  { speaker: 'narrator', emo: 'happy', text: '今天，沒有人故意嚇你。', inner: '如果每天都像今天就好了。' },
+
+  // ---------------- 週四（白天在學校，晚上和家人）----------------
+  { k: 'day', day: '週四', title: '假裝友善的玩笑', bg: 'classroom',
+    diary: ['別人笑著跟你說話、其實是在騙你的時候，你心裡是什麼感覺？', '你最想用什麼方式，讓爸爸知道今天學校發生的事？'],
+    recap: '志豪笑瞇瞇地騙小晴：「沙坑挖到暴龍骨頭，叫你快去挖！」後面的人等著看她跑去。晚上九點，開計程車的爸爸收工回家，看到小晴把恐龍模型排了一次又一次。',
     help: [
       { text: '提醒她：「他在亂講，學校沒有恐龍化石。」', result: '她停下來，翻開圖鑑確認，點了點頭。' },
       { text: '跟志豪說：「故意騙人看笑話，一點都不好笑。」', result: '志豪不高興地走開，沒有人跑去沙坑。' },
-      { text: '邀她：「這題數學怎麼算？我們一起對答案。」', result: '她坐回座位，很專心地算給你看。' },
-      { text: '下課告訴老師，有人故意騙同學去做奇怪的事', result: '老師提醒全班：故意騙人看笑話，也是欺負人。' },
+      { text: '傳訊息給她：「晚安，明天接力賽一起加油！」', result: '她回：「晚安。明天氣溫二十六度。」' },
+      { text: '決定明天進場時走在她旁邊，幫她隔開人群', result: '隔天集合時，她站在你旁邊，看起來比較安心。' },
     ] },
   { bg: 'classroom', chars: [{ id: 'qing', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '午休後，志豪笑瞇瞇地走過來。他的眼睛一直瞄向後面的同學。' },
@@ -112,14 +149,14 @@ const STORY = [
     { text: '不看他，低頭翻恐龍百科。',
       effect: { courage: -5 },
       then: [{ speaker: 'narrator', text: '你把百科立得高高的。', inner: '書不會騙人。書上寫的都是真的。' }] },
-    { text: '抬起頭，說出你知道的事實。', need: 40,
+    { text: '抬起頭，說出你知道的事實。', need: 50,
       fear: '如果我說錯了，大家會不會笑得更大聲？',
       then: [
         { speaker: 'qing', emo: 'neutral', text: '台灣沒有挖到過恐龍化石。你說的不是真的。' },
         { speaker: 'narrator', text: '教室安靜了一下。志豪聳聳肩走開了。', inner: '事實不會騙人。' },
       ] },
   ] },
-  // 連續兩天的壞事之後，這一天一定要有好事（不讓孩子連續三天只遇到糟糕的事）
+  // 被騙之後，阿凱來找她：昨天彩排一起數拍子，今天是朋友了
   { bg: 'classroom', chars: [{ id: 'qing', x: 52, emo: 'surprised' }, { id: 'kai', x: 140, emo: 'happy' }],
     speaker: 'narrator', text: '放學前，阿凱走過來，手上拿著一張恐龍貼紙。' },
   { speaker: 'kai', text: '你講化石的那段好厲害。這張三角龍給你。',
@@ -127,16 +164,7 @@ const STORY = [
   { speaker: 'narrator', emo: 'happy', text: '貼紙上的三角龍，有三根角，畫得很正確。',
     inner: '他聽懂了我說的話。' },
 
-  // ---------------- 週四 ----------------
-  { k: 'day', day: '週四', title: '爸爸的計程車', bg: 'home',
-    recap: '晚上九點，開計程車的爸爸收工回家，看到小晴把恐龍模型排了一次又一次。',
-    diary: ['你最想用什麼方式，讓爸爸知道今天學校發生的事？'],
-    help: [
-      { text: '傳訊息給她：「晚安，明天接力賽一起加油！」', result: '她回：「晚安。明天氣溫二十六度。」' },
-      { text: '傳一張小恐龍跑步的貼圖給她', result: '她回了一隻三角龍。' },
-      { text: '問資源班老師，運動會很吵時可以怎麼幫她', result: '老師說：「可以準備加油手卡，用比的就好。」' },
-      { text: '決定明天進場時走在她旁邊，幫她隔開人群', result: '隔天集合時，她站在你旁邊，看起來比較安心。' },
-    ] },
+  // 晚上
   { bg: 'home', chars: [{ id: 'qing', x: 64, emo: 'neutral' }, { id: 'dadQ', x: 128, emo: 'happy' }],
     speaker: 'narrator', text: '晚上九點，爸爸穿著計程車的制服回來，幫你把青椒挑掉。' },
   { speaker: 'dadQ', text: '小晴，你把暴龍和劍龍排了五次喔。今天學校很吵嗎？' },
@@ -161,7 +189,7 @@ const STORY = [
     { text: '把筆記本上的事，一條一條唸給爸爸聽。', need: 30, flag: 'toldMom',
       fear: '唸出來，那些事會不會變得更可怕？',
       then: [
-        { speaker: 'qing', emo: 'sad', text: '週一，鉛筆被弄亂。週二，故意摔椅子。週三，說不真實的話。' },
+        { speaker: 'qing', emo: 'sad', text: '週一，鉛筆被弄亂。週二，故意摔椅子。今天，說不真實的話。' },
         { speaker: 'dadQ', emo: 'sad', text: '……謝謝你寫得這麼清楚。欺負人是不對的，不是你的錯。' },
         { speaker: 'dadQ', emo: 'neutral', text: '明天爸爸先去學校跟林老師談。你不用一個人面對。',
           effect: { courage: 15, kind: 1 } },
