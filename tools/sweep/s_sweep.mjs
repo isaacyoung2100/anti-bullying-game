@@ -143,6 +143,9 @@ export default async ({ ev, shot, sleep }) => {
       await sleep(300); await look('最後一頁');
       if (!shared) {
         shared = true;
+        await ev(`document.getElementById('sheet').click()`); await sleep(1500);
+        await look('週記單');
+        await ev(`document.getElementById('go').click()`); await sleep(300);
         await ev(`document.getElementById('share').click()`); await sleep(1200);
         await look('分享');
       }

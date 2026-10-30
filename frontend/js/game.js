@@ -26,8 +26,10 @@ const state = {
   day: null,
   dayStep: null,      // 今天的標題卡（日記用它的引導問題）
   diary: [],          // 每天的日記 [{ day, quad, word, prompts, answers }]
+  picks: [],          // 這週做的選擇，給週記單 [{ day, prompt, text, cant }] 或 [{ day, who, text, none }]
   thinkFirst: null,   // 「換你想一想」第一次的選擇，給「聽完分享，再想一次」對照
   thinkAgain: null,   // 「聽完分享，再想一次」的選擇（分享圖用最後一次的選擇）
+  sheetWho: '',       // 週記單上的座號或名字（只畫在圖上）
   history: [],        // 看過的台詞（和當時的畫面），給「上一句」重看
   back: null,         // 正在重看：{ index, from: 'line' | 'panel' }
   anim: null,         // 場景動作：{ type: 'run' | 'shake' | 'jump' | 'cheer', who, t0 }
@@ -689,6 +691,9 @@ function stepChoice(step) {
   card.querySelectorAll('.choice:not(.locked)').forEach((btn) => {
     btn.onclick = () => {
       const o = step.options[Number(btn.dataset.n)];
+      // 記下選了什麼，也記下當時說不出口的選項：老師帶討論時，「想說卻說不出口」和選了什麼一樣重要
+      const cant = step.options.filter((x) => (x.need || 0) > state.courage).map((x) => x.text);
+      state.picks.push({ day: state.day, prompt: step.prompt, text: o.text, cant });
       if (o.flag) state.flags[o.flag] = true;
       applyEffect(o.effect);
       insertAfterCurrent(o.then);
@@ -715,6 +720,7 @@ function stepReact(step) {
       const o = step.options[Number(btn.dataset.n)];
       state.noticed += 1;
       if (!o.none) state.reached += 1;
+      state.picks.push({ day: state.day, who: step.who, text: o.text, none: !!o.none });
       insertAfterCurrent([{ speaker: 'narrator', glimpse: step.who, seenEmo: o.none ? undefined : 'happy', text: o.result }]);
       next();
     };
@@ -1045,8 +1051,10 @@ function wrapText(g, text, maxWidth) {
   const tokens = text.match(/[\u3000-\u9fff\uff00-\uffef]|[^\s\u3000-\u9fff\uff00-\uffef]+\s*|\s+/g) || [];
   const lines = [];
   let cur = '';
+  // 句號、逗號、右引號這類標點不放在行首：寧可讓這一行稍微超出一點
+  const noStart = /^[、。，．！？：；」』）〉》…]/;
   for (const tok of tokens) {
-    if (cur && g.measureText(cur + tok).width > maxWidth) {
+    if (cur && !noStart.test(tok) && g.measureText(cur + tok).width > maxWidth) {
       lines.push(cur.trimEnd());
       cur = tok.trimStart();
     } else {
@@ -1057,36 +1065,77 @@ function wrapText(g, text, maxWidth) {
   return lines;
 }
 
-function shareCard() {
-  const cv = document.createElement('canvas');
-  cv.width = 1080; cv.height = 1350;
-  const g = cv.getContext('2d');
-  const font = getComputedStyle(document.body).fontFamily;
-  const ink = '#3a3140';
-  const set = (size, weight = 700, color = ink) => { g.font = `${weight} ${size}px ${font}`; g.fillStyle = color; };
+const INK = '#3a3140';
+const RED_PEN = '#d0463c';
 
-  // 日記本的一頁：橫線、紅色邊線、裝訂孔
+// 畫圖用的筆：pen(g)(大小, 粗細, 顏色)
+const pen = (g) => {
+  const font = getComputedStyle(document.body).fontFamily;
+  return (size, weight = 700, color = INK) => { g.font = `${weight} ${size}px ${font}`; g.fillStyle = color; };
+};
+
+// 日記本的一頁：橫線、紅色邊線、裝訂孔
+function paperPage(g, w, h) {
   g.fillStyle = '#fbf7ee';
-  g.fillRect(0, 0, cv.width, cv.height);
+  g.fillRect(0, 0, w, h);
   g.strokeStyle = '#d3e0ec';
   g.lineWidth = 2;
-  for (let y = 120; y < cv.height; y += 72) { g.beginPath(); g.moveTo(0, y); g.lineTo(cv.width, y); g.stroke(); }
+  for (let y = 120; y < h; y += 72) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
   g.fillStyle = '#eba3a3';
-  g.fillRect(96, 0, 4, cv.height);
+  g.fillRect(96, 0, 4, h);
   g.fillStyle = '#2b2420';
-  for (let y = 70; y < cv.height; y += 130) { g.beginPath(); g.arc(46, y, 15, 0, Math.PI * 2); g.fill(); }
+  for (let y = 70; y < h; y += 130) { g.beginPath(); g.arc(46, y, 15, 0, Math.PI * 2); g.fill(); }
+}
 
-  const left = 150;
-  const width = cv.width - left - 80;
-  set(40, 700, '#d0463c');
-  g.fillText(t('shareKicker'), left, 110);
-  // 標題畫上螢光筆
+// 標題：小字（紅筆）加上畫了螢光筆的遊戲名稱
+function paperTitle(g, kicker, left, width) {
+  const set = pen(g);
+  set(40, 700, RED_PEN);
+  g.fillText(kicker, left, 110);
   set(84);
   const title = t('gameTitle');
   g.fillStyle = 'rgba(255, 226, 122, 0.85)';
   g.fillRect(left - 8, 150, Math.min(g.measureText(title).width + 16, width), 44);
   set(84);
   g.fillText(title, left, 200);
+}
+
+// 心裡的天氣：一天一格，高 170
+function weatherRow(g, left, y, width) {
+  const set = pen(g);
+  const font = getComputedStyle(document.body).fontFamily;
+  const tile = Math.min(130, (width - 5 * 14) / 6);
+  state.days.slice(0, 6).forEach((d, i) => {
+    const x = left + i * (tile + 14);
+    const w = weatherOf(d.courage);
+    g.fillStyle = '#ffffff';
+    g.strokeStyle = INK;
+    g.lineWidth = 3;
+    g.beginPath(); g.roundRect(x, y, tile, 170, 14); g.fill(); g.stroke();
+    g.font = `64px ${font}`;
+    g.textAlign = 'center';
+    g.fillText(w.icon, x + tile / 2, y + 85);
+    set(30);
+    g.textAlign = 'center';
+    g.fillText(w.word, x + tile / 2, y + 128);
+    set(26, 400, '#6f6578');
+    g.textAlign = 'center';
+    g.fillText(shortDay(d.day), x + tile / 2, y + 160);
+    g.textAlign = 'left';
+  });
+}
+
+function shareCard() {
+  const cv = document.createElement('canvas');
+  cv.width = 1080; cv.height = 1350;
+  const g = cv.getContext('2d');
+  const ink = INK;
+  const set = pen(g);
+  paperPage(g, cv.width, cv.height);
+
+  const left = 150;
+  const width = cv.width - left - 80;
+  paperTitle(g, t('shareKicker'), left, width);
 
   // 角色頭像（圓形貼紙）
   const pc = document.createElement('canvas');
@@ -1104,27 +1153,9 @@ function shareCard() {
   wrapText(g, t('shareWho', tr(state.story.name)), width - 290).forEach((l, i) => g.fillText(l, left + 290, 350 + i * 64));
 
   // 心裡的天氣
-  set(36, 700, '#d0463c');
+  set(36, 700, RED_PEN);
   g.fillText(t('shareWeather'), left, 600);
-  const tile = Math.min(130, (width - 5 * 14) / 6);
-  state.days.slice(0, 6).forEach((d, i) => {
-    const x = left + i * (tile + 14);
-    const w = weatherOf(d.courage);
-    g.fillStyle = '#ffffff';
-    g.strokeStyle = ink;
-    g.lineWidth = 3;
-    g.beginPath(); g.roundRect(x, 630, tile, 170, 14); g.fill(); g.stroke();
-    g.font = `64px ${font}`;
-    g.textAlign = 'center';
-    g.fillText(w.icon, x + tile / 2, 715);
-    set(30);
-    g.textAlign = 'center';
-    g.fillText(w.word, x + tile / 2, 758);
-    set(26, 400, '#6f6578');
-    g.textAlign = 'center';
-    g.fillText(shortDay(d.day), x + tile / 2, 790);
-    g.textAlign = 'left';
-  });
+  weatherRow(g, left, 630, width);
 
   // 換你想一想選的小事（最後一次的選擇）
   const pick = state.thinkAgain || state.thinkFirst;
@@ -1184,6 +1215,144 @@ function stepShare() {
   card.querySelector('#go').onclick = stepClosing;
 }
 
+// ---------- 給老師的週記單 ----------
+// 把這週的選擇、說不出口的話和日記整理成一張長圖，交給老師、上課討論時看著說
+// 和分享圖不一樣：週記單有日記內容，所以只給「下載」和「分享檔案」（例如傳到班級的作業區），不提供複製連結
+// 一樣什麼都不上傳：圖只在這台裝置上，學生自己按下載或分享才會交出去
+
+// 週記單的內容一行一行排下來：先量出高度，再畫
+function weekSheet(who) {
+  const cv = document.createElement('canvas');
+  cv.width = 1080;
+  const g = cv.getContext('2d');
+  const set = pen(g);
+  const left = 150;
+  const width = cv.width - left - 80;
+  const grey = '#6f6578';
+  const ops = [];
+  let y = 230;
+
+  const para = (text, { size = 34, weight = 400, color = INK, indent = 0, gap = 10 } = {}) => {
+    set(size, weight, color);
+    wrapText(g, text, width - indent).forEach((line) => {
+      y += Math.round(size * 1.5);
+      const at = y;
+      ops.push(() => { set(size, weight, color); g.fillText(line, left + indent, at); });
+    });
+    y += gap;
+  };
+  const heading = (text) => { y += 36; para(text, { size: 40, weight: 700, color: RED_PEN, gap: 14 }); };
+  const plain = (html) => html.replace(/<[^>]+>/g, '');
+
+  para(t('shareWho', tr(state.story.name)), { size: 40, weight: 700 });
+  para(t('sheetName', who || '＿＿＿＿＿＿'), { size: 36, weight: 700 });
+
+  if (state.days.length) {
+    heading(t('shareWeather'));
+    const at = y + 10;
+    ops.push(() => weatherRow(g, left, at, width));
+    y += 200;
+  }
+  para(plain(t('witnessFact', state.witness)), { size: 32 });
+  para(plain(t('kindFact', state.kind)), { size: 32 });
+  if (state.noticed) para(plain(t('reachFact', state.noticed, state.reached)), { size: 32 });
+
+  // 一天一段：那天的選擇、注意到的人、日記
+  const quads = t('quads');
+  state.story.story.filter((s) => s.k === 'day').forEach((d) => {
+    const picks = state.picks.filter((p) => p.day === d.day);
+    const entry = state.diary.find((e) => e.day === d.day);
+    if (!picks.length && !entry) return;
+    heading(t('dayTitle', tr(d.day), tr(d.title)));
+    picks.forEach((p) => {
+      if (p.who) {
+        para(t('sheetNoticed', nameOf(p.who), tr(p.text)), { weight: 700, indent: 20 });
+        return;
+      }
+      para(`▸ ${tr(p.prompt)}`, { size: 30, color: grey, indent: 20, gap: 0 });
+      para(t('sheetChose', tr(p.text)), { weight: 700, indent: 20, gap: p.cant.length ? 0 : 10 });
+      if (p.cant.length) para(t('sheetCant', p.cant.map(tr).join(t('listSep'))), { size: 30, color: '#9a4b45', indent: 20 });
+    });
+    if (entry && !entry.skipped) {
+      y += 8;
+      para(`${quads[entry.quad].face} ${t('diaryFeel', entry.word)}`, { weight: 700, indent: 20 });
+      entry.prompts.forEach((q, i) => {
+        para(q, { size: 30, color: grey, indent: 20, gap: 0 });
+        para(entry.answers[i] || t('sheetBlank'), { color: entry.answers[i] ? INK : grey, indent: 44 });
+      });
+    }
+  });
+
+  const first = state.thinkFirst;
+  if (first) {
+    heading(t('sheetThink'));
+    para(t('shareAct', tr(first.day.day), tr(first.action.text)), { weight: 700 });
+    const again = state.thinkAgain;
+    if (again) para(t('sheetAgain', tr(again.day.day), tr(again.action.text)), { weight: 700 });
+  }
+
+  y += 50;
+  para(`${t('gameTitle')}　${shareUrl().replace('https://', '')}`, { size: 28, color: '#3b6fb6' });
+
+  // iPad 的 Safari 一張圖最多約 1600 萬像素：太長就整張縮小
+  const h = y + 60;
+  const k = Math.min(1, 15000 / h);
+  cv.width = Math.round(1080 * k);
+  cv.height = Math.round(h * k);
+  g.scale(k, k);
+  paperPage(g, 1080, h);
+  paperTitle(g, t('sheetKicker'), left, width);
+  ops.forEach((op) => op());
+  return cv;
+}
+
+function stepSheet() {
+  const card = showPanel(`
+    <div class="kicker">${t('sheetKicker2')}</div>
+    <h2>${t('sheetTitle')}</h2>
+    <p class="diary-hint">${t('sheetHint')}</p>
+    <label class="own-word">${t('sheetNameLabel')}<input type="text" id="who" maxlength="20" placeholder="${t('sheetNamePh')}"></label>
+    <div class="share-btns">
+      <button class="btn" type="button" id="doShare" hidden>${t('shareBtn')}</button>
+      <a class="btn secondary" id="download" download="${esc(t('sheetFile'))}.png">${t('shareDownload')}</a>
+    </div>
+    <img class="share-img" id="sheetImg" alt="${esc(t('sheetAlt', tr(state.story.name)))}">
+    <div class="btn-row"><button class="btn secondary" type="button" id="go">${t('shareBack')}</button></div>
+  `, 'share-card sheet-card', { page: true });
+  const who = card.querySelector('#who');
+  const img = card.querySelector('#sheetImg');
+  const download = card.querySelector('#download');
+  const shareBtn = card.querySelector('#doShare');
+  let cv;
+  const render = () => {
+    state.sheetWho = who.value.trim();
+    cv = weekSheet(state.sheetWho);
+    const png = cv.toDataURL('image/png');
+    img.src = png;
+    download.href = png;
+  };
+  who.value = state.sheetWho;
+  render();
+  // 打字時不要每個字都重畫（長圖要畫一下子）
+  let timer;
+  who.oninput = () => { clearTimeout(timer); timer = setTimeout(render, 400); };
+  who.onchange = () => { clearTimeout(timer); render(); };
+
+  // 只有能分享檔案的裝置才顯示「分享」：只分享連結的話，老師就看不到內容了
+  const probe = new File([''], 'x.png', { type: 'image/png' });
+  if (navigator.canShare?.({ files: [probe] })) {
+    shareBtn.hidden = false;
+    shareBtn.onclick = async () => {
+      try {
+        const blob = await new Promise((r) => cv.toBlob(r, 'image/png'));
+        const file = new File([blob], `${t('sheetFile')}.png`, { type: 'image/png' });
+        await navigator.share({ files: [file], title: t('sheetKicker2') });
+      } catch { /* 使用者取消分享，或瀏覽器不允許 */ }
+    };
+  }
+  card.querySelector('#go').onclick = stepClosing;
+}
+
 function stepClosing() {
   setHudVisible(false);
   const card = showPanel(`
@@ -1197,7 +1366,8 @@ function stepClosing() {
       ${HELP_LINES.map((h) => `<p><b>${esc(tr(h.name))}　${esc(h.number)}</b><br><span>${esc(tr(h.note))}</span></p>`).join('')}
     </div>
     <p>${t('bystanderTip')}</p>
-    ${state.story ? `<button class="btn share-btn" type="button" id="share">${t('shareOpen')}</button>` : ''}
+    ${state.story ? `<button class="btn share-btn" type="button" id="sheet">${t('sheetOpen')}</button>` : ''}
+    ${state.story ? `<button class="btn secondary share-btn" type="button" id="share">${t('shareOpen')}</button>` : ''}
     <div class="btn-row">
       ${state.thinkFirst ? `<button class="btn" type="button" id="rethink">${t('againBtn')}</button>` : ''}
       ${state.story ? `<button class="btn secondary" type="button" id="again">${t('playAgain')}</button>` : ''}
@@ -1209,6 +1379,7 @@ function stepClosing() {
     insertAfterCurrent([{ k: 'think', again: true }, { k: 'closing' }]);
     next();
   });
+  card.querySelector('#sheet')?.addEventListener('click', stepSheet);
   card.querySelector('#share')?.addEventListener('click', stepShare);
   card.querySelector('#again')?.addEventListener('click', () => startStory(state.story.id));
   card.querySelector('#home').onclick = goHome;
@@ -1316,6 +1487,7 @@ function resetProgress() {
   state.day = null;
   state.dayStep = null;
   state.diary = [];
+  state.picks = [];
   state.thinkFirst = null;
   state.thinkAgain = null;
   state.history = [];
