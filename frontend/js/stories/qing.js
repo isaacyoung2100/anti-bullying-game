@@ -35,9 +35,8 @@ const STORY = [
     { text: '蹲下來，雙手抱住頭，閉上眼睛。',
       effect: { courage: -5 },
       then: [{ speaker: 'narrator', emo: 'cry', text: '你抱著頭蹲在桌子下面。', inner: '聲音太大、顏色太亂了。我需要安靜……' }] },
-    { text: '一直重複唸：「鉛筆散了、鉛筆散了……」',
-      effect: { courage: -5 },
-      then: [{ speaker: 'narrator', emo: 'sad', text: '你一直唸同一句話。志豪在旁邊學你的聲音。', inner: '為什麼他要發出奇怪的聲音？' }] },
+    { text: '閉上眼睛，吸氣數四下，吐氣數四下。',
+      then: [{ speaker: 'narrator', emo: 'neutral', text: '你閉上眼睛，一吸、一吐，數了好幾次。', inner: '心跳慢下來了。等一下，再把筆撿回來。' }] },
     { text: '一邊背甲龍的特徵，一邊把筆撿回來。', need: 45,
       fear: '如果我發出聲音，大家會不會圍過來看？',
       then: [

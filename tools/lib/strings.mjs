@@ -1,6 +1,6 @@
 // 收集遊戲中所有會顯示給玩家的劇本文字（翻譯表必須涵蓋這些字串）
 
-import { STORIES, CHARACTERS, ZHIHAO_INNER, HELP_LINES } from '../../frontend/js/story.js';
+import { STORIES, CHARACTERS, SCARED_LINE, HELP_LINES } from '../../frontend/js/story.js';
 
 export function storyStrings() {
   const out = new Set();
@@ -25,7 +25,7 @@ export function storyStrings() {
     for (const c of [st.contrast, st.contrast2].filter(Boolean)) { add(c.day); add(c.seen); add(c.truth); add(c.lead); }
   }
   Object.values(CHARACTERS).forEach((c) => add(c.name));
-  add(ZHIHAO_INNER);
+  add(SCARED_LINE);
   HELP_LINES.forEach((h) => { add(h.name); add(h.note); });
   return [...out];
 }

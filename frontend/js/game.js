@@ -1,5 +1,5 @@
 import {
-  STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, ZHIHAO_INNER, HELP_LINES,
+  STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, SCARED_LINE, HELP_LINES,
 } from './story.js?v=dev';
 import { W, H, INK, drawScene, drawForeground, drawProps, drawLight, drawChar, drawPortrait, sceneLabels } from './sprites.js?v=dev';
 import { t, tr, getLang, setLang } from './i18n.js?v=dev';
@@ -25,7 +25,7 @@ const state = {
   day: null,
   dayStep: null,      // 今天的標題卡（日記用它的引導問題）
   diary: [],          // 每天的日記 [{ day, quad, word, prompts, answers }]
-  picks: [],          // 這週做的選擇，給週記單 [{ day, prompt, text, cant }] 或 [{ day, who, text, none }]
+  picks: [],          // 這週做的選擇，給週記單 [{ day, prompt, text, need, scared }] 或 [{ day, who, text, none }]
   thinkFirst: null,   // 「換你想一想」選的那一天和那件小事（分享圖和週記單用）
   sheetWho: '',       // 週記單上的座號或名字（只畫在圖上）
   summary: null,      // 這週的你：{ text, share, ai }（反思頁顯示過的那一段，週記單和分享圖也用它）
@@ -230,33 +230,18 @@ function setHudVisible(on) {
   $('hud').classList.toggle('off', !on);
 }
 
-function updateHud(delta) {
+// 心靈能量不顯示在畫面上（數字會讓孩子以為在打分數）：
+// 只在程式裡算，用來決定選項旁要不要寫出心裡的害怕，以及回顧時每天的天氣
+function updateHud() {
   setHudVisible(true);
-  const fill = $('courageFill');
-  fill.style.width = `${state.courage}%`;
-  // 螢幕閱讀器用：不只靠長條和顏色
-  const bar = $('courageBar');
-  bar.setAttribute('aria-valuenow', String(state.courage));
-  bar.setAttribute('aria-valuetext', t('energyText', state.courage));
-  fill.style.background = state.courage >= 60 ? 'var(--good)' : state.courage >= 35 ? 'var(--mid)' : 'var(--bad)';
   $('dayChip').textContent = tr(state.day) || '';
-  const d = $('courageDelta');
-  if (delta) {
-    d.textContent = delta > 0 ? `+${delta}` : `${delta}`;
-    d.className = `mood-delta ${delta > 0 ? 'up' : 'down'}`;
-    setTimeout(() => { d.textContent = ''; }, 2500);
-  }
 }
 
 function applyEffect(effect) {
   if (!effect) return;
   state.witness += effect.witness || 0;
   state.kind += effect.kind || 0;
-  if (effect.courage) {
-    const before = state.courage;
-    state.courage = clamp(state.courage + effect.courage);
-    updateHud(state.courage - before);
-  }
+  if (effect.courage) state.courage = clamp(state.courage + effect.courage);
 }
 
 // ---------- 對話 ----------
@@ -429,7 +414,7 @@ function run() {
     choice: stepChoice,
     if: stepIf,
     ending: stepEnding,
-    zhihao: stepZhihao,
+    weekDone: stepWeekDone,
     react: stepReact,
     contrast: stepContrast,
     reflect: stepReflect,
@@ -608,8 +593,6 @@ function stepTitle() {
 function applyLang() {
   document.documentElement.lang = t('htmlLang');
   document.title = t('gameTitle');
-  document.querySelector('.courage-label').textContent = t('energy');
-  $('courageBar').setAttribute('aria-label', t('energy'));
   $('btnPause').textContent = t('pause');
   $('btnPause').setAttribute('aria-label', t('pauseLabel'));
   $('nextHint').textContent = t('nextHint');
@@ -677,30 +660,31 @@ function stepChoice(step) {
     <h2>${esc(tr(step.prompt))}</h2>
     <div class="choices">
       ${step.options.map((o, n) => {
-        const locked = (o.need || 0) > state.courage;
-        // 說不出口時，顯示心裡具體在怕什麼：說不出口是因為處境太難，不是因為不夠勇敢
-        return locked
-          // 用 aria-disabled 而不是 disabled：螢幕閱讀器才會念到「說不出口」，不會直接跳過
-          ? `<button class="choice locked" type="button" aria-disabled="true"><s>${esc(tr(o.text))}</s><span class="why">${t('cantSay')}</span>${o.fear ? `<span class="fear">${t('innerPrefix')}${esc(tr(o.fear))}</span>` : ''}</button>`
-          : `<button class="choice" type="button" data-n="${n}">${esc(tr(o.text))}</button>`;
+        // 勇氣不夠時，選項一樣可以選，括號裡寫出心裡在怕什麼：勇敢不是不害怕，是害怕的時候還是去做
+        const fear = scaredOf(o) ? `<span class="fear">（${t('innerPrefix')}${esc(tr(o.fear))}）</span>` : '';
+        return `<button class="choice" type="button" data-n="${n}">${esc(tr(o.text))}${fear}</button>`;
       }).join('')}
     </div>
     ${state.history.length ? `<button class="text-btn" type="button" id="review">${t('reviewBtn')}</button>` : ''}
   `, 'choice-card');
   card.querySelector('#review')?.addEventListener('click', goBack);
-  card.querySelectorAll('.choice:not(.locked)').forEach((btn) => {
+  card.querySelectorAll('.choice').forEach((btn) => {
     btn.onclick = () => {
       const o = step.options[Number(btn.dataset.n)];
-      // 記下選了什麼，也記下當時說不出口的選項：老師帶討論時，「想說卻說不出口」和選了什麼一樣重要
-      const cant = step.options.filter((x) => (x.need || 0) > state.courage).map((x) => x.text);
-      state.picks.push({ day: state.day, prompt: step.prompt, text: o.text, cant, need: o.need || 0 });
+      // 記下選了什麼，也記下是不是害怕還是做了：老師帶討論時，這和選了什麼一樣重要
+      const scared = scaredOf(o);
+      state.picks.push({ day: state.day, prompt: step.prompt, text: o.text, need: o.need || 0, scared });
       if (o.flag) state.flags[o.flag] = true;
       applyEffect(o.effect);
-      insertAfterCurrent(o.then);
+      // 害怕還是去做：先演出心跳很快的樣子，再接原本的劇情
+      insertAfterCurrent(scared ? [{ speaker: 'narrator', text: SCARED_LINE, inner: o.fear }, ...o.then] : o.then);
       next();
     };
   });
 }
+
+// 這個選項需要的勇氣，比現在的心靈能量多：還是能選，只是心裡會害怕
+const scaredOf = (o) => (o.need || 0) > state.courage && !!o.fear;
 
 // 背景一瞥的小回應：主角自己也在難受，可是還是可以做一點小事（一個眼神、一句小聲的話）
 // 「什麼都沒做」也是正常的選項：不劃掉、不扣能量，「這週的你」只說注意到了誰、做了什麼小事（每個角色一週兩次）
@@ -842,34 +826,23 @@ function diaryWeekHtml() {
 function stepEnding() {
   // 每個角色只有一個結局：欺負的人和旁觀者的行為固定，前面發生的事只透過旗標加入細節
   const contrast = state.story.contrast ? [{ k: 'contrast' }] : [];
-  insertAfterCurrent([...state.story.ending, { k: 'zhihao' }, ...contrast, { k: 'reflect' }, { k: 'think' }, { k: 'closing' }]);
+  insertAfterCurrent([...state.story.ending, { k: 'weekDone' }, ...contrast, { k: 'reflect' }, { k: 'think' }, { k: 'closing' }]);
   next();
 }
 
-function stepZhihao() {
+// 一週結束（看不到的一步）：記下週六心裡的天氣；一週的選擇都做完了，趁學生看對照頁，在背景請 AI 寫總結
+// 原本這裡有一頁「志豪的內心話」，已經拿掉：玩家扮演的是被欺負的人，不需要被要求去理解欺負他的人（見 docs/由來.md）
+function stepWeekDone() {
   state.view.phone = null;
   renderPhone();
   state.days.push({ day: state.day, courage: state.courage });
-  // 一週的選擇到這裡都做完了：趁學生看志豪和對照頁，在背景請 AI 寫總結
   state.summaryJob = aiSummary(summaryFacts());
   state.view.bg = 'classroom';
   state.view.props = [];
   state.view.zoom = null;
   state.view.time = null;
   state.view.beforeGlimpse = null;
-  state.view.chars = [{ id: 'zhihao', x: 96, emo: 'sad' }];
-  state.view.speaker = null;
-  const card = showPanel(`
-    <canvas class="portrait-lg" width="128" height="128" aria-hidden="true"></canvas>
-    <div>
-      <div class="kicker">${t('zhihaoKicker')}</div>
-      <h2>${t('zhihaoTitle')}</h2>
-      <p>${paragraphs(tr(ZHIHAO_INNER))}</p>
-      <div class="btn-row"><button class="btn" type="button" id="go">${t('cont')}</button></div>
-    </div>
-  `, 'inner-card');
-  drawPortrait(card.querySelector('canvas'), 'zhihao', 'sad');
-  card.querySelector('#go').onclick = next;
+  next();
 }
 
 // 同一天，在別人眼中：上面是這個禮拜自己看到的一瞥，下面是對方那天真正經歷的事
@@ -1291,8 +1264,8 @@ function weekSheet(who) {
         return;
       }
       if (!GENERIC.includes(p.prompt)) para(`▸ ${tr(p.prompt)}`, { size: 30, color: grey, indent: 20, gap: 0 });
-      para(t('sheetChose', tr(p.text)), { weight: 700, indent: 20, gap: p.cant.length ? 0 : 10 });
-      if (p.cant.length) para(t('sheetCant', p.cant.map(tr).join(t('listSep'))), { size: 30, color: '#9a4b45', indent: 20 });
+      para(t('sheetChose', tr(p.text)), { weight: 700, indent: 20, gap: p.scared ? 0 : 10 });
+      if (p.scared) para(t('sheetScared'), { size: 30, color: '#9a4b45', indent: 20 });
     });
     if (entry && !entry.skipped) {
       y += 8;

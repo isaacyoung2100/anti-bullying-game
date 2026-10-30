@@ -31,11 +31,9 @@ function playWeek(st, seed) {
       if (s.k === 'day') { endDay(); day = s.day; continue; }
       if (s.k === 'if') { if (rand(2)) walk(s.then); continue; }
       if (s.k === 'choice') {
-        // 和遊戲一樣：能量不夠的選項選不到
-        const open = s.options.filter((x) => (x.need || 0) <= courage);
-        const o = open.length ? open[rand(open.length)] : s.options[0];
-        const cant = s.options.filter((x) => (x.need || 0) > courage).map((x) => x.text);
-        state.picks.push({ day, prompt: s.prompt, text: o.text, cant, need: o.need || 0 });
+        // 和遊戲一樣：每個選項都能選；勇氣不夠還是選了，就是 scared
+        const o = s.options[rand(s.options.length)];
+        state.picks.push({ day, prompt: s.prompt, text: o.text, need: o.need || 0, scared: (o.need || 0) > courage && !!o.fear });
         courage = Math.max(0, Math.min(100, courage + (o.effect?.courage || 0)));
         walk(o.then);
         continue;
@@ -83,8 +81,7 @@ for (const lang of ['zh', 'en']) {
           assert.ok(d.day.length <= MAX.day && d.weather.length <= MAX.weather && (d.feel || '').length <= MAX.feel);
           assert.ok(d.chose.length <= 6 && d.noticed.length <= 3, `${st.id} ${d.day} 的選擇太多`);
           for (const c of d.chose) {
-            assert.ok(c.cant.length <= 4);
-            for (const s of [c.text, ...c.cant]) assert.ok(s.length <= MAX.text, `太長（${s.length}）：${s}`);
+            assert.ok(c.text.length <= MAX.text, `太長（${c.text.length}）：${c.text}`);
           }
           for (const n of d.noticed) assert.ok(n.who.length <= MAX.who && n.text.length <= MAX.text, `太長：${n.text}`);
         }

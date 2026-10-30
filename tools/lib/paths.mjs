@@ -1,8 +1,8 @@
 // 窮舉一個角色所有的選擇路徑
 // 規則與遊戲引擎（frontend/js/game.js）相同：每天早上 +OVERNIGHT、能量限制在 0–100、
-// 能量低於 need 的選項會被劃掉、if 只在旗標成立時展開
+// 每個選項都能選（能量低於 need 時，選了是「害怕還是做了」）、if 只在旗標成立時展開
 //
-// 每條路徑記錄：選了什麼、旗標、看到的每一句話、每個選擇點的能量與被劃掉的選項
+// 每條路徑記錄：選了什麼、旗標、看到的每一句話、每個選擇點的能量與當時會害怕的選項
 
 export function clamp(n) {
   return Math.max(0, Math.min(100, n));
@@ -33,20 +33,14 @@ export function enumeratePaths(story, { start, overnight }) {
         continue;
       }
       if (step.k === 'choice') {
-        const options = step.options.map((o) => ({ option: o, locked: (o.need || 0) > s.energy }));
-        const point = { day: s.day, prompt: step.prompt, energy: s.energy, locked: options.map((x) => x.locked) };
-        options.forEach(({ option, locked }, n) => {
-          if (locked) return;
+        const point = { day: s.day, prompt: step.prompt, energy: s.energy, scared: step.options.map((o) => (o.need || 0) > s.energy) };
+        step.options.forEach((option, n) => {
           const next = fork(s);
           next.choices.push({ ...point, picked: n });
           if (option.flag) next.flags[option.flag] = true;
           applyEffect(next, option.effect);
           walk([...option.then, ...queue], next);
         });
-        if (options.every((x) => x.locked)) {
-          s.deadEnds.push(point);
-          paths.push(s);
-        }
         return;
       }
       applyEffect(s, step.effect);
@@ -60,7 +54,7 @@ export function enumeratePaths(story, { start, overnight }) {
 
   walk([...list], {
     energy: start, day: null, flags: {}, choices: [], lines: [], energyLog: [],
-    witness: 0, kind: 0, energyRange: [start, start], deadEnds: [], inEnding: false,
+    witness: 0, kind: 0, energyRange: [start, start], inEnding: false,
   });
   return paths;
 }
@@ -73,7 +67,6 @@ function fork(s) {
     lines: [...s.lines],
     energyLog: [...s.energyLog],
     energyRange: [...s.energyRange],
-    deadEnds: [...s.deadEnds],
   };
 }
 
@@ -88,15 +81,15 @@ function applyEffect(s, effect) {
   }
 }
 
-// 每個選擇點、每個選項，在多少比例的到達路徑中被劃掉
-export function lockRates(paths) {
+// 每個選擇點、每個選項，在多少比例的到達路徑中會害怕（勇氣不夠還是選）
+export function scaredRates(paths) {
   const rates = new Map();
   for (const p of paths) {
     for (const c of p.choices) {
       const key = `${c.day}｜${c.prompt}`;
-      const r = rates.get(key) || { day: c.day, prompt: c.prompt, reached: 0, locked: c.locked.map(() => 0) };
+      const r = rates.get(key) || { day: c.day, prompt: c.prompt, reached: 0, scared: c.scared.map(() => 0) };
       r.reached += 1;
-      c.locked.forEach((l, i) => { if (l) r.locked[i] += 1; });
+      c.scared.forEach((l, i) => { if (l) r.scared[i] += 1; });
       rates.set(key, r);
     }
   }

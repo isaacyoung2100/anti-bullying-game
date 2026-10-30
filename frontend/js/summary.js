@@ -26,7 +26,7 @@ export function weekFacts({ story, days, picks, diary }, nameOf, weatherWord) {
         weather: weatherWord(d.courage),
         // 自己取的情緒詞是學生打的字：不送出去
         feel: entry && preset.has(entry.word) ? entry.word : null,
-        chose: mine.filter((p) => !p.who).map((p) => ({ text: tr(p.text), brave: (p.need || 0) > 0, cant: p.cant.map(tr) })),
+        chose: mine.filter((p) => !p.who).map((p) => ({ text: tr(p.text), brave: (p.need || 0) > 0, scared: !!p.scared })),
         noticed: mine.filter((p) => p.who).map((p) => ({ who: nameOf(p.who), text: tr(p.text), did: !p.none })),
       };
     }),
@@ -42,10 +42,11 @@ export function localSummary(f) {
   if (first && last && first !== last) lines.push([3, t('sumWeather', first.day, first.weather, last.day, last.weather)]);
 
   const chose = f.days.flatMap((d) => d.chose.map((c) => ({ ...c, day: d.day })));
-  const brave = chose.find((c) => c.brave);
-  if (brave) lines.push([1, t('sumBrave', brave.day, bare(brave.text))]);
-  const cant = chose.filter((c) => c.cant.length);
-  if (cant.length) lines.push([2, t('sumCant', cant.length, cant[0].day, bare(cant[0].cant[0]))]);
+  // 害怕還是去做的那一次最值得說；沒有的話，說一個需要勇氣的選擇
+  const scared = chose.find((c) => c.scared);
+  if (scared) lines.push([1, t('sumScared', scared.day, bare(scared.text))]);
+  const brave = chose.find((c) => c.brave && c !== scared);
+  if (brave) lines.push([2, t('sumBrave', brave.day, bare(brave.text))]);
 
   const noticed = f.days.flatMap((d) => d.noticed);
   const did = noticed.filter((n) => n.did);
@@ -65,7 +66,8 @@ export function localSummary(f) {
     used += line[1].length;
   });
 
-  const share = [did.length && t('shareReach', names(did)), brave && t('shareBrave', bare(brave.text)), t('shareFeel')]
+  const bold = scared || brave;
+  const share = [did.length && t('shareReach', names(did)), bold && t('shareBrave', bare(bold.text)), t('shareFeel')]
     .find((s) => s && s.length <= LIMITS[f.lang].share);
   return { text: lines.filter((l) => keep.has(l)).map((l) => l[1]).join(t('sentSep')), share, ai: false };
 }

@@ -5,19 +5,12 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
 import {
-  STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, HELP_LINES, ZHIHAO_INNER,
+  STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, HELP_LINES,
 } from '../../frontend/js/story.js';
-import { enumeratePaths, lockRates } from '../lib/paths.mjs';
+import { enumeratePaths, scaredRates } from '../lib/paths.mjs';
 import { dayMoods, longestWithoutGood, breaksBadRun } from '../lib/days.mjs';
 
 const ALL = STORIES.map((st) => ({ st, paths: enumeratePaths(st, { start: START_COURAGE, overnight: OVERNIGHT }) }));
-
-// 刻意設計成「每條路徑都說不出口」的選項；其他選項如果在所有路徑都被劃掉，就是數值沒調好
-const ALWAYS_LOCKED_OK = new Set([
-  'azhe|週一|2',  // 第一天就讓玩家遇到「說不出口」
-  'aming|週一|2',
-  'kai|週一|2',
-]);
 
 // 歧視用語與性別貶抑的綽號：需要呈現侮辱時，用綽號或嘲笑的行為呈現，不教孩子新的罵人字眼
 const FORBIDDEN = ['外籍新娘', '娘娘腔', '娘炮', '被笑娘', '女生國', '正義魔人', '智障'];
@@ -72,10 +65,26 @@ test('劇本格式：if 用到的旗標，一定有某個選項會設定', () =>
   }
 });
 
-test('不會卡關：每個選擇點至少有一個選項可以選', () => {
-  for (const { st, paths } of ALL) {
-    const stuck = paths.filter((p) => p.deadEnds.length);
-    assert.equal(stuck.length, 0, `${st.id} 有 ${stuck.length} 條路徑卡在全部被劃掉的選擇`);
+test('每個選擇點都有一個不需要勇氣的選項（例如退縮或保護自己）', () => {
+  for (const { st } of ALL) {
+    walkSteps([...st.story, ...st.ending], (s) => {
+      if (s.k === 'choice') assert.ok(s.options.some((o) => !o.need), `${st.id}「${s.prompt}」每個選項都需要勇氣`);
+    });
+  }
+});
+
+test('回嗆：只有阿哲、阿凱、品妤有，選了就演出後果，週五老師會回應', () => {
+  for (const { st } of ALL) {
+    const talk = [];
+    walkSteps(st.story, (s) => {
+      if (s.k === 'choice') talk.push(...s.options.filter((o) => o.flag === 'talkedBack'));
+    });
+    const expected = ['azhe', 'kai', 'pinyu'].includes(st.id) ? 1 : 0;
+    assert.equal(talk.length, expected, `${st.id} 的回嗆選項數量`);
+    for (const o of talk) {
+      assert.ok(!o.need && o.then.length >= 3, `${st.id} 的回嗆要直接能選，並演出後果`);
+      assert.ok(JSON.stringify(st.story).includes(`"flag":"talkedBack","then"`), `${st.id} 週五老師要回應回嗆`);
+    }
   }
 });
 
@@ -89,18 +98,6 @@ test('心靈能量永遠在 0 到 100 之間', () => {
   for (const { st, paths } of ALL) {
     for (const p of paths) {
       for (const e of p.energyLog) assert.ok(e.energy >= 0 && e.energy <= 100, `${st.id} ${e.day} 能量 ${e.energy}`);
-    }
-  }
-});
-
-test('只有刻意設計的選項，才會在每條路徑都被劃掉', () => {
-  for (const { st, paths } of ALL) {
-    for (const r of lockRates(paths)) {
-      r.locked.forEach((n, i) => {
-        if (n === r.reached) {
-          assert.ok(ALWAYS_LOCKED_OK.has(`${st.id}|${r.day}|${i}`), `${st.id} ${r.day} 選項 ${'ABC'[i]} 在每條路徑都被劃掉，但不在允許清單上`);
-        }
-      });
     }
   }
 });
@@ -166,17 +163,13 @@ test('求助資源包含教育部防制校園霸凌專線 1953', () => {
   assert.ok(HELP_LINES.some((h) => h.number === '1953'));
 });
 
-test('志豪的內心話要承擔責任，不只是說自己以前也被笑', () => {
-  assert.ok(ZHIHAO_INNER.includes('這不是藉口'));
-});
-
 // 路徑統計快照：數值改變時測試失敗，確認是刻意的再更新（UPDATE_SNAPSHOT=1 npm test）
 test('路徑統計與快照相同', () => {
   const file = new URL('./paths.snapshot.json', import.meta.url);
   const now = Object.fromEntries(ALL.map(({ st, paths }) => [st.id, {
     paths: paths.length,
     toldMom: paths.filter((p) => p.flags.toldMom).length,
-    lockRates: lockRates(paths).map((r) => `${r.day} ${r.locked.map((n) => Math.round((n / r.reached) * 100)).join('/')}`),
+    scaredRates: scaredRates(paths).map((r) => `${r.day} ${r.scared.map((n) => Math.round((n / r.reached) * 100)).join('/')}`),
   }]));
   if (process.env.UPDATE_SNAPSHOT) writeFileSync(file, `${JSON.stringify(now, null, 2)}\n`);
   const saved = JSON.parse(readFileSync(file, 'utf8'));

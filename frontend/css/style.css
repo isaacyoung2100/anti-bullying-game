@@ -110,7 +110,7 @@ button { cursor: pointer; }
   pointer-events: none;
 }
 
-/* ---------- 上方：心靈能量、日期、暫停 ---------- */
+/* ---------- 上方：日期、暫停（心靈能量不顯示數字，只在回顧時變成每天的天氣） ---------- */
 
 .hud {
   flex: none;
@@ -127,46 +127,8 @@ button { cursor: pointer; }
   z-index: 4;
 }
 
-.hud.off .courage,
 .hud.off .chip,
 .hud.off .pause-btn { visibility: hidden; }
-
-.courage {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: calc(1.8 * var(--u));
-  min-width: 0;
-}
-
-.courage-label { white-space: nowrap; }
-
-/* 用鉛筆畫的溫度計 */
-.courage-bar {
-  flex: 1;
-  height: calc(3.6 * var(--u));
-  background: #ffffff;
-  border: calc(0.5 * var(--u)) solid var(--ink);
-  border-radius: calc(2 * var(--u)) calc(0.8 * var(--u)) calc(2 * var(--u)) calc(0.8 * var(--u)) / calc(0.8 * var(--u)) calc(2 * var(--u)) calc(0.8 * var(--u)) calc(2 * var(--u));
-  overflow: hidden;
-}
-
-.courage-fill {
-  display: block;
-  height: 100%;
-  width: 70%;
-  background-color: var(--good);
-  background-image: repeating-linear-gradient(-55deg, rgba(255, 255, 255, 0.35) 0 calc(0.6 * var(--u)), transparent calc(0.6 * var(--u)) calc(1.4 * var(--u)));
-  transition: width 0.8s ease, background-color 0.3s;
-}
-
-.mood-delta {
-  min-width: calc(6 * var(--u));
-  font-weight: 700;
-}
-
-.mood-delta.up { color: var(--good); }
-.mood-delta.down { color: var(--red-pen); }
 
 /* 日期：紅色印章 */
 .chip {
@@ -665,26 +627,7 @@ button { cursor: pointer; }
 
 .choice:active { transform: translate(calc(0.4 * var(--u)), calc(0.6 * var(--u))); box-shadow: calc(0.2 * var(--u)) calc(0.3 * var(--u)) 0 var(--ink); }
 
-/* 說不出口的選項：被紅筆劃掉 */
-.choice.locked {
-  cursor: not-allowed;
-  background: transparent;
-  color: var(--ink-soft);
-  border-style: dashed;
-  border-color: #b9aeb5;
-  box-shadow: none;
-}
-
-.choice.locked::before { border-color: #b9aeb5; }
-.choice.locked s { text-decoration-color: var(--red-pen); text-decoration-thickness: calc(0.5 * var(--u)); }
-
-.choice .why {
-  display: block;
-  margin-top: calc(0.6 * var(--u));
-  font-size: calc(3.9 * var(--u));
-  color: var(--red-pen);
-}
-
+/* 勇氣不夠的選項一樣能選：下面用鉛筆小字寫出心裡在怕什麼 */
 .choice .fear {
   display: block;
   margin-top: calc(0.4 * var(--u));

@@ -10,7 +10,7 @@ FACTS = {
     "role": "阿明",
     "days": [
         {"day": "週一", "weather": "下雨", "feel": "害怕",
-         "chose": [{"text": "低下頭，看著自己的課本。", "brave": False, "cant": ["站起來說：「不要這樣叫我。」"]}],
+         "chose": [{"text": "下課後跟志豪說：「不要這樣叫我。」", "brave": True, "scared": True}],
          "noticed": []},
         {"day": "週二", "weather": "陰天", "feel": None, "chose": [],
          "noticed": [{"who": "小晴", "text": "走過去，把她掉的筆撿起來。", "did": True}]},
