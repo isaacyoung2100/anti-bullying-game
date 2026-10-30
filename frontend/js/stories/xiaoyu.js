@@ -260,7 +260,8 @@ const STORY = [
 // 運動會：只有一個結局。欺負的人和旁觀者在每條路徑都一樣
 // 媽媽週四說過會請假來看，所以每條路徑都在；有告訴媽媽，她會大聲喊加油
 const ENDING = [
-  { k: 'day', day: '週六', title: '運動會', bg: 'sportsday' },
+  { k: 'day', day: '週六', title: '運動會', bg: 'sportsday',
+    recap: '小雨穿著和大家一樣的班服，號碼布上有阿哲畫的金色閃電。有人小聲叫她「復古風女王」。她跑第三棒，一口氣超過兩個人，阿哲喊她「閃電女王」。輔導老師下禮拜想找她聊聊。' },
   { bg: 'sportsday', chars: [{ id: 'xiaoyu', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '你穿著和大家一樣的班服，號碼布上有阿哲畫的金色閃電。' },
   { speaker: 'narrator', text: '有人在後面小聲說：「復古風女王來了。」',

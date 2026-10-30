@@ -266,7 +266,8 @@ const STORY = [
 // 運動會：只有一個結局。欺負的人和旁觀者在每條路徑都一樣（後面一樣有人小聲說話）
 // 依前面發生的事加入細節：有告訴媽媽，媽媽就在觀眾席；和阿明聊過，他會提起約定
 const ENDING = [
-  { k: 'day', day: '週六', title: '運動會', bg: 'sportsday' },
+  { k: 'day', day: '週六', title: '運動會', bg: 'sportsday',
+    recap: '阿哲站上起跑線，後面有人小聲說「拜託不要又犯規」。他等「砰」再數一，衝了出去，把接力棒交出去，沒有犯規。老師約他下禮拜一午休帶畫冊去聊聊。' },
   { bg: 'sportsday', chars: [{ id: 'azhe', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '你站上起跑線。腿有一點抖。' },
   { speaker: 'narrator', text: '後面有人小聲說：「拜託不要又犯規。」',

@@ -265,7 +265,8 @@ const STORY = [
 
 // 運動會：只有一個結局。跑道邊的耳語在每條路徑都一樣
 const ENDING = [
-  { k: 'day', day: '週六', title: '第四棒', bg: 'sportsday' },
+  { k: 'day', day: '週六', title: '第四棒', bg: 'sportsday',
+    recap: '小晴戴著耳塞上場，跑道邊有人說「她也要跑接力喔？」她從小雨手中接過棒子，照固定的步伐直直往前衝，交給阿凱。老師約她下禮拜一午休聊恐龍。' },
   { bg: 'sportsday', chars: [{ id: 'qing', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '運動會的操場好吵。你戴著耳塞，尖叫聲變成了軟軟的悶響。' },
   { speaker: 'narrator', text: '跑道邊有人小聲說：「她也要跑接力喔？」',

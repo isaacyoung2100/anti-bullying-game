@@ -268,7 +268,8 @@ const STORY = [
 
 // 運動會：只有一個結局。欣儀和佳佳的反應在每條路徑都一樣
 const ENDING = [
-  { k: 'day', day: '週六', title: '真正的隊伍', bg: 'sportsday' },
+  { k: 'day', day: '週六', title: '真正的隊伍', bg: 'sportsday',
+    recap: '檢錄處，欣儀假裝沒看到品妤；佳佳跟她說「對不起，之前我不敢說話」。品妤跑第六棒，把棒子穩穩交給冠宇。老師約她下禮拜一午休聊聊。' },
   { bg: 'sportsday', chars: [{ id: 'pinyu', x: 52, emo: 'neutral' }, { id: 'xinyi', x: 140, emo: 'neutral' }],
     speaker: 'narrator', text: '大隊接力檢錄處，全班換上了一樣的號碼衣。' },
   { speaker: 'narrator', text: '欣儀走過你旁邊，假裝沒看到你。',

@@ -253,7 +253,8 @@ const STORY = [
 // 運動會：只有一個結局。欺負的人和旁觀者在每條路徑都一樣
 // 媽媽週四說會來；如果你請她不要來，她還是戴著帽子站在最後面
 const ENDING = [
-  { k: 'day', day: '週六', title: '運動會', bg: 'sportsday' },
+  { k: 'day', day: '週六', title: '運動會', bg: 'sportsday',
+    recap: '運動會開始前，阿明帶全班喊「Cố lên！五年三班！」，大家都笑了，這一次志豪沒有笑他。阿明把接力棒穩穩交了出去。老師說下禮拜想聽他說芽莊的海。' },
   { bg: 'sportsday', chars: [{ id: 'aming', x: 52, emo: 'neutral' }, { id: 'xiaoyu', x: 140, emo: 'happy' }],
     speaker: 'narrator', text: '比賽前，你、小雨、阿哲，還有幾個同學圍在一起。你深吸一口氣。' },
   { speaker: 'aming', emo: 'happy', text: 'Cố lên！五年三班！' },

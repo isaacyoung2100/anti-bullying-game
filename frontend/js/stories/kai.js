@@ -278,7 +278,8 @@ const STORY = [
 
 // 運動會：只有一個結局。旁邊別班的耳語在每條路徑都一樣
 const ENDING = [
-  { k: 'day', day: '週六', title: '運動會的節奏', bg: 'sportsday' },
+  { k: 'day', day: '週六', title: '運動會的節奏', bg: 'sportsday',
+    recap: '開幕進場，阿凱別著阿嬤縫的小花環走在前面，全班跟著他的節奏跳，這一次志豪沒有再學他。大隊接力他跑第五棒。老師約他下禮拜一午休聊聊。' },
   { bg: 'sportsday', chars: [{ id: 'kai', x: 52, emo: 'neutral' }],
     speaker: 'narrator', text: '開幕進場。你胸前別著阿嬤用金線縫好的小花環。' },
   { speaker: 'narrator', text: '旁邊別班有人小聲說：「你看三班前面那個男生……」',

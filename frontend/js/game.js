@@ -1257,30 +1257,36 @@ function weekSheet(who) {
   para(plain(t('kindFact', state.kind)), { size: 32 });
   if (state.noticed) para(plain(t('reachFact', state.noticed, state.reached)), { size: 32 });
 
-  // 一天一段：那天的選擇、注意到的人、日記
+  // 一天一段：那天發生什麼、那天的選擇、注意到的人、日記；週六（運動會）是結局，只有發生什麼
+  // 「你會怎麼做？」這類通用的問題不列出來（上面已經寫了那天發生什麼）；日記只列出有寫的題目
   const quads = t('quads');
-  state.story.story.filter((s) => s.k === 'day').forEach((d) => {
+  const GENERIC = ['你會怎麼做？', '你會怎麼回答？'];
+  const sat = state.story.ending.find((s) => s.k === 'day');
+  const days = [...state.story.story.filter((s) => s.k === 'day'), ...(state.days.some((d) => d.day === sat?.day) ? [sat] : [])];
+  days.forEach((d) => {
     const picks = state.picks.filter((p) => p.day === d.day);
     const entry = state.diary.find((e) => e.day === d.day);
-    if (!picks.length && !entry) return;
+    if (d !== sat && !picks.length && !entry) return;
     heading(t('dayTitle', tr(d.day), tr(d.title)));
-    // 先用一兩句話說那天發生什麼，選擇題的「你會怎麼做？」才看得懂
+    // 先用一兩句話說那天發生什麼，選擇才看得懂
     if (d.recap) para(tr(d.recap), { size: 30, color: grey, gap: 16 });
     picks.forEach((p) => {
       if (p.who) {
         para(t('sheetNoticed', nameOf(p.who), tr(p.text)), { weight: 700, indent: 20 });
         return;
       }
-      para(`▸ ${tr(p.prompt)}`, { size: 30, color: grey, indent: 20, gap: 0 });
+      if (!GENERIC.includes(p.prompt)) para(`▸ ${tr(p.prompt)}`, { size: 30, color: grey, indent: 20, gap: 0 });
       para(t('sheetChose', tr(p.text)), { weight: 700, indent: 20, gap: p.cant.length ? 0 : 10 });
       if (p.cant.length) para(t('sheetCant', p.cant.map(tr).join(t('listSep'))), { size: 30, color: '#9a4b45', indent: 20 });
     });
     if (entry && !entry.skipped) {
       y += 8;
       para(`${quads[entry.quad].face} ${t('diaryFeel', entry.word)}`, { weight: 700, indent: 20 });
-      entry.prompts.forEach((q, i) => {
+      const written = entry.prompts.map((q, i) => [q, entry.answers[i]]).filter(([, a]) => a);
+      if (!written.length) para(t('sheetNoDiary'), { size: 30, color: grey, indent: 20 });
+      written.forEach(([q, a]) => {
         para(q, { size: 30, color: grey, indent: 20, gap: 0 });
-        para(entry.answers[i] || t('sheetBlank'), { color: entry.answers[i] ? INK : grey, indent: 44 });
+        para(a, { indent: 44 });
       });
     }
   });
