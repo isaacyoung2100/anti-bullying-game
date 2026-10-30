@@ -835,24 +835,6 @@ button { cursor: pointer; }
   white-space: pre-line;
 }
 
-/* 聽完分享，再想一次：兩次的選擇並排 */
-.compare {
-  display: flex;
-  flex-direction: column;
-  gap: calc(2.4 * var(--u));
-  margin: calc(2 * var(--u)) 0 calc(4 * var(--u));
-}
-
-.compare > div {
-  padding: calc(2.4 * var(--u)) calc(4 * var(--u));
-  background: #ffffff;
-  border: calc(0.45 * var(--u)) solid var(--ink);
-  border-radius: var(--hand-border);
-}
-
-.compare .label { display: block; font-size: calc(3.8 * var(--u)); color: var(--red-pen); font-weight: 700; }
-.first-note { font-size: calc(4 * var(--u)); color: var(--ink-soft); }
-
 /* 最後 */
 .closing-card .big {
   display: inline-block;

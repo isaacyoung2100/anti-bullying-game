@@ -1,5 +1,5 @@
 // 亂玩壓力測試：像小孩一樣亂按，每一步都檢查
-// 亂選、亂按「上一句」、暫停又繼續、重新開始、日記亂打（HTML、表情符號、超長文字）、分享、再想一次、再玩一次
+// 亂選、亂按「上一句」、暫停又繼續、重新開始、日記亂打（HTML、表情符號、超長文字）、分享、週記單、再玩一次
 // 每一步檢查：怪字（undefined、NaN）、日記裡的 HTML 被執行、英文版出現中文、整頁可以橫向捲動、卡住
 import { writeFileSync, appendFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -100,8 +100,8 @@ export default async ({ ev, sleep }) => {
           await ev(`(window.__acts ||= []).push(${JSON.stringify(a)}); window.__acts = window.__acts.slice(-4)`);
           if (a === 'closing') {
             closings += 1;
-            // 最後一頁：先看分享卡，再「再想一次」，最後回主畫面
-            const next = closings === 1 ? 'share' : closings === 2 ? 'rethink' : closings === 3 ? 'again' : 'home';
+            // 最後一頁：先看分享卡，再看週記單，再玩一次，最後回主畫面
+            const next = closings === 1 ? 'share' : closings === 2 ? 'sheet' : closings === 3 ? 'again' : 'home';
             const ok = await ev(`const b = document.getElementById('${next}'); if (b) { b.click(); return true; } return false;`);
             if (next === 'again' && ok) { await sleep(200); await ev(`const r = document.querySelector('.role[data-id="${role}"]'); if (r) r.click();`); }
             if (next === 'home' || (!ok && closings > 3)) { done = true; break; }

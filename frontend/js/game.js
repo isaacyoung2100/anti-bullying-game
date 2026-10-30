@@ -27,8 +27,7 @@ const state = {
   dayStep: null,      // 今天的標題卡（日記用它的引導問題）
   diary: [],          // 每天的日記 [{ day, quad, word, prompts, answers }]
   picks: [],          // 這週做的選擇，給週記單 [{ day, prompt, text, cant }] 或 [{ day, who, text, none }]
-  thinkFirst: null,   // 「換你想一想」第一次的選擇，給「聽完分享，再想一次」對照
-  thinkAgain: null,   // 「聽完分享，再想一次」的選擇（分享圖用最後一次的選擇）
+  thinkFirst: null,   // 「換你想一想」選的那一天和那件小事（分享圖和週記單用）
   sheetWho: '',       // 週記單上的座號或名字（只畫在圖上）
   history: [],        // 看過的台詞（和當時的畫面），給「上一句」重看
   back: null,         // 正在重看：{ index, from: 'line' | 'panel' }
@@ -952,11 +951,9 @@ function stepReflect() {
 }
 
 // 換位思考：從被欺負的人回到旁觀者，想一件自己可以做的小事（不記錄、不評分）
-// again：進班的綜合活動，各組上台分享之後再想一次，和第一次的選擇對照
-function stepThink(step = {}) {
-  const again = !!step.again;
-  const first = state.thinkFirst;
-  const kicker = (n) => (again ? t('againKicker', n) : t('thinkKicker', n));
+// 各組分享之後再選一次，改在實體學習單上做，遊戲裡只選一次
+function stepThink() {
+  const kicker = (n) => t('thinkKicker', n);
   state.view.speaker = null;
   const st = state.story;
   const name = esc(tr(st.name));
@@ -973,7 +970,6 @@ function stepThink(step = {}) {
   const pickDay = () => {
     const card = showPanel(`
       <div class="kicker">${kicker(1)}</div>
-      ${again && first ? `<p class="first-note">${t('firstWas', esc(tr(first.day.day)), esc(tr(first.action.text)))}</p>` : ''}
       <h2>${t('thinkDayQ', name)}</h2>
       <div class="pick-col">
         ${days.map((d, n) => `
@@ -1009,21 +1005,6 @@ function stepThink(step = {}) {
   };
 
   const showResult = (day, action) => {
-    if (again && first) {
-      state.thinkAgain = { day, action };
-      const label = (d, a) => `${t('dayTitle', esc(tr(d.day)), esc(tr(d.title)))}<br>${esc(tr(a.text))}`;
-      showPanel(`
-        <div class="kicker">${kicker(3)}</div>
-        <div class="compare">
-          <div><span class="label">${t('firstLabel')}</span>${label(first.day, first.action)}</div>
-          <div><span class="label">${t('nowLabel')}</span>${label(day, action)}</div>
-        </div>
-        <p>${first.day === day && first.action.text === action.text ? t('sameNote') : t('changedNote')}</p>
-        <p><b>${t('youCanToo')}</b></p>
-        <div class="btn-row"><button class="btn" type="button" id="go">${t('cont')}</button></div>
-      `, 'think-card').querySelector('#go').onclick = next;
-      return;
-    }
     state.thinkFirst = { day, action };
     showPanel(`
       <div class="kicker">${kicker(3)}</div>
@@ -1158,7 +1139,7 @@ function shareCard() {
   weatherRow(g, left, 630, width);
 
   // 換你想一想選的小事（最後一次的選擇）
-  const pick = state.thinkAgain || state.thinkFirst;
+  const pick = state.thinkFirst;
   if (pick) {
     set(40);
     const lines = wrapText(g, t('shareAct', tr(pick.day.day), tr(pick.action.text)), width - 60);
@@ -1295,8 +1276,6 @@ function weekSheet(who) {
   if (first) {
     heading(t('sheetThink'));
     para(t('shareAct', tr(first.day.day), tr(first.action.text)), { weight: 700 });
-    const again = state.thinkAgain;
-    if (again) para(t('sheetAgain', tr(again.day.day), tr(again.action.text)), { weight: 700 });
   }
 
   y += 50;
@@ -1377,16 +1356,10 @@ function stepClosing() {
     ${state.story ? `<button class="btn share-btn" type="button" id="sheet">${t('sheetOpen')}</button>` : ''}
     ${state.story ? `<button class="btn secondary share-btn" type="button" id="share">${t('shareOpen')}</button>` : ''}
     <div class="btn-row">
-      ${state.thinkFirst ? `<button class="btn" type="button" id="rethink">${t('againBtn')}</button>` : ''}
       ${state.story ? `<button class="btn secondary" type="button" id="again">${t('playAgain')}</button>` : ''}
       <button class="btn secondary" type="button" id="home">${t('home')}</button>
     </div>
   `, 'closing-card', { page: true });
-  // 綜合活動：各組上台分享後，回到「換你想一想」再選一次
-  card.querySelector('#rethink')?.addEventListener('click', () => {
-    insertAfterCurrent([{ k: 'think', again: true }, { k: 'closing' }]);
-    next();
-  });
   card.querySelector('#sheet')?.addEventListener('click', stepSheet);
   card.querySelector('#share')?.addEventListener('click', stepShare);
   card.querySelector('#again')?.addEventListener('click', () => startStory(state.story.id));
@@ -1497,7 +1470,6 @@ function resetProgress() {
   state.diary = [];
   state.picks = [];
   state.thinkFirst = null;
-  state.thinkAgain = null;
   state.history = [];
   state.back = null;
   state.anim = null;
