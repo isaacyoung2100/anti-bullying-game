@@ -1264,6 +1264,8 @@ function weekSheet(who) {
     const entry = state.diary.find((e) => e.day === d.day);
     if (!picks.length && !entry) return;
     heading(t('dayTitle', tr(d.day), tr(d.title)));
+    // 先用一兩句話說那天發生什麼，選擇題的「你會怎麼做？」才看得懂
+    if (d.recap) para(tr(d.recap), { size: 30, color: grey, gap: 16 });
     picks.forEach((p) => {
       if (p.who) {
         para(t('sheetNoticed', nameOf(p.who), tr(p.text)), { weight: 700, indent: 20 });
