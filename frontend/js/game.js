@@ -1,8 +1,9 @@
 import {
   STORIES, CHARACTERS, START_COURAGE, OVERNIGHT, ZHIHAO_INNER, HELP_LINES,
 } from './story.js?v=dev';
-import { W, H, drawScene, drawForeground, drawProps, drawLight, drawChar, drawPortrait, sceneLabels } from './sprites.js?v=dev';
+import { W, H, INK, drawScene, drawForeground, drawProps, drawLight, drawChar, drawPortrait, sceneLabels } from './sprites.js?v=dev';
 import { t, tr, getLang, setLang } from './i18n.js?v=dev';
+import { weekFacts, localSummary, aiSummary, wakeAI } from './summary.js?v=dev';
 
 const $ = (id) => document.getElementById(id);
 const screen = $('screen');
@@ -18,8 +19,6 @@ const state = {
   i: 0,
   courage: START_COURAGE,
   witness: 0,         // 有人看到卻沒說話的次數
-  noticed: 0,         // 背景一瞥：注意到別人的次數
-  reached: 0,         // 注意到之後，做了一點什麼的次數
   kind: 0,            // 有人伸出手的次數
   flags: {},
   days: [],           // 每天結束時的勇氣 [{ day, courage }]
@@ -29,6 +28,8 @@ const state = {
   picks: [],          // 這週做的選擇，給週記單 [{ day, prompt, text, cant }] 或 [{ day, who, text, none }]
   thinkFirst: null,   // 「換你想一想」選的那一天和那件小事（分享圖和週記單用）
   sheetWho: '',       // 週記單上的座號或名字（只畫在圖上）
+  summary: null,      // 這週的你：{ text, share, ai }（反思頁顯示過的那一段，週記單和分享圖也用它）
+  summaryJob: null,   // 背景裡請 AI 寫總結的 Promise（沒有 AI 或失敗時得到 null）
   history: [],        // 看過的台詞（和當時的畫面），給「上一句」重看
   back: null,         // 正在重看：{ index, from: 'line' | 'panel' }
   anim: null,         // 場景動作：{ type: 'run' | 'shake' | 'jump' | 'cheer', who, t0 }
@@ -692,7 +693,7 @@ function stepChoice(step) {
       const o = step.options[Number(btn.dataset.n)];
       // 記下選了什麼，也記下當時說不出口的選項：老師帶討論時，「想說卻說不出口」和選了什麼一樣重要
       const cant = step.options.filter((x) => (x.need || 0) > state.courage).map((x) => x.text);
-      state.picks.push({ day: state.day, prompt: step.prompt, text: o.text, cant });
+      state.picks.push({ day: state.day, prompt: step.prompt, text: o.text, cant, need: o.need || 0 });
       if (o.flag) state.flags[o.flag] = true;
       applyEffect(o.effect);
       insertAfterCurrent(o.then);
@@ -702,7 +703,7 @@ function stepChoice(step) {
 }
 
 // 背景一瞥的小回應：主角自己也在難受，可是還是可以做一點小事（一個眼神、一句小聲的話）
-// 「什麼都沒做」也是正常的選項：不劃掉、不扣能量，回顧時只說「注意到幾次、做了幾次」（每個角色一週兩次）
+// 「什麼都沒做」也是正常的選項：不劃掉、不扣能量，「這週的你」只說注意到了誰、做了什麼小事（每個角色一週兩次）
 function stepReact(step) {
   state.view.speaker = null;
   const card = showPanel(`
@@ -717,8 +718,6 @@ function stepReact(step) {
   card.querySelectorAll('.choice').forEach((btn) => {
     btn.onclick = () => {
       const o = step.options[Number(btn.dataset.n)];
-      state.noticed += 1;
-      if (!o.none) state.reached += 1;
       state.picks.push({ day: state.day, who: step.who, text: o.text, none: !!o.none });
       insertAfterCurrent([{ speaker: 'narrator', glimpse: step.who, seenEmo: o.none ? undefined : 'happy', text: o.result }]);
       next();
@@ -851,6 +850,8 @@ function stepZhihao() {
   state.view.phone = null;
   renderPhone();
   state.days.push({ day: state.day, courage: state.courage });
+  // 一週的選擇到這裡都做完了：趁學生看志豪和對照頁，在背景請 AI 寫總結
+  state.summaryJob = aiSummary(summaryFacts());
   state.view.bg = 'classroom';
   state.view.props = [];
   state.view.zoom = null;
@@ -935,20 +936,39 @@ function stepReflect() {
       <span class="wx-label">${esc(shortDay(d.day))}</span>
     </div>`;
   }).join('');
-  showPanel(`
+  const card = showPanel(`
     <div class="kicker">${t('weekKicker')}</div>
     <h2>${t('weekTitle')}</h2>
     <div class="wx-row" role="list" aria-label="${t('weekAria')}">${tiles}</div>
     <div class="facts">
       <p>${t('witnessFact', state.witness)}</p>
-      <p>${t('kindFact', state.kind)}</p>
-      ${state.noticed ? `<p>${t('reachFact', state.noticed, state.reached)}</p>` : ''}
       <p class="quiet">${t('weekQuiet')}</p>
     </div>
+    <h2>${t('sumKicker')}</h2>
+    <div class="summary" id="summary" aria-live="polite"><p class="loading">${t('sumLoading')}</p></div>
     ${state.diary.length ? `<h2>${t('diaryWeekTitle')}</h2><div class="diary-week">${diaryWeekHtml()}</div>` : ''}
     <div class="btn-row"><button class="btn" type="button" id="go">${t('cont')}</button></div>
-  `, 'reflect-card', { page: true }).querySelector('#go').onclick = next;
+  `, 'reflect-card', { page: true });
+  card.querySelector('#go').onclick = next;
+  const fill = (s) => {
+    state.summary = s;
+    card.querySelector('#summary').innerHTML = `<p>${esc(s.text)}</p>${s.ai ? `<p class="ai-note">${t('sumByAi')}</p>` : ''}`;
+  };
+  if (state.summary) return fill(state.summary);
+  const job = state.summaryJob;
+  if (!job) return fill(localSummary(summaryFacts()));
+  // AI 還沒寫好就先顯示「正在整理」；拿不到（沒設定、太慢、失敗）就用程式組的句子
+  job.then((s) => {
+    if (state.summaryJob !== job) return;  // 已經重新開始玩了
+    const sum = s || localSummary(summaryFacts());
+    if (card.isConnected) fill(sum);
+    else state.summary = sum;
+  });
 }
+
+// 這週的你：沒有 AI 的版本隨時算得出來（例如從暫停選單直接離開，沒有經過反思頁）
+const summaryFacts = () => weekFacts(state, nameOf, (c) => weatherOf(c).word);
+const currentSummary = () => state.summary || localSummary(summaryFacts());
 
 // 換位思考：從被欺負的人回到旁觀者，想一件自己可以做的小事（不記錄、不評分）
 // 各組分享之後再選一次，改在實體學習單上做，遊戲裡只選一次
@@ -1046,7 +1066,6 @@ function wrapText(g, text, maxWidth) {
   return lines;
 }
 
-const INK = '#3a3140';
 const RED_PEN = '#d0463c';
 
 // 畫圖用的筆：pen(g)(大小, 粗細, 顏色)
@@ -1112,10 +1131,19 @@ function shareCard() {
   const g = cv.getContext('2d');
   const ink = INK;
   const set = pen(g);
-  paperPage(g, cv.width, cv.height);
-
   const left = 150;
   const width = cv.width - left - 80;
+
+  // 先量下面兩段有幾行：字多的時候圖拉長一點，不要把網址擠出去
+  const pick = state.thinkFirst;
+  set(40);
+  const actLines = pick ? wrapText(g, t('shareAct', tr(pick.day.day), tr(pick.action.text)), width - 60) : [];
+  set(36, 400);
+  const shareLines = wrapText(g, currentSummary().share, width).slice(0, 3);
+  const inviteY = Math.max(1200, 850 + (pick ? 84 + actLines.length * 58 : 0) + shareLines.length * 52 + 90);
+  cv.height = Math.max(1350, inviteY + 95);
+
+  paperPage(g, cv.width, cv.height);
   paperTitle(g, t('shareKicker'), left, width);
 
   // 角色頭像（圓形貼紙）
@@ -1138,24 +1166,27 @@ function shareCard() {
   g.fillText(t('shareWeather'), left, 600);
   weatherRow(g, left, 630, width);
 
-  // 換你想一想選的小事（最後一次的選擇）
-  const pick = state.thinkFirst;
+  // 換你想一想選的小事
+  let y = 850;
   if (pick) {
-    set(40);
-    const lines = wrapText(g, t('shareAct', tr(pick.day.day), tr(pick.action.text)), width - 60);
-    const h = 44 + lines.length * 58;
+    const h = 44 + actLines.length * 58;
     g.fillStyle = '#ffffff';
     g.strokeStyle = ink;
     g.lineWidth = 4;
-    g.beginPath(); g.roundRect(left, 850, width, h, 18); g.fill(); g.stroke();
+    g.beginPath(); g.roundRect(left, y, width, h, 18); g.fill(); g.stroke();
     set(40);
-    lines.forEach((l, i) => g.fillText(l, left + 30, 910 + i * 58));
+    actLines.forEach((l, i) => g.fillText(l, left + 30, y + 60 + i * 58));
+    y += h + 40;
   }
 
+  // 這週的你，給朋友看的一句話（不放完整的總結）
+  set(36, 400);
+  shareLines.forEach((l) => { y += 52; g.fillText(l, left, y); });
+
   set(40);
-  g.fillText(t('shareInvite'), left, 1200);
+  g.fillText(t('shareInvite'), left, inviteY);
   set(34, 700, '#3b6fb6');
-  g.fillText(shareUrl().replace('https://', ''), left, 1255);
+  g.fillText(shareUrl().replace('https://', ''), left, inviteY + 55);
   return cv;
 }
 
@@ -1235,8 +1266,11 @@ function weekSheet(who) {
     y += 200;
   }
   para(plain(t('witnessFact', state.witness)), { size: 32 });
-  para(plain(t('kindFact', state.kind)), { size: 32 });
-  if (state.noticed) para(plain(t('reachFact', state.noticed, state.reached)), { size: 32 });
+
+  const sum = currentSummary();
+  heading(t('sumKicker'));
+  para(sum.text);
+  if (sum.ai) para(t('sumByAi'), { size: 26, color: grey });
 
   // 一天一段：那天發生什麼、那天的選擇、注意到的人、日記；週六（運動會）是結局，只有發生什麼
   // 「你會怎麼做？」這類通用的問題不列出來（上面已經寫了那天發生什麼）；日記只列出有寫的題目
@@ -1461,8 +1495,6 @@ function resetProgress() {
   state.courage = START_COURAGE;
   state.witness = 0;
   state.kind = 0;
-  state.noticed = 0;
-  state.reached = 0;
   state.flags = {};
   state.days = [];
   state.day = null;
@@ -1470,6 +1502,8 @@ function resetProgress() {
   state.diary = [];
   state.picks = [];
   state.thinkFirst = null;
+  state.summary = null;
+  state.summaryJob = null;
   state.history = [];
   state.back = null;
   state.anim = null;
@@ -1495,6 +1529,7 @@ function startStory(id) {
     steps.push(s);
   });
   state.steps = [...steps, { k: 'diary' }, { k: 'ending' }].map((s) => ({ ...s }));
+  wakeAI();
   run();
 }
 

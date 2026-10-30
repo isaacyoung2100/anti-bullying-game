@@ -784,6 +784,18 @@ button { cursor: pointer; }
 .facts .num { font-size: calc(8.6 * var(--u)); color: var(--red-pen); margin-right: calc(1 * var(--u)); }
 .facts .quiet { color: var(--ink-soft); font-size: calc(4.2 * var(--u)); }
 
+/* 這週的你：一張白色便條 */
+.summary {
+  margin: calc(2 * var(--u)) 0 calc(4 * var(--u));
+  padding: calc(2.4 * var(--u)) calc(3.6 * var(--u));
+  background: #ffffff;
+  border: calc(0.45 * var(--u)) solid var(--ink);
+  border-radius: var(--hand-border);
+}
+.summary p { margin: 0; }
+.summary .loading { color: var(--ink-soft); }
+.summary .ai-note { margin-top: calc(1.6 * var(--u)); font-size: calc(3.4 * var(--u)); color: var(--ink-soft); }
+
 /* 換你想一想 */
 .pick-col {
   display: flex;

@@ -5,7 +5,7 @@
 export const W = 192;
 export const H = 108;
 
-const INK = '#3a3140';
+export const INK = '#3a3140';
 const PAPER = '#fbf7ee';
 
 // ---------- 手繪工具 ----------
