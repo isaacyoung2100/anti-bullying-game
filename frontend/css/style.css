@@ -794,7 +794,6 @@ button { cursor: pointer; }
 }
 .summary p { margin: 0; }
 .summary .loading { color: var(--ink-soft); }
-.summary .ai-note { margin-top: calc(1.6 * var(--u)); font-size: calc(3.4 * var(--u)); color: var(--ink-soft); }
 
 /* 換你想一想 */
 .pick-col {

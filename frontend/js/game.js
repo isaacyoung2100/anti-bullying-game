@@ -952,7 +952,7 @@ function stepReflect() {
   card.querySelector('#go').onclick = next;
   const fill = (s) => {
     state.summary = s;
-    card.querySelector('#summary').innerHTML = `<p>${esc(s.text)}</p>${s.ai ? `<p class="ai-note">${t('sumByAi')}</p>` : ''}`;
+    card.querySelector('#summary').innerHTML = `<p>${esc(s.text)}</p>`;
   };
   if (state.summary) return fill(state.summary);
   const job = state.summaryJob;

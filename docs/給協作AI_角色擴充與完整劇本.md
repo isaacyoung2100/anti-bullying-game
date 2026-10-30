@@ -317,7 +317,7 @@
 ### 技術架構
 
 - 前端：HTML、CSS、JavaScript 模組，遊戲在學生的瀏覽器裡跑，不收集資料。
-- AI 總結的後端（選用）：Python FastAPI 放在 Hugging Face Spaces，呼叫 Gemini；只收到這週的選擇（劇本裡的句子），不保存。沒有後端也能玩。
+- AI 總結的後端（選用）：Python FastAPI 部署在 Vercel，呼叫 Gemini；只收到這週的選擇（劇本裡的句子），不保存。沒有後端也能玩。
 - 美術全部用程式繪製，沒有圖片檔：場景和角色用 canvas 畫成色鉛筆塗鴉（線條加上固定種子的抖動、斜線筆觸上色），背景畫好後快取；介面的紙張、紙膠帶、印章都是 CSS。
 - 劇本以資料形式寫在 `frontend/js/stories/`，一個角色一個檔案；這份文件由劇本檔自動產生。
 - 內容管線：劇本資料 → `npm test`（格式驗證、窮舉路徑與設計原則檢查）→ `npm run docs`（產生這份文件）→ `npm run build`（單檔版）。
