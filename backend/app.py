@@ -1,4 +1,4 @@
-"""「這週的你」AI 總結的後端（FastAPI，放在 Hugging Face Spaces）
+"""「這週的你」AI 總結的後端（FastAPI，部署在 Vercel）
 
 遊戲在學生的瀏覽器裡跑；只有到反思頁時，瀏覽器會把「這週的事實」送到這裡，
 這裡加上寫作規則、用藏起來的金鑰請 Gemini 寫幾句話，檢查過再送回去。
@@ -22,7 +22,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-# ---------- 設定（都可以用 Hugging Face 的 Variables / Secrets 改） ----------
+# ---------- 設定（都可以用 Vercel 的 Environment Variables 改） ----------
 
 API_KEY = os.environ.get("GEMINI_API_KEY", "")
 # 預設用 Google 會自動指向最新版的別名；免費方案能用哪些模型會變，必要時在 Variables 改 MODEL
@@ -174,7 +174,7 @@ def allow(ip: str) -> bool:
 
 
 def client_ip(request: Request) -> str:
-    # Hugging Face 前面有一層代理：真正的來源在 X-Forwarded-For 的第一個
+    # 主機前面有一層代理：真正的來源在 X-Forwarded-For 的第一個
     fwd = request.headers.get("x-forwarded-for", "")
     return fwd.split(",")[0].strip() or (request.client.host if request.client else "?")
 

@@ -1,13 +1,3 @@
----
-title: anti-bullying-game AI summary
-emoji: 📝
-colorFrom: yellow
-colorTo: red
-sdk: docker
-app_port: 7860
-pinned: false
----
-
 # 「這週的你」AI 總結後端
 
 《五年三班大隊接力》的反思頁有一段「這週的你」。遊戲在學生的瀏覽器裡跑，只有到反思頁時，
@@ -37,16 +27,19 @@ pinned: false
 超過 12 秒、AI 寫的內容沒通過檢查（太長、貼標籤、不是中文……），都回傳 503。
 遊戲收到 503 就改用程式依照選擇組出來的總結，學生不會看到錯誤訊息。
 
-## 部署到 Hugging Face Spaces（免費，不用綁卡）
+## 部署到 Vercel（免費的 Hobby 方案）
 
-1. 到 [Google AI Studio](https://aistudio.google.com/) 用 Google 帳號建立一把 API 金鑰（免費方案，不用綁卡）。
-2. 到 Hugging Face 建立一個新的 Space：SDK 選 **Docker**（Blank），Hardware 選免費的 CPU basic。
-3. 把這個資料夾裡的 `README.md`、`Dockerfile`、`requirements.txt`、`app.py` 上傳到 Space（Files → Add file → Upload files）。
-4. Space 的 Settings → **Secrets** 新增 `GEMINI_API_KEY`，貼上金鑰。金鑰不要放進 GitHub。
-5. 等 Space 顯示 Running，打開 `https://<帳號>-<space 名稱>.hf.space/health`，看到 `{"ok":true,"ai":true}` 就好了。
-6. 把這個網址填進遊戲的 `frontend/js/config.js` 的 `AI_URL`，推上 GitHub。
+目前的網址：https://anti-bullying-ai.vercel.app （`/health` 回傳 `{"ok":true,"ai":true}` 就是正常）
 
-可以在 Settings → **Variables** 調整：
+1. 到 [Google AI Studio](https://aistudio.google.com/apikey) 建立一把 API 金鑰，Billing Tier 要是 **Free tier**（不要按 Set up billing）。
+2. 用 GitHub 帳號登入 [Vercel](https://vercel.com/signup)，方案選 **Hobby**。
+3. Add New → Project → Import `anti-bullying-game`：
+   - **Root Directory** 選 `backend`（Vercel 會從 `app.py` 認出 FastAPI）
+   - **Environment Variables** 新增 `GEMINI_API_KEY`，貼上金鑰。金鑰不要放進 GitHub。
+4. 按 Deploy。之後推到 GitHub 的 main，Vercel 會自動重新部署。
+5. 把網址填進遊戲的 `frontend/js/config.js` 的 `AI_URL`。
+
+改了 Environment Variables 之後，要到 Deployments 按 Redeploy 才會生效。可以調整的設定：
 
 | 名稱 | 預設 | 用途 |
 |---|---|---|
@@ -55,6 +48,10 @@ pinned: false
 | `PER_IP` | 5 | 同一個來源每 10 分鐘最多幾次 |
 | `DAILY_LIMIT` | 500 | 全站每天最多幾次 |
 | `TIMEOUT` | 12 | 等 Gemini 最多幾秒 |
+
+Vercel 會同時開好幾份程式，每份各自計算次數，所以上面的次數限制是大約的。Gemini 用的是免費方案，最壞的情況是當天額度用完、遊戲改顯示程式組的總結，不會扣錢。
+
+`Dockerfile` 是給其他能跑 Docker 的主機用的（例如學校的伺服器），Vercel 用不到。原本打算放 Hugging Face Spaces，但它的 Docker Space 現在要付費。
 
 ## 在自己的電腦上試
 

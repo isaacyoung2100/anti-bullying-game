@@ -62,7 +62,7 @@ powershell -ExecutionPolicy Bypass -File tools/sweep/sweep_all.ps1
 - **Render**：新增 Static Site，Publish directory 填 `frontend`，Build command 留空。
 - **GitHub Pages**（目前使用）：`.github/workflows/pages.yml` 會在推送到 main 時先跑 `npm test`，通過後把 `frontend` 資料夾部署上去。
 - **單一檔案（Claude Artifacts 等）**：執行 `python tools/build_artifact.py`，會把整個遊戲打包成 `dist/artifact.html`。
-- **AI 總結的後端（選用）**：`backend/` 是 Python FastAPI，放在 Hugging Face Spaces（免費、不用綁卡），用 Gemini 的免費方案。部署步驟在 `backend/README.md`；部署好後把網址填進 `frontend/js/config.js` 的 `AI_URL`。後端的測試：`pytest backend/test_app.py`。
+- **AI 總結的後端（選用）**：`backend/` 是 Python FastAPI，部署在 Vercel（免費的 Hobby 方案，網址 https://anti-bullying-ai.vercel.app ），用 Gemini 的免費方案。部署步驟在 `backend/README.md`；部署好後把網址填進 `frontend/js/config.js` 的 `AI_URL`。後端的測試：`pytest backend/test_app.py`。
 
 ## 研究資料
 
@@ -80,7 +80,7 @@ frontend/js/game.js      遊戲流程
 frontend/js/i18n.js      中英文切換與介面文字
 frontend/js/summary.js   這週的你：整理事實、程式組的總結、請 AI 後端改寫
 frontend/js/config.js    AI 後端的網址（留空就不用 AI）
-backend/                 AI 總結的後端（FastAPI + Gemini，放在 Hugging Face Spaces）
+backend/                 AI 總結的後端（FastAPI + Gemini，部署在 Vercel）
 frontend/js/lang/        劇本的英文翻譯（key 是中文原文，劇本結構兩種語言共用）
 tools/build_artifact.py  打包成單一 HTML 檔
 tools/simulate.mjs       模擬所有選擇路徑，檢查數值平衡
