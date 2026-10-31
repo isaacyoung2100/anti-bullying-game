@@ -73,6 +73,17 @@ test('每個選擇點都有一個不需要勇氣的選項（例如退縮或保�
   }
 });
 
+test('保護自己：每個角色至少兩個標成 protect 的選項，都不需要勇氣，也不是回嗆', () => {
+  for (const { st } of ALL) {
+    const mine = [];
+    walkSteps(st.story, (s) => {
+      if (s.k === 'choice') mine.push(...s.options.filter((o) => o.protect));
+    });
+    assert.ok(mine.length >= 2, `${st.id} 只有 ${mine.length} 個保護自己的選項`);
+    for (const o of mine) assert.ok(!o.need && o.flag !== 'talkedBack', `${st.id}「${o.text}」不該需要勇氣或是回嗆`);
+  }
+});
+
 test('回嗆：只有阿哲、阿凱、品妤有，選了就演出後果，週五老師會回應', () => {
   for (const { st } of ALL) {
     const talk = [];

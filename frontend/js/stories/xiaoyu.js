@@ -38,7 +38,7 @@ const STORY = [
     effect: { courage: -10, witness: 5 } },
   { speaker: 'class', text: '（後面有人小聲說：「她那件好像穿三年了吧。」）' },
   { k: 'choice', prompt: '你會怎麼做？', options: [
-    { text: '不理志豪，跟佳佳說：「我回家再問問看。」',
+    { text: '不理志豪，跟佳佳說：「我回家再問問看。」', protect: true,
       then: [
         { speaker: 'xiaoyu', emo: 'neutral', text: '我回家再問問看。' },
         { speaker: 'narrator', text: '你沒有看志豪，把眼睛放回黑板上。', inner: '他想看我難過，我偏不讓他看到。' },
@@ -86,7 +86,7 @@ const STORY = [
     { text: '傳一個「哈哈」貼圖，假裝不在意。',
       effect: { courage: -10 },
       then: [{ speaker: 'narrator', emo: 'happy', phone: withMsg(CLASS_GROUP, { me: true, sticker: '😂' }), text: '你傳了一個大笑的貼圖。', inner: '我在笑。為什麼我在笑？' }] },
-    { text: '退出群組，把手機收起來，去陪弟弟玩。',
+    { text: '退出群組，把手機收起來，去陪弟弟玩。', protect: true,
       then: [{ speaker: 'narrator', emo: 'neutral', phone: withMsg(CLASS_GROUP, { system: '你已退出群組' }), text: '你退出群組，把手機收進抽屜，陪弟弟玩積木。', inner: '先離開讓我難受的地方。這不是玻璃心。' }] },
     { text: '把照片截圖下來，等媽媽回家給她看。', need: 40, flag: 'savedProof',
       fear: '截圖了又怎樣？大人會不會說只是開玩笑？',
@@ -160,7 +160,7 @@ const STORY = [
     { text: '假裝在看課本。',
       effect: { courage: -5 },
       then: [{ speaker: 'narrator', emo: 'sad', text: '課本上的字一個都看不進去。', inner: '不要哭。在這裡哭就更丟臉了。' }] },
-    { text: '下課去操場，找冠宇他們一起練跑。',
+    { text: '下課去操場，找冠宇他們一起練跑。', protect: true,
       then: [{ speaker: 'narrator', emo: 'neutral', text: '你在操場跑了兩圈，風吹在臉上，涼涼的。', inner: '邀請卡上沒有我，可是操場上有我。' }] },
     { text: '問佳佳：「我也可以去嗎？」', need: 50,
       fear: '如果她說不行，我會更丟臉。',

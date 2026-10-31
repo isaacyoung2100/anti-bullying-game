@@ -25,7 +25,7 @@ const state = {
   day: null,
   dayStep: null,      // 今天的標題卡（日記用它的引導問題）
   diary: [],          // 每天的日記 [{ day, quad, word, prompts, answers }]
-  picks: [],          // 這週做的選擇，給週記單 [{ day, prompt, text, need, scared }] 或 [{ day, who, text, none }]
+  picks: [],          // 這週做的選擇，給週記單 [{ day, prompt, text, need, scared, protect }] 或 [{ day, who, text, none }]
   thinkFirst: null,   // 「換你想一想」選的那一天和那件小事（分享圖和週記單用）
   sheetWho: '',       // 週記單上的座號或名字（只畫在圖上）
   summary: null,      // 這週的你：{ text, share, ai }（反思頁顯示過的那一段，週記單和分享圖也用它）
@@ -673,7 +673,7 @@ function stepChoice(step) {
       const o = step.options[Number(btn.dataset.n)];
       // 記下選了什麼，也記下是不是害怕還是做了：老師帶討論時，這和選了什麼一樣重要
       const scared = scaredOf(o);
-      state.picks.push({ day: state.day, prompt: step.prompt, text: o.text, need: o.need || 0, scared });
+      state.picks.push({ day: state.day, prompt: step.prompt, text: o.text, need: o.need || 0, scared, protect: !!o.protect });
       if (o.flag) state.flags[o.flag] = true;
       applyEffect(o.effect);
       // 害怕還是去做：先演出心跳很快的樣子，再接原本的劇情

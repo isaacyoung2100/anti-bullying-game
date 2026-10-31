@@ -35,7 +35,7 @@ const STORY = [
     { text: '蹲下來，雙手抱住頭，閉上眼睛。',
       effect: { courage: -5 },
       then: [{ speaker: 'narrator', emo: 'cry', text: '你抱著頭蹲在桌子下面。', inner: '聲音太大、顏色太亂了。我需要安靜……' }] },
-    { text: '閉上眼睛，吸氣數四下，吐氣數四下。',
+    { text: '閉上眼睛，吸氣數四下，吐氣數四下。', protect: true,
       then: [{ speaker: 'narrator', emo: 'neutral', text: '你閉上眼睛，一吸、一吐，數了好幾次。', inner: '心跳慢下來了。等一下，再把筆撿回來。' }] },
     { text: '一邊背甲龍的特徵，一邊把筆撿回來。', need: 45,
       fear: '如果我發出聲音，大家會不會圍過來看？',
@@ -79,7 +79,7 @@ const STORY = [
     { text: '趴在桌上，用外套把頭整個包起來。',
       effect: { courage: -5 },
       then: [{ speaker: 'narrator', emo: 'cry', text: '你縮在外套底下，眼淚一直流。', inner: '好吵，好痛。我想回家……' }] },
-    { text: '走去資源教室的冷靜角。',
+    { text: '走去資源教室的冷靜角。', protect: true,
       then: [
         { speaker: 'narrator', emo: 'neutral', text: '你快步走到資源教室。那裡有軟墊，很安靜。' },
         { speaker: 'narrator', text: '資源班老師遞給你一杯水，讓你坐在軟墊上。', inner: '這是我讓自己好起來的方法。' },

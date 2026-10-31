@@ -31,7 +31,7 @@ export function weekFacts({ story, days, picks, diary }, nameOf, weatherWord) {
         weather: weatherWord(d.courage),
         // 自己取的情緒詞是學生打的字：不送出去
         feel: entry && preset.has(entry.word) ? entry.word : null,
-        chose: mine.filter((p) => !p.who).map((p) => ({ text: tr(p.text), brave: (p.need || 0) > 0, scared: !!p.scared })),
+        chose: mine.filter((p) => !p.who).map((p) => ({ text: tr(p.text), brave: (p.need || 0) > 0, scared: !!p.scared, protect: !!p.protect })),
         noticed: mine.filter((p) => p.who).map((p) => ({ who: nameOf(p.who), text: tr(p.text), did: !p.none })),
       };
     }),
@@ -52,12 +52,16 @@ export function localSummary(f) {
   if (scared) lines.push([1, t('sumScared', scared.day, bare(scared.text))]);
   const brave = chose.find((c) => c.brave && c !== scared);
   if (brave) lines.push([2, t('sumBrave', brave.day, bare(brave.text))]);
+  // 先把自己顧好的選擇也值得說，不然一路保護自己的學生，總結裡像什麼都沒做
+  const protect = chose.find((c) => c.protect);
+  if (protect) lines.push([2, t('sumProtect', protect.day, bare(protect.text))]);
 
   const noticed = f.days.flatMap((d) => d.noticed);
   const did = noticed.filter((n) => n.did);
   const names = (ns) => list([...new Set(ns.map((n) => n.who))]);
   if (did.length) lines.push([0, t('sumReach', names(did), bare(did[0].text))]);
-  else if (noticed.length) lines.push([0, t('sumNoReach', names(noticed))]);
+  // 已經說過「先把自己顧好」，這裡就不再重複
+  else if (noticed.length) lines.push([0, protect ? t('sumNoticed', names(noticed)) : t('sumNoReach', names(noticed))]);
 
   const feels = [...new Set(f.days.map((d) => d.feel).filter(Boolean))];
   if (feels.length) lines.push([4, t('sumFeel', list(feels))]);
@@ -72,7 +76,7 @@ export function localSummary(f) {
   });
 
   const bold = scared || brave;
-  const share = [did.length && t('shareReach', names(did)), bold && t('shareBrave', bare(bold.text)), t('shareFeel')]
+  const share = [did.length && t('shareReach', names(did)), bold && t('shareBrave', bare(bold.text)), protect && t('shareProtect'), t('shareFeel')]
     .find((s) => s && s.length <= LIMITS[f.lang].share);
   return { text: lines.filter((l) => keep.has(l)).map((l) => l[1]).join(t('sentSep')), share, ai: false };
 }

@@ -33,7 +33,7 @@ function playWeek(st, seed) {
       if (s.k === 'choice') {
         // 和遊戲一樣：每個選項都能選；勇氣不夠還是選了，就是 scared
         const o = s.options[rand(s.options.length)];
-        state.picks.push({ day, prompt: s.prompt, text: o.text, need: o.need || 0, scared: (o.need || 0) > courage && !!o.fear });
+        state.picks.push({ day, prompt: s.prompt, text: o.text, need: o.need || 0, scared: (o.need || 0) > courage && !!o.fear, protect: !!o.protect });
         courage = Math.max(0, Math.min(100, courage + (o.effect?.courage || 0)));
         walk(o.then);
         continue;
@@ -89,6 +89,22 @@ for (const lang of ['zh', 'en']) {
     }
   });
 }
+
+test('這週的你：一路都選保護自己的選項，總結會提到那個選擇', () => {
+  for (const lang of ['zh', 'en']) {
+    setLang(lang);
+    for (const st of STORIES) {
+      const state = playWeek(st, 1);
+      const first = state.picks.find((p) => p.protect);
+      if (!first) continue;
+      // 其他需要勇氣的選擇都拿掉，只留下保護自己的
+      state.picks = state.picks.filter((p) => p.who || !p.need);
+      const s = localSummary(weekFacts(state, nameOf(st), weatherWord));
+      assert.ok(s.text.includes(tr(first.text).replace(/[。.]$/, '').slice(0, 6)), `${st.id}（${lang}）沒提到保護自己：${s.text}`);
+    }
+  }
+  setLang('zh');
+});
 
 test('AI 輸出的檢查：擋掉太長、貼標籤、不是中文的內容', () => {
   const ok = { summary: '這週你心裡的天氣，從週一的「下雨」，走到週六的「晴天」。你注意到了小晴。', share: '這週我學會替自己的心情取名字。' };

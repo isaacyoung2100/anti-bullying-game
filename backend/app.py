@@ -45,6 +45,7 @@ class Chose(BaseModel):
     text: Line
     brave: bool = False  # 需要勇氣才選得到的選項
     scared: bool = False  # 勇氣不夠、心裡很害怕，還是選了
+    protect: bool = False  # 不跟人衝突、先把自己顧好的選擇
 
 
 class Noticed(BaseModel):
@@ -77,21 +78,21 @@ class Summary(BaseModel):
 RULES = {
     "zh": """你在一個反霸凌教育遊戲裡，替國小五、六年級的學生寫「這週的你」。
 學生剛扮演 JSON 裡的 role（一個被欺負的孩子），過了運動會前的一個禮拜。
-JSON 是程式整理好的事實：每天心裡的天氣（weather）、學生做的選擇（chose，brave 表示需要勇氣、scared 表示學生當時心裡很害怕還是做了）、注意到別的同學被欺負時做了什麼（noticed，did 表示有做一點什麼）、
+JSON 是程式整理好的事實：每天心裡的天氣（weather）、學生做的選擇（chose，brave 表示需要勇氣、scared 表示學生當時心裡很害怕還是做了，protect 表示先把自己顧好、不跟人衝突的做法）、注意到別的同學被欺負時做了什麼（noticed，did 表示有做一點什麼）、
 日記裡選的情緒詞（feel）。
 
 規則：
 1. 只寫 JSON 裡有的事。不要編造情節、人名、對話或結果。
 2. 用「你」稱呼學生。語氣溫暖、具體，用五年級看得懂的字，繁體中文。
 3. 不打分數、不比較、不貼標籤、不說教；不要說學生不夠勇敢、冷漠，或「你應該」怎樣。
-4. 如果有 scared 的選擇，要肯定他：勇敢不是不害怕，是害怕的時候還是去做。選了退縮的選項也不要責備，那是保護自己的方式。
+4. 如果有 scared 的選擇，要肯定他：勇敢不是不害怕，是害怕的時候還是去做。如果有 protect 的選擇，要說出來並肯定：先把自己顧好也很重要。選了退縮的選項也不要責備，那是保護自己的方式。
 5. 不做診斷，也不評論學生的心理狀態。
 6. summary：3 到 4 句，最多 150 個字。挑一兩個具體的選擇來說，不要逐日流水帳。
 7. share：要給朋友看的一句話，用「我」開頭，最多 30 個字，只說做了什麼，不提難過的細節。""",
     "en": """You write "You this week" for 5th and 6th graders in an anti-bullying education game.
 The student just played the role in the JSON (a child being bullied) through the week before Sports Day.
 The JSON holds facts prepared by the game: each day's weather in their heart (weather), the choices they made
-(chose; brave means it took courage, scared means they were scared and did it anyway),
+(chose; brave means it took courage, scared means they were scared and did it anyway, protect means they took care of themselves without a fight),
 what they did when they noticed other classmates being bullied (noticed; did means they did a little something),
 and the feeling word picked in their diary (feel).
 
@@ -99,7 +100,7 @@ Rules:
 1. Only write about things in the JSON. Do not invent events, names, dialogue, or outcomes.
 2. Speak to the student as "you". Be warm and specific, with words a 5th grader knows.
 3. No scores, comparisons, labels, or lectures; never say they were not brave enough, uncaring, or that they "should" do something.
-4. If a choice is scared, affirm it: being brave doesn't mean not being scared. Never criticize quieter choices; they were ways to protect themselves.
+4. If a choice is scared, affirm it: being brave doesn't mean not being scared. If a choice is protect, mention and affirm it: taking care of yourself first matters too. Never criticize quieter choices; they were ways to protect themselves.
 5. No diagnosis and no comments on their mental state.
 6. summary: 3 to 4 sentences, at most 90 words. Pick one or two concrete choices; do not list every day.
 7. share: one sentence for friends, starting with "I", at most 25 words, about what they did, without sad details.""",

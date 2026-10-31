@@ -12,7 +12,8 @@
 // { speaker, text, inner?, emo?, bg?, chars?, effect? }   一句台詞；inner 是你心裡真正的想法
 // { k: 'day', day, title, bg }                            每天開始的標題卡
 // { k: 'choice', prompt, options: [...] }                 你的選擇
-//   option: { text, need?, fear?, effect?, flag?, then: [步驟...] }   need：需要多少勇氣，不夠時顯示 fear
+//   option: { text, need?, fear?, protect?, effect?, flag?, then: [步驟...] }   need：需要多少勇氣，不夠時顯示 fear
+//     protect：不跟人衝突、先把自己顧好的選項（總結會提到）
 // { k: 'if', flag, then: [步驟...] }                       有某個旗標才會發生
 // effect: { courage, witness, kind }                      勇氣變化、旁觀沉默的人數、善意的次數
 
