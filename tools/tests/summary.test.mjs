@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { STORIES, CHARACTERS } from '../../frontend/js/story.js';
-import { setLang, tr, t } from '../../frontend/js/i18n.js';
+import { setLang, tr, t } from '../../frontend/js/i18n.js?v=dev';
 import { weekFacts, localSummary, checkSummary } from '../../frontend/js/summary.js';
 
 // 和 backend/app.py 的欄位上限一致

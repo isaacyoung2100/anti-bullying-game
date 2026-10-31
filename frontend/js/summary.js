@@ -12,6 +12,11 @@ const bare = (s) => s
   .replace(/「/g, '『').replace(/」/g, '』').replace(/“/g, '‘').replace(/”/g, '’')
   .replace(/[。．.！!？?…，,]+(?=[』’]?$)/, '');
 
+// 列出名字：中文用「、」；英文最後兩個用 and（Xiaoyu, Kai and Qing）
+const list = (xs) => (getLang() === 'en' && xs.length > 1
+  ? `${xs.slice(0, -1).join(', ')} and ${xs.at(-1)}`
+  : xs.join(t('listSep')));
+
 // state：遊戲狀態；nameOf：角色 id 換成名字；weatherWord：能量換成「晴天、下雨」
 export function weekFacts({ story, days, picks, diary }, nameOf, weatherWord) {
   const preset = new Set(Object.values(t('quads')).flatMap((q) => q.words));
@@ -50,12 +55,12 @@ export function localSummary(f) {
 
   const noticed = f.days.flatMap((d) => d.noticed);
   const did = noticed.filter((n) => n.did);
-  const names = (list) => [...new Set(list.map((n) => n.who))].join(t('listSep'));
+  const names = (ns) => list([...new Set(ns.map((n) => n.who))]);
   if (did.length) lines.push([0, t('sumReach', names(did), bare(did[0].text))]);
   else if (noticed.length) lines.push([0, t('sumNoReach', names(noticed))]);
 
   const feels = [...new Set(f.days.map((d) => d.feel).filter(Boolean))];
-  if (feels.length) lines.push([4, t('sumFeel', feels.join(t('listSep')))]);
+  if (feels.length) lines.push([4, t('sumFeel', list(feels))]);
 
   const budget = LIMITS[f.lang].text - 20;
   const keep = new Set();
