@@ -31,7 +31,7 @@ ALLOWED_ORIGINS = os.environ.get(
     "ALLOWED_ORIGINS",
     "https://isaacyoung2100.github.io,http://localhost:8000,http://127.0.0.1:8000",
 ).split(",")
-PER_IP = int(os.environ.get("PER_IP", "5"))            # 同一個來源，每 10 分鐘最多幾次
+PER_IP = int(os.environ.get("PER_IP", "40"))           # 同一個來源，每 10 分鐘最多幾次（一間教室通常共用一個對外網址，要夠一個班）
 DAILY_LIMIT = int(os.environ.get("DAILY_LIMIT", "500"))  # 全站每天最多幾次（低於免費額度）
 TIMEOUT = float(os.environ.get("TIMEOUT", "12"))
 

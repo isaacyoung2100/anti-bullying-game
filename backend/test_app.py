@@ -50,7 +50,8 @@ def test_rejects_long_or_extra_input(client):
     assert client.post("/summary", json=many).status_code == 422
 
 
-def test_rate_limit_per_ip(client):
+def test_rate_limit_per_ip(client, monkeypatch):
+    monkeypatch.setattr(server, "PER_IP", 5)
     codes = [client.post("/summary", json=FACTS, headers={"X-Forwarded-For": "1.2.3.4"}).status_code for _ in range(7)]
     assert codes[: server.PER_IP] == [200] * server.PER_IP
     assert codes[-1] == 503
